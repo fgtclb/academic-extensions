@@ -60,11 +60,10 @@ alternative, "treat `NULL` as one of the two states explicitly".
 
 Rejected: a `NOT NULL DEFAULT 0` column. The schema comparison would turn the
 existing `NULL` rows into a failing `ALTER`: PostgreSQL refuses `SET NOT NULL`
-while `NULL` rows exist, and strict MySQL refuses the `MODIFY`. Upgrade wizards
-run after the comparison, so the rows would need rewriting by a DataHandler
-hook or a manual SQL step before it. That is out of proportion for a filter
-defect, and imports that write the column directly could still write `NULL`
-on databases that were not migrated.
+while `NULL` rows exist, and strict MySQL refuses the `MODIFY`. Every
+installation would have to rewrite those rows before its schema update. That
+is out of proportion for a filter defect, and imports that write the column
+directly could still write `NULL` on databases that were not migrated.
 
 Rejected: a TCA `default => 0` on the field. It only affects records created
 from now on through DataHandler, leaves every existing `NULL` row where it is,

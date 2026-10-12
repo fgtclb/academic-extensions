@@ -516,6 +516,12 @@ filter of the project lists selects by that rule, and a template reads the same
 state from every project as :html:`{project.activeState}`: `active` or
 `completed`, never empty.
 
+A project page whose end date was never stored has no end date either, and is
+active. That is a page created in the page tree, a page switched to the project
+page type, an imported page or one from before the extension was installed,
+as long as no editor has entered an end date. The :guilabel:`Active` filter
+lists it, and the :guilabel:`Completed` filter does not.
+
 ..  _configuration-active-state-badge:
 
 The state on the project cards
@@ -537,12 +543,6 @@ An active project gets :html:`active` instead. That class names the state in
 every language, so a site styles the two states by it. A
 site package with a :file:`Project/Item.html` of its own shows the badge only
 once it takes over that block.
-
-A project whose end date column was never written, a page created before the
-extension was installed or by an import that left the column out, has no end
-date and is active. The :guilabel:`Active` filter does not list it yet, and
-saving the page in the backend does not change that: the column keeps its
-empty value as long as no end date is entered.
 
 ..  _configuration-crop-variants:
 

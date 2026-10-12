@@ -219,6 +219,24 @@ final class AcademicProjectsProjectListPluginTest extends AbstractAcademicProjec
     }
 
     /**
+     * A content element preset to active projects lists the open ended ones, whether the end
+     * date was saved empty (`0`) or was never stored (`NULL`), and leaves out the finished
+     * one. The badge is switched on, so every listed card also shows the state it is listed
+     * for.
+     */
+    #[Test]
+    public function projectListPluginPresetToActiveProjectsListsProjectsWithoutAnEndDate(): void
+    {
+        $this->setUpTestCase('projectListPage_presetToActive');
+
+        $this->assertSame([
+            'Open ended project' => 'active: Active',
+            'Project without an end date value' => 'active: Active',
+            'Running project' => 'active: Active',
+        ], $this->stateBadgesByProjectTitle($this->renderHomePage()));
+    }
+
+    /**
      * Reads the cards of the list: the title of each project, with the state its badge
      * names in its modifier class and the label it shows, or an empty string for a card
      * without a badge.
