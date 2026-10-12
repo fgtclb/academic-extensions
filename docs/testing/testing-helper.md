@@ -261,8 +261,8 @@ $this->assertSame(0, $this->countHeaderElements(
 **The trap it exists for.** `assertStringContainsString()` on the header text
 passes on a header that renders twice, and on an empty `<header></header>` a
 plugin leaves behind next to the heading of the layout. Both were in the job
-plugins in every release since 2.1.0, and the text assertions added later did
-not see them.
+plugins and in the profile editing plugin in every release since 2.1.0, and the
+text assertions added later did not see them.
 
 ---
 

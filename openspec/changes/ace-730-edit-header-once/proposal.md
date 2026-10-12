@@ -29,8 +29,8 @@ with it.
   section in the configuration manual.
 
 Behaviour is the same on TYPO3 v12 and v13. The switch is a TypoScript
-constant on both. Whether TYPO3 v13 gets a site setting as well is a decision
-for the maintainer, see `design.md`.
+constant on both, and there is no site setting for it, as decided in
+`design.md`.
 
 A site whose content element layout renders **no** header loses the plugin
 header on update and switches the constant on. That is what the `Important`
@@ -61,9 +61,10 @@ None.
 ## Non-goals
 
 - `main`. ACE-262 replaced the editor there and its templates render no
-  content element header, so there is nothing to forward-port. Whether the
-  new 2.4 changelog entry is mirrored into the `Changelog/2.4/` folder of
-  `main` is a separate decision, see `design.md`.
+  content element header, so there is nothing to forward-port. The new 2.4
+  changelog entry is mirrored into the `Changelog/2.4/` folder of `main`
+  in a follow-up of its own (ACE-902), with a `Breaking` entry for 3.0, see
+  `design.md`.
 - Changing the content element layout or `lib.contentElement`.
 - The `record` view variable: a TYPO3 v14 requirement of the header partial,
   and this branch has no v14 support.
