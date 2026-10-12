@@ -453,6 +453,13 @@ ddev composer sqlite:backup
 
 Then the same in `core-14`, so both templates of the branch carry it.
 
+The unit suite enforces the rule. `TemplateUpgradeWizardsTest` of
+`packages-dev/dev-site` reads both templates and fails for every registered,
+non-repeatable wizard of the extensions that one of them does not mark as done,
+naming the template, the class and these commands with the identifier filled
+in. See
+[The upgrade wizards of the snapshots](../testing/seed-verification.md#the-upgrade-wizards-of-the-snapshots).
+
 On the seed the wizard is expected to answer that it does not need to make
 changes and is marked as done. A wizard that changes something there is a
 finding about the seed or the wizard, not about the template, and is resolved
@@ -478,7 +485,9 @@ Two kinds of wizard need nothing:
 - A repeatable one, for the reason above.
 - One that is not registered. `MigrateContractPublishToHiddenUpgradeWizard` of
   `academic_persons` carries `#[Exclude]` on purpose, a project registers it
-  itself, so TYPO3 does not know it and a template cannot mark it.
+  itself, so TYPO3 does not know it and a template cannot mark it. Symfony's
+  `#[Exclude]` is the way to keep a wizard out of the container, and with it
+  out of `TemplateUpgradeWizardsTest`.
 
 A [rebuild from nothing](environment.md#rebuilding-an-instance-from-nothing)
 marks every registered wizard as well, and is the right step when the change

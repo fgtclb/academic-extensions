@@ -275,10 +275,10 @@ Test discovery: phpunit globs `packages/*/*/Tests/Unit/`,
 `packages/*/*/Tests/Functional/` **and** `packages-dev/*/Tests/{Unit,Functional}/`
 across everything at once (`Build/phpunit/*.xml`) — there is no per-extension
 test config. `packages-dev/` is in the glob because all three of its packages
-carry tests of their own — the seed definition of `packages-dev/dev-site`, the
-tests of the `runTests.sh -j` scripts, of the DDEV worktree name script, of
-the branch version name script and of the functional test base class in
-`packages-dev/testing-helper`, and the checks
+carry tests of their own: the seed definition and the instance templates of
+`packages-dev/dev-site`, the tests of the `runTests.sh -j` scripts, of the
+DDEV worktree name script, of the branch version name script and of the
+functional test base class in `packages-dev/testing-helper`, and the checks
 in `packages-dev/monorepo-shared` of the `ext_emconf.php` dependency keys, of
 the title and description of every upgrade wizard, of
 the extension name of every translation, of the extension points, of customer

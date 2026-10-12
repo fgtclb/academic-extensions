@@ -5,7 +5,7 @@ database, no site, no request. Everything the subject needs is passed to it or
 stubbed. That makes the suite fast enough to run on every save, and it makes a
 failure point at one class instead of at a stack.
 
-There are 156 unit test classes: 137 across the twelve extensions, three in
+There are 158 unit test classes: 137 across the twelve extensions, five in
 `packages-dev/dev-site`, eleven in `packages-dev/monorepo-shared` and five in
 `packages-dev/testing-helper`. Twelve of them are the one-line version
 compatibility test every extension carries (see
@@ -112,7 +112,7 @@ them follow the shape below.
 
 **Every test class is `final`, declares `strict_types`, and extends
 `TYPO3\TestingFramework\Core\Unit\UnitTestCase`.** There is no local abstract
-unit test case, and no unit test extends another test class. The eighteen below
+unit test case, and no unit test extends another test class. The twenty-one below
 `packages-dev/` are the exception to the base class: they need nothing of
 TYPO3 and extend PHPUnit's `TestCase` directly.
 
