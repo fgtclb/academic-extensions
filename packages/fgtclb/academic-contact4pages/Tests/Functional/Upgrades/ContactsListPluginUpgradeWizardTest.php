@@ -9,8 +9,9 @@ use FGTCLB\AcademicContacts4pages\Upgrades\ContactsListPluginUpgradeWizard;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use TYPO3\CMS\Core\Database\Connection;
-use TYPO3\CMS\Core\Information\Typo3Version;
 use TYPO3\CMS\Core\Registry;
+use TYPO3\CMS\Install\Service\UpgradeWizardsService;
+use TYPO3\CMS\Install\Updates\UpgradeWizardRegistry;
 
 /**
  * The fixture holds content elements of the type version 1.x stored for the page
@@ -104,14 +105,10 @@ final class ContactsListPluginUpgradeWizardTest extends AbstractAcademicContacts
     public function theWizardIsRegisteredUnderItsOwnIdentifier(): void
     {
         $registry = $this->getUpgradeWizardRegistry();
-        $hasUpgradeWizard = [$registry, 'hasUpgradeWizard'];
-        $getUpgradeWizard = [$registry, 'getUpgradeWizard'];
-        $this->assertIsCallable($hasUpgradeWizard);
-        $this->assertIsCallable($getUpgradeWizard);
 
-        $this->assertTrue($hasUpgradeWizard(self::IDENTIFIER));
-        $this->assertInstanceOf(ContactsListPluginUpgradeWizard::class, $getUpgradeWizard(self::IDENTIFIER));
-        $this->assertFalse($hasUpgradeWizard(self::PREVIOUS_IDENTIFIER));
+        $this->assertTrue($registry->hasUpgradeWizard(self::IDENTIFIER));
+        $this->assertInstanceOf(ContactsListPluginUpgradeWizard::class, $registry->getUpgradeWizard(self::IDENTIFIER));
+        $this->assertFalse($registry->hasUpgradeWizard(self::PREVIOUS_IDENTIFIER));
     }
 
     /**
@@ -124,14 +121,13 @@ final class ContactsListPluginUpgradeWizardTest extends AbstractAcademicContacts
         $registry = $this->get(Registry::class);
         $this->assertInstanceOf(Registry::class, $registry);
         $registry->set('installUpdate', self::PREVIOUS_CLASS_NAME, 1);
-        $isWizardDone = [$this->getUpgradeWizardsService(), 'isWizardDone'];
-        $this->assertIsCallable($isWizardDone);
+        $upgradeWizardsService = $this->getUpgradeWizardsService();
 
-        $this->assertFalse($isWizardDone(self::IDENTIFIER));
+        $this->assertFalse($upgradeWizardsService->isWizardDone(self::IDENTIFIER));
 
         // The lookup itself works: marking this wizard done is seen.
         $registry->set('installUpdate', ContactsListPluginUpgradeWizard::class, 1);
-        $this->assertTrue($isWizardDone(self::IDENTIFIER));
+        $this->assertTrue($upgradeWizardsService->isWizardDone(self::IDENTIFIER));
     }
 
     /**
@@ -168,26 +164,17 @@ final class ContactsListPluginUpgradeWizardTest extends AbstractAcademicContacts
         return $subject;
     }
 
-    /**
-     * The registry and the service moved from EXT:install to EXT:core in TYPO3
-     * v14, and neither version has the other's class. Only the place to ask
-     * differs.
-     */
-    private function getUpgradeWizardRegistry(): object
+    private function getUpgradeWizardRegistry(): UpgradeWizardRegistry
     {
-        $registry = $this->get((new Typo3Version())->getMajorVersion() >= 14
-            ? 'TYPO3\\CMS\\Core\\Upgrades\\UpgradeWizardRegistry'
-            : 'TYPO3\\CMS\\Install\\Updates\\UpgradeWizardRegistry');
-        $this->assertIsObject($registry);
+        $registry = $this->get(UpgradeWizardRegistry::class);
+        $this->assertInstanceOf(UpgradeWizardRegistry::class, $registry);
         return $registry;
     }
 
-    private function getUpgradeWizardsService(): object
+    private function getUpgradeWizardsService(): UpgradeWizardsService
     {
-        $service = $this->get((new Typo3Version())->getMajorVersion() >= 14
-            ? 'TYPO3\\CMS\\Core\\Service\\UpgradeWizardsService'
-            : 'TYPO3\\CMS\\Install\\Service\\UpgradeWizardsService');
-        $this->assertIsObject($service);
+        $service = $this->get(UpgradeWizardsService::class);
+        $this->assertInstanceOf(UpgradeWizardsService::class, $service);
         return $service;
     }
 }
