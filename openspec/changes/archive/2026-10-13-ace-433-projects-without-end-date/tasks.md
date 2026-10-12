@@ -47,8 +47,8 @@
 - [x] 4.3 `lintMarkdown -n` and `checkRstRenderingAll` green.
 - [x] 4.4 `docs/` and the `Documentation/Changelog/2.4/` entry are part of the
   change, `README.md` and `CONTRIBUTING.md` still only summarize and link.
-- [ ] 4.5 Commit as `[BUGFIX] ACE-433: Treat a NULL end date as active`, body
+- [x] 4.5 Commit as `[BUGFIX] ACE-433: Treat a NULL end date as active`, body
   wrapped at 72, footer `Resolves: ACE-433`, no attribution of any kind.
-- [ ] 4.6 Archive the change as the last commit of the same pull request and
+- [x] 4.6 Archive the change as the last commit of the same pull request and
   verify the added requirement landed in
   `openspec/specs/academic-projects/list-filter/spec.md`.
