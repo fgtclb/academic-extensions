@@ -81,7 +81,9 @@ Recommended: option 1. The extension declares no site setting today, and on
 `main` the editor of 3.0 renders no header of its own and has no switch
 (ACE-262), so a site setting declared for 2.4.0 would be declared for one
 minor version and then disappear, while a constant that nothing reads any
-more is harmless. Confirm with the maintainer before writing code.
+more is harmless.
+
+Decided on 2026-10-12: option 1, the constant only.
 
 ### An undefined `styles.content.defaultHeaderType`
 
@@ -142,6 +144,25 @@ on `main`. Either the entry here names the section without a `:ref:`, or the
 mirror on `main` replaces the link by text and the folders differ in that
 line.
 
+Decided on 2026-10-12: mirror it after the merge, and write the entry here
+without a `:ref:`, so the mirror is a plain copy and the folders stay byte
+identical. The entry names the manual section in words. The follow-up on
+`main` adds a `Breaking` entry to `Changelog/3.0/` as well: a 2.4 site that
+switches the header on loses it on the update to 3.0, whose editor renders no
+header and reads no such constant.
+
+## Verified
+
+Against the unchanged layout, on TYPO3 v12 and v13 alike, the new test class
+failed in six of its twelve cases: header layout 2 counted the heading twice
+with the switch off, header layout "Default" left a `<header>` inside the
+plugin wrapper, and with the switch on header layout "Default" rendered no
+heading, on the profile list and on the view of the profile each. With the
+change, all twelve pass. Without the `defaultHeaderType` line in the setup,
+the two switched on "Default" cases fail on both versions, and nothing else.
+The "Hidden" cases pass before and after, they guard the layout that shows no
+header.
+
 ## Risks / Trade-offs
 
 - [A site whose content element layout renders no header loses the profile
@@ -151,6 +172,6 @@ line.
   -> The `Important` entry names the copied layout and shows the condition to
   wrap the line in.
 - [A site that switches the constant on keeps no header of its own on 3.0,
-  where the editor renders none] -> Out of scope here. The 3.0 editor is a
-  replacement documented on `main`, and its layout question is the one any
-  other content element has.
+  where the editor renders none] -> Not part of this change. The follow-up
+  ACE-902 on `main` documents it in a `Breaking` entry for 3.0, with the
+  two ways to render the header there.

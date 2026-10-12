@@ -98,11 +98,11 @@ its own and which includes no TypoScript of EXT:fluid_styled_content.
 TypoScript has no fallback for an undefined constant, so a site in that
 position that switches the header on sets the plugin setting itself.
 
-`academic_jobs` and `academic_bite_jobs` render the header this way. The other
-plugins render none of their own, with one exception on this branch: the
-`ProfileEdit` layout of `academic_persons_edit` renders `Header/All`
-unconditionally, so the profile editing plugin shows the double header too.
-`main` replaced that editor (ACE-262); here it waits for a change of its own.
+`academic_jobs`, `academic_bite_jobs` and `academic_persons_edit` render the
+header this way, the last one in its `ProfileEdit` layout, which every view of
+the profile editing plugin uses (ACE-730). The other plugins render none of
+their own. `main` replaced that editor (ACE-262), and the editor there renders
+no header and has no switch.
 
 A test of a plugin header counts the headings in the DOM through
 `ContentElementHeaderAssertionTrait` of the
