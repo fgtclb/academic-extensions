@@ -753,6 +753,43 @@ table, and executes the renames `SchemaMigrator::getUpdateSuggestions()`
 suggests for removal, as the Install Tool does. The renames stay in the
 database of the test case class, so such a class holds one test.
 
+## A column can hold `NULL` although its field is not `nullable`
+
+A column declared `DEFAULT NULL` in `ext_tables.sql` holds `NULL` in every row
+that was written without a value for it, even when its TCA field is not
+`nullable`. Two places in DataHandler keep it that way, read in
+`typo3/cms-core/Classes/DataHandling/DataHandler.php` of TYPO3 13.4.36 and
+14.3.8:
+
+- `newFieldArray()` (v13 `:8239`, v14 `:8261`) presets a field of a new record
+  only from its TCA `default` or from `TCAdefaults` in user or page TSconfig.
+  Without either, a record created by a datamap that does not carry the field
+  stores the column default. For a page, that is one created in the page tree,
+  one created as another page type and switched later, or an import.
+- `compareFieldArrayWithCurrentAndUnset()` (v13 `:8326`, v14 `:8401`) compares
+  the submitted value of a field that is not `nullable` with the stored one as
+  integers. An empty input and `NULL` are both `0`, so the field is dropped as
+  unchanged, and a backend save without a value keeps `NULL`.
+
+A filter on such a column therefore names `NULL` itself. SQL compares `NULL`
+with anything as unknown, so `end_date = 0 OR end_date > :now` leaves out every
+row that holds `NULL`, on every DBMS. In an Extbase query,
+`$query->equals('property', null)` renders `IS NULL`
+(`Typo3DbQueryParser::parseDynamicOperand()`, v13 `:425-427`, v14
+`:404-406`), and the value does not pass through the date mapping first.
+
+The project end date of `academic_projects` is the case that reached a release
+(ACE-433): `ProjectRepository::findByDemand()` lists a project without a stored
+end date as active. Making the column `NOT NULL DEFAULT 0` instead is not a
+schema change alone. PostgreSQL and strict MySQL refuse it while `NULL` rows
+exist, so every installation would have to rewrite those rows before its
+schema update, and an import that writes the column directly could still
+write `NULL`.
+
+A test of such a filter seeds a row with `\NULL` in the CSV fixture next to a
+row with `0`, as `projectsWithEndDates.csv` of `ProjectRepositoryTest` does,
+and runs on PostgreSQL and MariaDB as well as SQLite.
+
 ## Testing this class of defect
 
 Rules 1 and 2 fail in the direction the default test run cannot see: rule 1
@@ -810,6 +847,8 @@ other asserting that the empty result still has the shape a template expects.
 - `packages/fgtclb/academic-jobs/Documentation/Changelog/2.4/Important-JobContactWizardFindsRenamedTable.rst`:
   the ACE-895 changelog entry, for installations that let the analyzer rename
   the old contact table first.
+- `packages/fgtclb/academic-projects/Documentation/Changelog/3.0/Important-ProjectsWithoutEndDateAreActive.rst`:
+  the ACE-433 changelog entry, for project pages without a stored end date.
 - `.Build/vendor/typo3/cms-core/Classes/Database/Query/QueryBuilder.php` and
   `.../Query/Expression/ExpressionBuilder.php` — the authoritative source for
   both mechanisms; read the installed version, not the documentation of another.

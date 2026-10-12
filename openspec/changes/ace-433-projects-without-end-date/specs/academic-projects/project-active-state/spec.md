@@ -4,9 +4,12 @@
 Every project that the list filter "Active" shows SHALL be in the state
 active, and every project that the list filter "Completed" shows SHALL be in
 the state completed. Every project in the state active SHALL be listed by the
-"Active" filter, and every project in the state completed SHALL be listed by
-the "Completed" filter, whether its end date was saved empty or was never
-stored at all. This applies to TYPO3 v13 and v14 alike.
+"Active" filter, whether it has an end date still ahead, an end date saved
+empty or no stored end date at all, and every project in the state completed
+SHALL be listed by the "Completed" filter. This holds for an end date as the
+backend stores it, at local midnight. An imported end date with a time of day
+can read as completed on its last day while the "Active" filter still lists
+it. This applies to TYPO3 v13 and v14 alike.
 
 #### Scenario: Filtered list of active projects
 - **WHEN** a visitor filters the project list by "Active"

@@ -35,8 +35,4 @@ A template of a site package that already reads
 :html:`{project.activeState}` rendered nothing so far, and renders `active` or
 `completed` now.
 
-A project whose end date column was never written is active, while the
-:guilabel:`Active` filter does not list it yet. See
-:ref:`configuration-active-state`.
-
 ..  index:: Frontend, FlexForm, Fluid

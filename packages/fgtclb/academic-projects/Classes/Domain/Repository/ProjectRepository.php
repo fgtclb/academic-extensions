@@ -63,9 +63,15 @@ class ProjectRepository extends Repository
 
         $activeState = ActiveState::tryFromDefault($demand->getActiveState());
         if ($activeState === ActiveState::ACTIVE) {
+            // The column is `DEFAULT NULL` and its TCA field has no `default`, so a page
+            // created without the field (in the page tree, as another page type, by an
+            // import) stores `NULL` unless TSconfig sets `TCAdefaults`, and a later backend
+            // save without an end date keeps it. `NULL` compares as unknown, so it is named
+            // on its own: no stored end date means open ended.
             $constraints[] = $query->logicalOr(
                 ...array_values(
                     [
+                        $query->equals('txAcademicprojectsEndDate', null),
                         $query->equals('txAcademicprojectsEndDate', 0),
                         $query->greaterThan('txAcademicprojectsEndDate', new \DateTime()),
                     ]
