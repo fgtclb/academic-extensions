@@ -82,6 +82,25 @@ final class AcademicProjectsProjectListPluginTest extends AbstractAcademicProjec
     }
 
     /**
+     * A content element preset to active projects lists the open ended ones, whether the end
+     * date was saved empty (`0`) or was never stored (`NULL`), and leaves out the finished
+     * one. The card count keeps the check for the missing finished project from passing
+     * on a page that renders no list at all.
+     */
+    #[Test]
+    public function projectListPluginPresetToActiveProjectsListsProjectsWithoutAnEndDate(): void
+    {
+        $this->setUpTestCase('projectListPage_presetToActive');
+
+        $content = $this->renderHomePage();
+        // A card, not the `academic-projects-itemlist` around the cards.
+        $this->assertSame(2, preg_match_all('/class="[^"]*\bacademic-projects-item\b[^"]*"/', $content));
+        $this->assertStringContainsString('Open ended project', $content);
+        $this->assertStringContainsString('Project without an end date value', $content);
+        $this->assertStringNotContainsString('Finished project', $content);
+    }
+
+    /**
      * The short description is rich text and goes through the site's "lib.parseFunc_RTE",
      * so the editor's link to a page reaches the visitor as the page's URL, not as "t3://".
      */

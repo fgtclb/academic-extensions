@@ -12,8 +12,8 @@ Measured on `2` `e4c581602`, TYPO3 12.4.45 and 13.4.36 (`.Build/vendor` after
   `end_date > 0 AND end_date < now`. A `NULL` matches neither.
 - How the column stays `NULL`, the same on both cores:
   `DataHandler::newFieldArray()` (v12 `:8362`, v13 `:8239`) presets only fields
-  with a TCA `default` or a `TCAdefaults` entry in TSconfig, and `compareFieldArrayWithCurrentAndUnset()` (v12
-  `:8467`, v13 `:8326`) compares a field that is not `nullable` as integers
+  with a TCA `default` or a `TCAdefaults` entry in TSconfig, and
+  `compareFieldArrayWithCurrentAndUnset()` (v12 `:8467`, v13 `:8326`) compares a field that is not `nullable` as integers
   through `isSubmittedValueEqualToStoredValue()`, so an empty input equals the
   stored `NULL` and the field is dropped as unchanged.
 - `equals($property, null)` renders `IS NULL` in the Extbase query parser on
