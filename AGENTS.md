@@ -323,14 +323,14 @@ Test discovery: phpunit globs `packages/*/*/Tests/Unit/`,
 `packages/*/*/Tests/Functional/` **and** `packages-dev/*/Tests/{Unit,Functional}/`
 across everything at once (`Build/phpunit/*.xml`) — there is no per-extension
 test config. `packages-dev/` is in the glob for the tests of the development
-seed, of the scripts behind `runTests.sh -j` and of the branch version name
-script, and for the checks that every `ext_emconf.php` names its dependencies
-by extension key, that every upgrade wizard has a title and a description,
-that every translation names its extension without an underscore, that the
-manual links in `guides.xml` lead to the package and its interlink shortcode is
-the composer name, that the branch alias is keyed to composer's name of the
-branch and that the files `bin/set-version` writes are in the form it writes
-them.
+seed and its instance templates, of the scripts behind `runTests.sh -j` and of
+the branch version name script, and for the checks that every `ext_emconf.php`
+names its dependencies by extension key, that every upgrade wizard has a title
+and a description, that every translation names its extension without an
+underscore, that the manual links in `guides.xml` lead to the package and its
+interlink shortcode is the composer name, that the branch alias is keyed to
+composer's name of the branch and that the files `bin/set-version` writes are
+in the form it writes them.
 
 ## CI (`.github/workflows/`)
 

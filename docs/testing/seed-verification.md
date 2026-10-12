@@ -134,6 +134,10 @@ category repository of `category_types` then reads that type in German: no
 German list offered a category filter, and the manifest recorded the defect as
 the expected state (ACE-834).
 
+The fourth unit test of the directory, `TemplateUpgradeWizardsTest`, checks the
+snapshots, see
+[The upgrade wizards of the snapshots](#the-upgrade-wizards-of-the-snapshots).
+
 ## The checks
 
 ### `SeedManifestTest` — the definition against the manifest
@@ -241,6 +245,40 @@ versions 15 and 16.
 `constants.typoscript`, a `setup.typoscript` **or** an `include_static_file.txt`
 — the aggregate folders of the academic extensions hold nothing but the third
 one.
+
+## The upgrade wizards of the snapshots
+
+`TemplateUpgradeWizardsTest`, a unit test in
+[`packages-dev/dev-site/Tests/Unit/`](../../packages-dev/dev-site/Tests/Unit),
+reads every `sqlite-databases/core-*.sqlite` of the branch as a file, read
+only, through PDO, and fails for each upgrade wizard of the extensions that a
+snapshot does not mark as done. TYPO3 records a wizard as done in
+`sys_registry`, as the row `installUpdate` / `<class name>` with the value
+`i:1;`, and `typo3 setup` writes that row only for the wizards of the code a
+snapshot is built from. A wizard added later is offered by every instance
+restored from the snapshot, as if the seed still needed it. Two wizards were
+missed that way before the check existed (ACE-899).
+
+The wizards come from the code, not from a list. Every class the composer
+autoloader maps below `packages/fgtclb/*/Classes/` whose file names
+`UpgradeWizard` is loaded and reflected, so an aliased import or an attribute
+wrapped over several lines is found as well. The match ignores case, as PHP
+does for class names. A candidate file whose class does not match its path
+fails the test rather than being skipped.
+A wizard is a class with the `UpgradeWizard` attribute of TYPO3. One with
+Symfony's `#[Exclude]` is not registered, and one implementing
+`RepeatableInterface` is never marked done, so neither is expected in a
+snapshot. Core and third-party wizards are not checked.
+
+It is a unit test because it needs no TYPO3 instance, and it reads every
+snapshot, not only the one of the installed core, so a run on either core
+version checks both. It also fails when the snapshot of a core version the
+branch supports is missing, and when the discovery finds fewer wizards than the
+branch has, so a broken discovery does not pass with nothing to check.
+
+A failure names the snapshot, the wizard class and the commands that mark it
+done, see
+[When an upgrade wizard is added](../development/environment.md#when-an-upgrade-wizard-is-added).
 
 ## Why the manifest and the snapshot can agree at all
 
