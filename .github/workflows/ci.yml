@@ -474,10 +474,10 @@ jobs:
           overwrite: true
   # One job whose name never changes, so a branch ruleset can require it without
   # pinning the matrix. Every leaf job here carries its core, PHP and DBMS values
-  # in its name — "unit (v13, PHP 8.2)", "functional mysql 8.0 (v14, PHP 8.5)" —
-  # and requiring those by name would move the matrix into a repository setting
-  # that lives outside the branch, where the two maintained branches do not have
-  # the same one.
+  # in its name, for example "unit (v13, PHP 8.2)" or "functional mysql 8.0
+  # (v13, PHP 8.5)", and requiring those by name would move the matrix into a
+  # repository setting that lives outside the branch, where the two maintained
+  # branches do not have the same one.
   #
   # "always()" is what makes it work: without it the job would be skipped as soon
   # as anything it needs fails, and a skipped required check blocks a pull request

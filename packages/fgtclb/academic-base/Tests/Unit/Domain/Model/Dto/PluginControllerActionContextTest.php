@@ -51,9 +51,8 @@ final class PluginControllerActionContextTest extends UnitTestCase
      * A plugin renders in the frontend and in the backend preview alike, and listeners branch on
      * it, so the request type has to survive unaltered.
      *
-     * Only these two are covered: `ApplicationType` is a two case enum on TYPO3 v13 and gains
-     * `INSTALL` in v14, so naming that case here would not compile against the older version
-     * this branch still supports. A plugin context is never built in the install tool anyway.
+     * These two are all there is: `ApplicationType` has no other case on TYPO3 v12 and v13, the
+     * versions this branch supports. A plugin context is never built in the install tool anyway.
      *
      * @return \Generator<string, array{0: int, 1: ApplicationType}>
      */
