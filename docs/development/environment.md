@@ -744,6 +744,59 @@ Two things make this safe rather than a shortcut, and both have to hold:
 If the change adds or removes records, or changes anything structural, rebuild
 instead.
 
+#### When an upgrade wizard is added
+
+`typo3 setup` marks every non-repeatable upgrade wizard that exists at that
+moment as done: one `sys_registry` row in the namespace `installUpdate`, keyed by
+the class name of the wizard, with the value `i:1;`. A wizard that arrives after
+the last rebuild is therefore missing from the templates, and every instance
+restored from them reports it as `AVAILABLE` in `upgrade:list --all`. Once its
+check finds something, the upgrade module offers it in an instance that never
+needed it. That is how `ContactsListPluginUpgradeWizard` (ACE-897) and
+`RepairNewJobFormValuesUpgradeWizard` (ACE-886) ended up missing in both
+templates after the rebuild of ACE-834 (ACE-899).
+
+**A change that adds a non-repeatable upgrade wizard also marks it done in both
+templates of the branch**, in the same change. Non-repeatable means the class
+does not implement `RepeatableInterface`. Renaming the class of a wizard counts
+as adding one, because the registry row names the class: the old row stays and
+marks nothing any more. A template rebuilt or backed up before a rebase lacks
+the wizards the rebase brings in, so run the step again after rebasing such a
+change. In each instance, after a `ddev composer install` that knows the wizard:
+
+```shell
+cd core-12
+ddev composer sqlite:apply
+ddev exec vendor/bin/typo3 upgrade:run <identifier> --no-interaction
+ddev composer sqlite:backup
+```
+
+On the seed the wizard is expected to find nothing to do. `upgrade:run` then
+skips the update, marks the wizard done and says so: `Wizard <identifier> does
+not need to make changes. Marking wizard as done.` If it runs its update
+instead, the seed holds data the wizard migrates, and that is a finding about
+the seed or the wizard, not something to back up.
+
+This is deliberately not a rebuild. A rebuild regenerates every table, while
+the run adds one `sys_registry` row per wizard and moves the `sys_registry`
+entry of `sqlite_sequence`, and nothing else. A comparison of the old and the
+new template, table by table with Python's `sqlite3` module, shows exactly that.
+The seed manifests do not change, because they do not cover `sys_registry`.
+
+Verify it in a freshly restored instance:
+
+```shell
+ddev composer sqlite:apply
+ddev exec vendor/bin/typo3 upgrade:list --all
+```
+
+It lists every wizard of the academic extensions as `DONE`, and every wizard it
+still reports as `AVAILABLE` implements `RepeatableInterface`, which TYPO3 never
+marks done. Which wizards those are changes with the core and the theme, today
+they belong to the core and to `bootstrap_package`. Plain `upgrade:list` is not
+the check: it leaves out every wizard that finds nothing to do, so a wizard
+missing from the templates does not show there.
+
 #### The walk-through
 
 Every command below was run against `core-13/` on this branch; the output quoted

@@ -7,7 +7,7 @@ apart in silence twice in this repository:
 |---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------|
 | [`packages-dev/dev-site/Configuration/DataFactory/`](../../packages-dev/dev-site/Configuration/DataFactory)                                                                     | A human, editing YAML.                                             |
 | [`sqlite-databases/core-12.sqlite`](../../sqlite-databases) and `core-13.sqlite`                                                                                                | A human, importing that YAML into an instance and taking a backup. |
-| [`packages-dev/dev-site/Tests/Functional/Fixtures/SeedManifest-core13.json`](../../packages-dev/dev-site/Tests/Functional/Fixtures/SeedManifest-core13.json) and `-core14.json` | `Build/Scripts/runTests.sh -s seedManifest`.                       |
+| [`packages-dev/dev-site/Tests/Functional/Fixtures/SeedManifest-core12.json`](../../packages-dev/dev-site/Tests/Functional/Fixtures/SeedManifest-core12.json) and `-core13.json` | `Build/Scripts/runTests.sh -s seedManifest`.                       |
 
 Nothing forced the first two to agree. A page added to the definition and never
 re-snapshotted simply was not in the instance a fresh clone came up with, and
@@ -23,7 +23,7 @@ as well as `packages/*/*/Tests/` — see
 
 ## The manifest
 
-`SeedManifest-core13.json` and `SeedManifest-core14.json` hold, per table the
+`SeedManifest-core12.json` and `SeedManifest-core13.json` hold, per table the
 seed writes:
 
 - `rows` — how many rows the import produced;
@@ -33,7 +33,8 @@ seed writes:
 It is **generated from a real import and never counted from the YAML**. The two
 are not the same thing: `DataHandler` writes a `sys_file_reference` row for the
 translation of a page and of a profile that no `references:` entry declares, so
-that table ends up with 86 rows where `config.yml` names 56.
+that table ends up with 54 rows on v12 where `config.yml` names 35, and with 86
+rows on v13 where the `config.yml` of the second set names 56.
 
 Two reductions make the measurement comparable between a functional test
 instance and a development instance:
@@ -61,20 +62,33 @@ manifest is red on the PostgreSQL jobs of the matrix and green everywhere else.
 Regenerate it after any change to the seed, once per core version:
 
 ```bash
+Build/Scripts/runTests.sh -t 12 -p 8.1 -s composerUpdate
+Build/Scripts/runTests.sh -t 12 -p 8.1 -s seedManifest
 Build/Scripts/runTests.sh -t 13 -p 8.2 -s composerUpdate
 Build/Scripts/runTests.sh -t 13 -p 8.2 -s seedManifest
-Build/Scripts/runTests.sh -t 14 -p 8.2 -s composerUpdate
-Build/Scripts/runTests.sh -t 14 -p 8.2 -s seedManifest
 ```
 
-The two runs write two files, and that is not symmetry for its own sake: the two
-cores initialise a column the seed does not name differently. TYPO3 v13 writes
-the schema default into `pages.geocode_status` (`open`) and
-`tt_content.imagewidth` (`0`) where v14 leaves both `NULL` — on 218 and 236 rows
-respectively. Folding that away would mean dropping the two columns from the
-projection, which hides a difference that is real, and the artifact the manifest
-is checked against is per core version anyway. Everything else in the two files
-is identical.
+The two runs write two files, because the two cores import different sets.
+TYPO3 v12 imports `academics-instance`, TYPO3 v13 imports the generated
+`academics-instance-sets` with its `/legacy/` mirror, see
+[Two sets, one of them generated](#two-sets-one-of-them-generated). Both files
+list the same 28 tables with the same columns. Twenty of them are identical in
+both: users and groups, files, categories and the records of the storage
+folders, which the mirror does not repeat. Seven grow on v13 because the mirror
+repeats their rows:
+
+| Table                                            | v12 | v13 |
+|--------------------------------------------------|-----|-----|
+| `pages`                                          | 132 | 246 |
+| `tt_content`                                     | 128 | 256 |
+| `sys_file_reference`                             | 54  | 86  |
+| `tx_academiccontacts4pages_domain_model_contact` | 22  | 44  |
+| `tx_academicpartners_domain_model_partnership`   | 16  | 32  |
+| `tx_academicstudyplan_domain_model_module`       | 48  | 96  |
+| `tx_academicstudyplan_domain_model_semester`     | 16  | 32  |
+
+`sys_template` holds one row on both and differs in its content: on v12 it is
+the root record of the `/` tree, on v13 the one of the `/legacy/` tree.
 
 `seedManifest` is a suite of its own rather than a `--group` on `functional`,
 because a PHPUnit group filter given on the command line *replaces* the one in

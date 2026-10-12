@@ -372,6 +372,12 @@ Rebuilding one from nothing, including the exact `typo3 setup` invocation and
 the two things it leaves behind, is
 [Rebuilding an instance from nothing](environment.md#rebuilding-an-instance-from-nothing).
 
+A change that adds a non-repeatable upgrade wizard marks it done in both
+templates, with `upgrade:run` in an instance restored by `sqlite:apply` and a
+`sqlite:backup` afterwards. Otherwise every instance restored from the templates
+reports the wizard as not done. The commands and how to verify the result are in
+[When an upgrade wizard is added](environment.md#when-an-upgrade-wizard-is-added).
+
 ## See also
 
 - [Development environment](environment.md) — the harness, and the seeding and
