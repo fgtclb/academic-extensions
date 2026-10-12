@@ -125,6 +125,24 @@ render. A test that looks for it compares without case for that reason.
 are deliberately left as they are: their fields declare no items, so there is
 nothing to replace.
 
+## An appended item must not repeat the declared empty value
+
+The declared empty item of a select has a value too, usually `''` or `0`, and
+a handler that builds its items from a configured string can produce the same
+value. `DemandValues` and `RecordTypes` of `academic_persons` read comma
+separated `value=label` lists from the extension configuration. Until
+ACE-438, an emptied option, a trailing comma or two commas in a row added an
+item `''` without a label beside the declared "none" or "undefined" item. For
+the sort and group fields of the persons list the parsed list is also the
+allow list of `ProfileRepository`, so "none" passed it and the list ordered by
+a column without a name, which SQLite, MariaDB and PostgreSQL reject.
+
+`AbstractDemandValues` and `AbstractTypes` split the list with
+`GeneralUtility::trimExplode(',', $value, true)` now and skip an entry whose
+value is empty. The split of an entry by `=` deliberately keeps empty values:
+with `removeEmptyValues`, `=Label` comes back as the single element `Label`,
+which lands in the value position and leaves the label undefined.
+
 ## A `###REC_FIELD_…###` marker needs a value in the row
 
 A `foreign_table_where` can read the record being edited through
