@@ -183,25 +183,44 @@ attribute values and query strings, and four values drawn per request (the CSP
 nonce, a cHash, an error page request id, the login form's request token).
 
 A second test asserts what each page *owes* a visitor: `200`, `403` for the two
-pages the seed puts behind a frontend user group, and `404` for the profile
-detail page. Its plugin ends a request without a profile with the "page not
+pages the seed puts behind a frontend user group, and `404` for the three detail
+pages, the profile detail of the lists, the one of the hidden profiles and the
+job detail. Their plugins end a request without a record with the "page not
 found" handling of the site, on TYPO3 v12 and v13 alike.
 
-The theme is substituted on **both** sides. The `/` tree of a development
-instance is themed by EXT:bootstrap_package and the `/legacy/` tree cannot be —
-see [TypoScript and site sets](../architecture/typoscript-and-site-sets.md) —
-so the test puts the same minimal page object on both, shipped by the seed
-package in the two delivery forms. Everything academic is delivered exactly as
-the seed declares it, through both mechanisms, which is what the comparison is
-about.
+The theme is substituted on **both** sides. Both trees of the `core-13` instance
+are themed by EXT:bootstrap_package 15, the `/` tree through its site set and the
+`/legacy/` tree through its static template, but the functional suite does not
+install the theme. So the test puts the same two things in its place on both
+sides: the minimal page object of the seed package, shipped in the two delivery
+forms, and fluid_styled_content.
 
-> **Skipped on this branch (ACE-468).** It reported 84 of the then 104 page pairs
-> differing here, and the seed is not what is wrong with it: the real `core-13`
-> instance renders both trees correctly. Inside the harness the mirror keeps its
-> page object but loses the plugin definitions of the `Full` aggregates, which
-> points at the nested static include chain and the `addStaticFile()` calls a
-> functional test with a warm TCA cache never executes. The skip carries that
-> reason in its message, so every run says so.
+- The `/` site gets the set `fgtclb/academics-dev-site-page-object` where the
+  committed configuration names `bootstrap-package/full`, and that set depends
+  on `typo3/fluid-styled-content`.
+- In the legacy root `sys_template` record, the test replaces the entry
+  `EXT:bootstrap_package/Configuration/TypoScript` with
+  `EXT:fluid_styled_content/Configuration/TypoScript` after the import, in the
+  same position. It fails instead of comparing when the record no longer names
+  the theme exactly once. The seed and the manifest tests keep the record as
+  the seed declares it.
+
+Everything academic is delivered exactly as the seed declares it, through both
+mechanisms, which is what the comparison is about.
+
+The legacy half is not cosmetic, and its absence kept the class skipped on this
+branch until ACE-468. Extbase registers the TypoScript of every plugin for the
+content rendering, and a `sys_template` tree receives it only right after a
+static template listed in
+`$GLOBALS['TYPO3_CONF_VARS']['FE']['contentRenderingTemplates']`. A site set
+tree receives it without that condition. The definitions of the core content
+elements are that template itself: fluid_styled_content, or in the instance the
+theme, which brings its own. The theme is the only such template the legacy
+record names, so with the theme missing, 86 of 106 page pairs differed, and
+every content element of the legacy tree, `header` and `text` included,
+reported that it has no rendering definition.
+`main` has no substitution on the legacy side, because its legacy record names
+fluid_styled_content itself.
 
 ### `SeedTranslationParentTest`: the translations against their originals
 
