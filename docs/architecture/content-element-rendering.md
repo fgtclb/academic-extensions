@@ -113,8 +113,14 @@ is off, and a site that switches it on either has EXT:fluid_styled_content or
 provides its own `Header/All`.
 
 The editing plugin of `academic_persons_edit` has no switch; its templates
-render no content element header. A test of a plugin header counts the headings
-in the DOM through `ContentElementHeaderAssertionTrait` of the
+render no content element header. Its 2.4 layout rendered one behind the
+constant `plugin.tx_academicpersonsedit.renderContentElementHeader` (ACE-730),
+which nothing reads here, so a site that switched it on loses the header on the
+update. Its `Breaking` changelog entry names the two ways to render it again
+(ACE-902).
+
+A test of a plugin header counts the headings in the DOM through
+`ContentElementHeaderAssertionTrait` of the
 [testing helper](../testing/testing-helper.md), because an assertion that the
 header text appears passes on a header that renders twice.
 
