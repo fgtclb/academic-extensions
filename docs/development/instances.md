@@ -423,6 +423,69 @@ what `SnapshotManifestTest` reports — the two used to drift apart in silence.
 Change the seed and the snapshot in the same change, and regenerate the manifest
 with them: [Seed verification](../testing/seed-verification.md).
 
+### A new upgrade wizard is marked done in the templates
+
+TYPO3 records a non-repeatable upgrade wizard as done in `sys_registry`, one row
+in the namespace `installUpdate` per wizard, keyed by its **class name**.
+`typo3 setup` writes that row for every wizard registered at that moment, so a
+template rebuilt from nothing knows exactly the wizards of the code it was built
+from. A wizard added later is missing from it. So is a wizard that moved to a
+new class under its old identifier, because TYPO3 knows a wizard by its class,
+not by its identifier (ACE-897).
+
+The gap does not show at first. `upgrade:list` and the upgrade module list only
+the wizards that have something to do, and on the seed a wizard usually has
+nothing to do. `upgrade:list --all` reports it as `AVAILABLE`, and whoever looks
+at the instance cannot tell it from a migration the seed still needs. Both
+templates missed two wizards that way (ACE-899). One landed while another change
+rebuilt the templates on its own branch, and that change was rebased over it
+afterwards. The other one moved to a new class.
+
+So **a change that adds a non-repeatable upgrade wizard, or moves one to a new
+class, marks it done in the templates of its branch**, in each instance:
+
+```shell
+cd core-13
+ddev composer sqlite:apply
+ddev exec vendor/bin/typo3 upgrade:run <identifier> --no-interaction
+ddev composer sqlite:backup
+```
+
+Then the same in `core-14`, so both templates of the branch carry it.
+
+On the seed the wizard is expected to answer that it does not need to make
+changes and is marked as done. A wizard that changes something there is a
+finding about the seed or the wizard, not about the template, and is resolved
+before a snapshot is committed.
+
+Prove the result before committing it. Compare the old and the new template
+table by table, every row of every table, as in
+[Verifying the result before committing it](environment.md#verifying-the-result-before-committing-it).
+Only `sys_registry` gains one row per wizard, and `sqlite_sequence` the counter
+of that table. Then restore the new template and list what is still open:
+
+```shell
+ddev composer sqlite:apply
+ddev exec 'COLUMNS=400 vendor/bin/typo3 upgrade:list --all' | grep AVAILABLE
+```
+
+Every wizard left in that list implements `RepeatableInterface`. TYPO3 never
+records a repeatable wizard as done, so those stay, from the core, from
+`bootstrap_package` and from the academic extensions alike.
+
+Two kinds of wizard need nothing:
+
+- A repeatable one, for the reason above.
+- One that is not registered. `MigrateContractPublishToHiddenUpgradeWizard` of
+  `academic_persons` carries `#[Exclude]` on purpose, a project registers it
+  itself, so TYPO3 does not know it and a template cannot mark it.
+
+A [rebuild from nothing](environment.md#rebuilding-an-instance-from-nothing)
+marks every registered wizard as well, and is the right step when the change
+needs a rebuild anyway. It marks only the wizards of the code it was built from,
+though, so a template rebuilt before a rebase lacks what the rebase brought in.
+Run the list above once more after rebasing such a change.
+
 ## See also
 
 - [Development environment](environment.md) — the harness, and the seeding and
