@@ -27,20 +27,18 @@
                             <f:for each="{contacts}" as="contact">
                                 <f:if condition="{contact.role.uid} == {role.uid}">
                                     <div class="col-12 col-md-6 col-lg-4 col-xl-3">
-                                        <div class="ace-item">
-                                            <f:render
-                                                partial="Contacts/Item"
-                                                arguments="{
-                                                    contact: contact,
-                                                    role: role,
-                                                    profile: contact.contract.profile,
-                                                    contract: contact.contract,
-                                                    settings: settings,
-                                                    data: data,
-                                                    grouped: 1
-                                                }"
-                                            />
-                                        </div>
+                                        <f:render
+                                            partial="Contacts/Item"
+                                            arguments="{
+                                                contact: contact,
+                                                role: role,
+                                                profile: contact.contract.profile,
+                                                contract: contact.contract,
+                                                settings: settings,
+                                                data: data,
+                                                grouped: 1
+                                            }"
+                                        />
                                     </div>
                                 </f:if>
                             </f:for>
@@ -53,18 +51,16 @@
                         <div class="row">
                             <f:for each="{contactsWithoutRole}" as="contact">
                                 <div class="col-12 col-md-6 col-lg-4 col-xl-3">
-                                    <div class="ace-item">
-                                        <f:render
-                                            partial="Contacts/Item"
-                                            arguments="{
-                                                contact: contact,
-                                                profile: contact.contract.profile,
-                                                contract: contact.contract,
-                                                settings: settings,
-                                                data: data
-                                            }"
-                                        />
-                                    </div>
+                                    <f:render
+                                        partial="Contacts/Item"
+                                        arguments="{
+                                            contact: contact,
+                                            profile: contact.contract.profile,
+                                            contract: contact.contract,
+                                            settings: settings,
+                                            data: data
+                                        }"
+                                    />
                                 </div>
                             </f:for>
                         </div>
@@ -76,19 +72,17 @@
                     <div class="row">
                         <f:for each="{contacts}" as="contact">
                             <div class="col-12 col-md-6 col-lg-4 col-xl-3">
-                                <div class="ace-item">
-                                    <f:render
-                                        partial="Contacts/Item"
-                                        arguments="{
-                                            contact: contact,
-                                            role: contact.role,
-                                            profile: contact.contract.profile,
-                                            contract: contact.contract,
-                                            settings: settings,
-                                            data: data
-                                        }"
-                                    />
-                                </div>
+                                <f:render
+                                    partial="Contacts/Item"
+                                    arguments="{
+                                        contact: contact,
+                                        role: contact.role,
+                                        profile: contact.contract.profile,
+                                        contract: contact.contract,
+                                        settings: settings,
+                                        data: data
+                                    }"
+                                />
                             </div>
                         </f:for>
                     </div>

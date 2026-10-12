@@ -491,6 +491,8 @@ final class AcademicContacts4PagesListPluginTest extends AbstractAcademicContact
         $this->assertSame(['Dean\'s Office', 'Student Advisors'], $this->roleHeadings($content));
         $this->assertSame(['Müllermann', 'Nebenan', 'Huber', 'Beispiel'], $this->renderedLastNames($content));
         $this->assertSame(0, $this->countRoleParagraphs($content));
+        // The grouped contacts and the one without a role sit directly in their grid column.
+        $this->assertSame(4, $this->countProfileCardsInGridColumns($content));
     }
 
     /**
@@ -518,6 +520,7 @@ final class AcademicContacts4PagesListPluginTest extends AbstractAcademicContact
         $this->assertSame([], $this->roleHeadings($content));
         $this->assertSame(['Müllermann', 'Huber', 'Beispiel', 'Nebenan'], $this->renderedLastNames($content));
         $this->assertSame(4, $this->countProfileCards($content));
+        $this->assertSame(4, $this->countProfileCardsInGridColumns($content));
         // One row for all of them, not one per role.
         $this->assertSame(1, substr_count($content, '<div class="row">'));
         // Not grouped, so every name renders one heading level up, as a role-less contact does.
@@ -537,8 +540,9 @@ final class AcademicContacts4PagesListPluginTest extends AbstractAcademicContact
         $document->loadHTML($this->renderHomePage(), LIBXML_NOERROR);
         $xpath = new \DOMXPath($document);
         $roleOfContact = [];
-        // One grid column per contact, holding the role name and the card.
-        foreach ($this->nodes($xpath, "//div[contains(concat(' ', normalize-space(@class), ' '), ' academic-contacts4pages-list ')]//div[contains(concat(' ', normalize-space(@class), ' '), ' ace-itemlist ')]/div[@class='row']/div/div[contains(concat(' ', normalize-space(@class), ' '), ' ace-item ')]") as $item) {
+        // One grid column per contact, holding the role name and the card. The profile
+        // article is the ace-item, so the role paragraph is a sibling of it in the column.
+        foreach ($this->nodes($xpath, "//div[contains(concat(' ', normalize-space(@class), ' '), ' academic-contacts4pages-list ')]//div[contains(concat(' ', normalize-space(@class), ' '), ' ace-itemlist ')]/div[@class='row']/div[contains(concat(' ', normalize-space(@class), ' '), ' col-12 ')]") as $item) {
             preg_match('#(Müllermann|Huber|Beispiel|Nebenan)#u', $item->textContent, $name);
             $role = $this->nodes($xpath, "./p[contains(concat(' ', normalize-space(@class), ' '), ' ace-role ')]", $item)->item(0);
             $roleOfContact[$name[1] ?? '?'] = $role === null ? null : trim($role->textContent);
@@ -680,6 +684,22 @@ final class AcademicContacts4PagesListPluginTest extends AbstractAcademicContact
         return $this->countNodes(
             new \DOMXPath($document),
             "//article[contains(concat(' ', normalize-space(@class), ' '), ' ace-item ')]",
+        );
+    }
+
+    /**
+     * The cards that sit directly in a grid column of an item list. Every card of the
+     * list does, so a wrapper between the column and the card leaves this count
+     * behind countProfileCards().
+     */
+    private function countProfileCardsInGridColumns(string $content): int
+    {
+        $document = new \DOMDocument();
+        $document->loadHTML($content, LIBXML_NOERROR);
+
+        return $this->countNodes(
+            new \DOMXPath($document),
+            "//div[contains(concat(' ', normalize-space(@class), ' '), ' academic-contacts4pages-list ')]//div[contains(concat(' ', normalize-space(@class), ' '), ' ace-itemlist ')]/div[@class='row']/div[contains(concat(' ', normalize-space(@class), ' '), ' col-12 ')]/article[contains(concat(' ', normalize-space(@class), ' '), ' ace-item ')]",
         );
     }
 

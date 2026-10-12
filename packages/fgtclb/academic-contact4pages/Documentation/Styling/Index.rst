@@ -44,11 +44,9 @@ Every contact is rendered as the profile item of
             <div class="ace-itemlist">
                 <div class="row">
                     <div class="col-12 col-md-6 col-lg-4 col-xl-3">
-                        <div class="ace-item">
-                            <p class="ace-role">Role of the contact</p>
-                            <!-- the profile item of EXT:academic_persons -->
-                            <article class="ace-item">…</article>
-                        </div>
+                        <p class="ace-role">Role of the contact</p>
+                        <!-- the profile item of EXT:academic_persons -->
+                        <article class="ace-item">…</article>
                     </div>
                 </div>
             </div>
@@ -59,12 +57,14 @@ Every contact is rendered as the profile item of
     own. Its `row` starts with the heading of the role, a :html:`<header
     class="ace-header">` around an `ace-title`, before the grid columns. The
     contacts without a role follow in a last `ace-itemlist` without a heading.
-*   A grouped contact does not repeat its role in an `ace-role`.
-*   The profile item inside is built up as described in the chapter
+    A grouped contact does not repeat its role in an `ace-role`.
+*   The profile item is built up as described in the chapter
     `Styling of academic_persons
     <https://docs.typo3.org/p/fgtclb/academic-persons/main/en-us/Styling/Index.html>`__.
-    The outer `ace-item` is the cell of the contact list, the inner
-    :html:`<article class="ace-item">` the profile.
+    The grid column is the cell of the contact list and the
+    :html:`<article class="ace-item">` is the profile. In the list that is not
+    grouped, the role is a :html:`<p class="ace-role">` in that column, in
+    front of the article.
 
 ..  _styling-example:
 
