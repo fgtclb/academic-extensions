@@ -2,8 +2,8 @@
 
 Conventions for classes under `packages/fgtclb/*/Classes/` and
 `packages-dev/*/Classes/`. Where the codebase is inconsistent this page says so
-rather than describing an intention as a rule: 375 PHP files declaring 329
-classes, 11 interfaces, 20 traits and 15 enums do not follow one style yet.
+rather than describing an intention as a rule: 389 PHP files declaring 342
+classes, 11 interfaces, 21 traits and 15 enums do not follow one style yet.
 
 The counts on this page are measured over `packages/fgtclb/*/Classes/` and
 `packages-dev/*/Classes/` together, unless a section says otherwise:
@@ -16,20 +16,20 @@ grep -rhoP '^(?:(?:final|abstract|readonly)\s+)*class\b' --include='*.php' \
 
 ## `final` by default, and where it is impossible
 
-221 of the 329 classes are `final` (67 %). The distribution is not random: it
+235 of the 342 classes are `final` (69 %). The distribution is not random: it
 tracks whether the framework instantiates the class or the container does.
 
 | Directory                                  | final | plain | abstract | % final |
 |--------------------------------------------|-------|-------|----------|---------|
-| `Classes/Upgrades/`                        | 17    | 0     | 0        | 100 %   |
+| `Classes/Upgrades/`                        | 18    | 0     | 0        | 100 %   |
 | `Classes/Service/` and `Classes/Services/` | 32    | 2     | 0        | 94 %    |
-| `Classes/EventListener/`                   | 14    | 1     | 0        | 93 %    |
+| `Classes/EventListener/`                   | 18    | 1     | 0        | 95 %    |
 | `Classes/Controller/`                      | 9     | 0     | 0        | 100 %   |
 | `Classes/Domain/Model/Dto/`                | 8     | 10    | 1        | 42 %    |
 | `Classes/ViewHelpers/`                     | 9     | 6     | 0        | 60 %    |
 | `Classes/Domain/Model/` (excluding `Dto/`) | 1     | 23    | 0        | 4 %     |
 | `Classes/Domain/Repository/`               | 0     | 16    | 0        | 0 %     |
-| Everything else                            | 131   | 44    | 5        | 73 %    |
+| Everything else                            | 140   | 43    | 5        | 74 %    |
 
 Make a new class `final` unless something concrete prevents it. Services are
 replaced through the container, not through inheritance, so extensibility is
@@ -405,7 +405,7 @@ retired core labels. See [Testing helper](../testing/testing-helper.md).
 
 ## Strict types
 
-302 of the 305 files declare `strict_types=1` (99 %) — here counted over
+367 of the 370 files declare `strict_types=1` (99 %), here counted over
 `packages/fgtclb/` only. New files must. Measured with
 `find packages/fgtclb/*/Classes -name '*.php' | wc -l` against
 `grep -rl 'declare(strict_types=1)' --include='*.php' packages/fgtclb/*/Classes | wc -l`;
