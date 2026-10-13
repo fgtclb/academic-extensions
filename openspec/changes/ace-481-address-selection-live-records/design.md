@@ -54,8 +54,9 @@ What core does, identical on both versions unless stated:
   value. No translated uid is substituted.
 - FormEngine: `TcaSelectItems::addData()` adds the `foreign_table` items
   (`AbstractItemProvider::addItemsFromForeignTable()`, with
-  `DeletedRestriction`, `WorkspaceRestriction`, `workspaceOL()` keeping the
-  live uid, no delete placeholders, and the page permission clause
+  `DeletedRestriction`, `WorkspaceRestriction` without move pointers,
+  `workspaceOL()` keeping the live uid, no delete placeholders, and the page
+  permission clause
   `PAGE_SHOW` on the record's page), then runs the `itemsProcFunc`.
   `processSelectFieldValue()` keeps a stored value without `foreign_table`
   only when it is among the items, and with `foreign_table` also when it is a
@@ -85,7 +86,8 @@ latest is 2.3.4. The address tables are versionable on `main` only, since
 **Goals:**
 
 - Every stored selection is a uid that stays valid after publishing.
-- Copy remapping and the reference index from core, not from a hook.
+- The reference index and the relation aware form handling from core. Copy
+  remapping from a hook, see the amendment of decision 1.
 - The same form on v13 and v14.
 
 **Non-Goals:**
@@ -99,7 +101,8 @@ latest is 2.3.4. The address tables are versionable on `main` only, since
 
 The three columns get `foreign_table` (the address table of `academic_persons`)
 and a `foreign_table_where` limited to `{#contract} = ###REC_FIELD_contract###`
-and `{#sys_language_uid} IN (-1, 0)`, ordered by `sorting`, then `uid`. That
+(compared as text, see "Risks") and
+`{#sys_language_uid} IN (-1, 0)`, ordered by `sorting`, then `uid`. That
 gives copy remapping, the reference index and the relation aware value handling
 of FormEngine in one declaration, with no schema change.
 
@@ -113,17 +116,38 @@ ambiguous column on every DBMS, under option A as well, because core still
 runs its own item query before the handler.
 
 Rejected: an `MM` relation or `type` `group`, a schema change and a data
-migration for a single value. Rejected: remapping in a `DataHandler` hook,
-which repeats what core does once the field is declared and still leaves the
-reference index empty.
+migration for a single value.
+
+**Amended after the versioning test (task 2.10), confirmed by the maintainer on
+2026-10-13.** With `foreign_table` alone the first workspace edit of a contract
+made the contact version select the version row of its address, measured on
+13.4.36 and 14.3.9 (the open question below). Each field therefore also names
+its address table in `dontRemapTablesOnCopy`, and the copy is remapped by a
+`DataHandler` hook, `AddressSelectionCopyHook` (`processCmdmap_afterFinish`):
+for every page contact in `copyMappingArray_merged`, a selected uid whose
+address is in the mapping is replaced by the mapped uid when that record is
+neither a version (`t3ver_oid`) nor a translation (`l10n_parent`) of the
+selected one. A translation of a contract translates its addresses in one
+command, and the selection is shared by all languages and holds the default
+language uid. The values are written directly, as core writes its own
+remapping, before the outermost `DataHandler` updates the reference index, so
+the index holds them and an editor without access to the three excluded fields
+gets the copy right. The reference index and the relation aware form handling
+still come from the declaration.
+
+Rejected: letting core remap and repairing the contact versions afterwards,
+which writes a wrong value first and needs its own reference index update.
 
 ### 2. Who builds the items, decision for the maintainer
 
-**Option A, recommended: the items handler stays the source.** With
+**Option A, chosen by the maintainer on 2026-10-13.** With
 `foreign_table` set, core adds its own items first. The handler removes the
 items with a positive value that core added and appends its own list as
-today, now queried with `WorkspaceRestriction` for the editor's workspace,
-overlaid with `workspaceOL()`, without delete placeholders, value the live uid
+today, now queried with `WorkspaceRestriction` for the editor's workspace and
+without move pointers (moving a contract in a workspace turns the versions of
+its addresses into move pointers, which the restriction lets through and core's
+item query leaves out), overlaid with `workspaceOL()`,
+without delete placeholders, value the live uid
 (a record new in the workspace keeps its own). Labels, the hidden marker, the
 inline parent fallback and the event stay as they are, and the editor's page
 permissions do not narrow the list, consistent with the contract select, which
@@ -145,10 +169,11 @@ lies about it.
 
 ### 3. `showIfEmpty` on all three fields, decision for the maintainer
 
-Set `'showIfEmpty' => true`. Without it v14 removes a select whose contract
-has no address of that kind, so "display none" cannot be chosen in advance and
-the form differs from v13. v13 ignores the key. Rejected: accepting the v14
-removal, which makes the two cores show different forms for one record.
+Set `'showIfEmpty' => true`, confirmed by the maintainer on 2026-10-13. Without
+it v14 removes a select whose contract has no address of that kind, so "display
+none" cannot be chosen in advance and the form differs from v13. v13 ignores
+the key. Rejected: accepting the v14 removal, which makes the two cores show
+different forms for one record.
 
 ### 4. No upgrade wizard and no schema change
 
@@ -192,7 +217,12 @@ labels and the event.
 - [The `RelationHandler` keeps a dangling uid as a relation id] → intended:
   the selection stays visible as invalid instead of being lost on save.
 - [PostgreSQL and the `###REC_FIELD_contract###` marker] → `contract` has a
-  default, and the form test of a new contact runs on PostgreSQL as well.
+  default, but the contract select drops a value it has no item for, a
+  contract that is gone or one not saved yet, and the marker becomes `''`,
+  which PostgreSQL rejects for an integer column (measured).
+  The clause therefore compares `CAST(contract AS CHAR(11))`, and a form test
+  of a contact whose contract is gone asserts that no flash message is queued.
+  Core's items are dropped by the handler anyway.
 - [A seed or fixture writes these columns through `DataHandler`] → the seed
   stores `0`, `-1` and uids, which keep their values. `seedManifest` is run
   for both cores and must not change.
@@ -205,7 +235,13 @@ the handler. Stored values are the same either way.
 
 ## Open Questions
 
-- Decision 2, which is confirmed before the first code change.
+None left. Decision 2 is option A. The versioning question below was measured
+red on 13.4.36 and 14.3.9 with `foreign_table` alone and is answered by the
+amendment of decision 1. The same remapping moves the parent pointers of inline
+children that are declared as relations (the `contract` of an address, the
+`profile` of a contract, the `role` and `page` of a page contact) to the
+parent's version row. That is older than this change and tracked as ACE-907.
+
 - Versioning uses the copy mapping, found in review by reading both cores,
   not run. The first workspace edit of a contract, or of a profile with its
   contracts, versions the inline children in the same command
@@ -219,6 +255,5 @@ the handler. Stored values are the same either way.
   relations), which is the defect this change fixes, now produced by core.
   Without `foreign_table` nothing is remapped, which is why it does not
   happen today. `dontRemapTablesOnCopy` with the address tables would stop
-  it, and copy remapping with it. The task 2.10 test settles the premise
-  before decision 1 is implemented, and a red result goes to the maintainer
-  as a change of decision 1, not as a fix inside it.
+  it, and copy remapping with it. Resolved: the task 2.10 test was red, the
+  maintainer chose `dontRemapTablesOnCopy` with a copy hook, see decision 1.
