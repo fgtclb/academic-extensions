@@ -57,7 +57,8 @@ TYPO3 v13 and v14.
 #### Scenario: Contract of a selection edited in a workspace
 - **WHEN** an editor in a workspace edits a contract whose page contact
   selects one of its e-mail addresses, and publishes the workspace
-- **THEN** the published page contact still selects that e-mail address
+- **THEN** the published page contact still selects that e-mail address, and
+  the page shows the contact with it
 
 ### Requirement: A copied contract keeps its contacts' selections on its own addresses
 When a contract is copied together with its addresses and its page contacts,

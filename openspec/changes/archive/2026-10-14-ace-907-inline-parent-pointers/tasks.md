@@ -47,7 +47,7 @@
 
 ## 4. The issue and the commit
 
-- [ ] 4.1 YouTrack ACE-907 (exists, do not file a new one): `In Progress` at
+- [x] 4.1 YouTrack ACE-907 (exists, do not file a new one): `In Progress` at
   the start, `Testing PR` with the pull request, `Done` after the merge.
 - [x] 4.2 The proposal as the first commit, the fix as
   `[BUGFIX] ACE-907: Keep inline children on publish` in TYPO3 Core format,
@@ -62,4 +62,4 @@
 - [x] 5.3 `lintMarkdown -n` and `checkRstRenderingAll` green.
 - [x] 5.4 `docs/` and the `Documentation/Changelog/3.0/` entries are part of
   the change. `README.md` and `CONTRIBUTING.md` still only summarize and link.
-- [ ] 5.5 Archive the change as the last commit of the same pull request.
+- [x] 5.5 Archive the change as the last commit of the same pull request.
