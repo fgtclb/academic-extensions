@@ -22,7 +22,12 @@ variables. `trimExplode()` (`GeneralUtility.php`, v13.4.35 `:822`, v14.3.7
 key 1". `firstName=` ends up labelled `null`, `=First` ends up as the value
 `First`, and `=` raises two warnings and ends up as the key `''` labelled
 `null`. The triage report assumed `=First` yields an empty value. It does not,
-it yields a PHP warning.
+it yields a PHP warning. On PHP 8.5, `=` also raises the deprecation "Using
+null as an array offset", which a unit test under `failOnDeprecation` reports.
+Re-measured on 2026-10-13 against the real classes on both cores: passing
+`removeEmptyValues` to the split by `,` alone removes the empty item, but
+leaves every warning of an entry with an empty side, because the split by `=`
+already passes it and that is what drops the side.
 
 **The allow list accepts the empty value.**
 `ProfileRepository::getOrderingsFromDemand()` (`:668-683`, `2` `:346-361`)
@@ -43,8 +48,11 @@ does with that identifier is not measured, task 2.5 measures it.
 and `ExtensionConfigurationPathDoesNotExistException` since ACE-365 and checks
 `is_string()`, because `get()` returns an array for a path that is a prefix of
 deeper options. On v13 and v14 `get()` restores a missing path from
-`ext_conf_template.txt` before it throws, so it throws only when that cannot be
-written.
+`ext_conf_template.txt` before it throws, so it throws one of the two only for
+an extension or a path the template does not declare. When the settings file
+cannot be written, the restore throws `SettingsWriteException` from
+`ConfigurationManager::writeLocalConfiguration()` instead, which neither class
+catches (found in the review, 2026-10-13).
 
 **The direction is validated only in the repository.** `getOrderingsFromDemand()`
 accepts exactly `asc` and `desc` (`:673`) and skips the sort ordering
@@ -113,8 +121,9 @@ reverted or backported without the other.
 
 Rejected: two pull requests as a stack. Possible, since each commit is green
 alone, but the archive commit then belongs to the top one and the gain over
-one pull request with three commits is small. The implementer may stack them
-if Stefan asks for it.
+one pull request with three commits is small.
+
+Confirmed by Stefan on 2026-10-13: one pull request with three commits.
 
 ### 2. Empty values are dropped in the parser
 
@@ -134,6 +143,10 @@ either.
 Rejected: keeping today's result for `=First` (the value `First`). It came
 with a PHP warning on every read and was never a documented form.
 
+Keeping the empty side also keeps an equals sign at either end of a label:
+`firstName==First` is labelled `=First` and `a=b=` is labelled `b=`, where the
+old split dropped them. The unit tests pin the first.
+
 The empty side of an entry is also item 3 of ACE-434. The change
 `ace-434-coverage-round-leftovers` (pipeline #130, after this one) leaves that
 item to this change and does not plan it again, so the ACE-438 commit names
@@ -147,8 +160,12 @@ every list falls back to the uid order instead of failing the frontend
 rendering. The comment of `AbstractTypes` is reused in substance.
 
 Rejected: letting the exception through so that a broken installation is
-noticed. `get()` already repairs what it can, and what remains is an unwritable
-settings file, which the install tool reports better than a failing list.
+noticed. The two exceptions mean a path the template does not declare, which a
+list should survive like the type selects do.
+
+Not caught: `SettingsWriteException`. An unwritable settings file fails every
+caller of `get()` that needs a restore, in the core as well, and the guard stays
+the one `AbstractTypes` carries.
 
 ### 4. The setter normalises the direction and keeps the previous value
 
@@ -181,9 +198,8 @@ entry, should do. Options:
 - (b) Fall back to the first allowed value in the repository.
 - (c) Fall back to the shipped default `lastName` when it is allowed.
 
-The recommendation keeps this change to the direction. Stefan confirms (a)
-before code is written. If he picks (b) or (c), the spec gains a requirement
-and task 6.2 applies, through `/opsx:update` first.
+The recommendation keeps this change to the direction. Stefan chose (a) on
+2026-10-13, so the spec gains no requirement and task 6.2 does not apply.
 
 ## Risks / Trade-offs
 

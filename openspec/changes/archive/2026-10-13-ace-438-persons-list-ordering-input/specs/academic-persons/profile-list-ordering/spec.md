@@ -75,18 +75,18 @@ without raising a PHP warning.
   `=First name,lastName=Last name`
 - **THEN** the sort select offers "none" and "Last name" only
 
-### Requirement: An unreadable sort or group configuration does not break the list
+### Requirement: An undeclared sort or group configuration does not break the list
 
-When the extension configuration of the allowed sort values or the allowed
-group values cannot be read, the system SHALL treat the list as empty: the
-select offers only "none" and the persons list renders in the order the
-profiles were created, instead of failing with an error.
+When the extension configuration does not declare the allowed sort values or
+the allowed group values, or holds something other than a text for them, the
+system SHALL treat the list as empty: the select offers only "none" and the
+persons list renders in the order the profiles were created, instead of
+failing with an error.
 
-#### Scenario: Configuration path cannot be restored
+#### Scenario: Configuration path is not declared
 
-- **WHEN** the allowed sort values are missing from the stored extension
-  configuration and the system cannot restore them, and a visitor opens a
-  persons list
+- **WHEN** the allowed sort values are read from a path the extension
+  configuration does not declare, and a visitor opens a persons list
 - **THEN** the list renders its profiles in the order they were created
 
 ### Requirement: The sort direction is read in any letter case
