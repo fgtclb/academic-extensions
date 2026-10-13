@@ -227,7 +227,7 @@ a relation, and that changes four things:
   copied contact to a copied address only when that address is neither a
   version nor a translation of the selected one. The parent pointers of
   inline children that are declared as relations run into the same remapping,
-  see ACE-907.
+  see [the next section](#the-pointer-of-an-inline-child-to-its-parent-is-not-remapped).
 - **TYPO3 v14 removes the select when it has no record item.**
   `TcaColumnsRemoveEmptyRelations` (v14.2, core issue #109366) drops a select
   with a `foreign_table` from the form unless one of its items has a positive
@@ -238,6 +238,52 @@ a relation, and that changes four things:
 The reference index writes a row for each selected address, and one with the
 `ref_uid` `-1` for "display none", as it does for the `-1` and `-2` of
 `fe_group`.
+
+## The pointer of an inline child to its parent is not remapped
+
+An inline child points at its parent through its `foreign_field`. Ten of those
+pointers are declared as relations, so that a form or the reference index can
+show them: the `contract` of the e-mail address, phone number and postal
+address tables, the `profile` and `organisational_unit` of a contract and the
+`profile` of the profile information records in `academic_persons`, and the
+`page` and `role` of a page contact and of a partnership in
+`academic_contacts4pages` and `academic_partners`. The `page` ones are a
+`group` with `allowed` `pages`, the others a `select` with the parent table as
+`foreign_table`.
+
+Each of them names its parent table in `dontRemapTablesOnCopy` (ACE-907). The
+first workspace edit of a parent versions its workspace aware inline children
+in the same command, and `remapListedDBRecords()` then rewrites every relation
+of the new versions through the copy mapping, live uid to version uid. Without
+the setting, the child version pointed at the parent's version row, which
+publishing deletes, while every other relation of a version names live uids.
+
+Whether the published child kept that pointer depends on where the workspace
+is published from. The workspace module publishes as a user in the workspace,
+and `version_swap_processFields()` of the workspaces extension then writes the
+live parent into the swapped children once more, through
+`updateInlineForeignFieldSorting()`. `workspace:autopublish`, which publishes a
+workspace on its publish date, runs as a user of the live workspace, and that
+repair does not happen. So the children lost their parent when a workspace was
+published on its date, or by other code publishing from live, and from the
+module as well when a page and the role of its contacts or partnerships were
+edited in the same workspace: the page was lost then. A profile lost its
+contracts, a page its contacts and partnerships. A second edit did not repair
+it, because the child no longer belonged to the live parent.
+
+The setting does not stop the pointer from being written where it has to
+change. `remapListedDBRecords_procInline()` writes it through
+`RelationHandler::writeForeignField()`, which takes the live parent for a
+version, the copied parent for a copy and the translated parent for a
+translation. Measured on 13.4.36 and 14.3.9 with identical results, and the
+tests publish from both places.
+
+Three pointers need nothing: the two of the study plan are `passthrough`, and
+the `contract` of a page contact is a `select` without `foreign_table`, none of
+them is a relation to `DataHandler`. A test per extension uses
+[`InlineParentPointerAssertionTrait`](../testing/testing-helper.md#inlineparentpointerassertiontrait)
+and fails for a new inline relation whose pointer is a relation and does not
+name its parent table.
 
 ## What the page list expansion does besides expanding
 

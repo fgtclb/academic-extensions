@@ -100,6 +100,9 @@ return [
             'config' => [
                 'type' => 'group',
                 'allowed' => 'pages',
+                // The parent of the inline relation. Core must not move the pointer to the
+                // parent's version row when the parent is edited in a workspace (ACE-907).
+                'dontRemapTablesOnCopy' => 'pages',
                 'maxitems' => 1,
                 'minitems' => 1,
                 'size' => 1,
@@ -141,6 +144,9 @@ return [
                     ],
                 ],
                 'foreign_table' => 'tx_academiccontacts4pages_domain_model_role',
+                // The parent of the inline relation. Core must not move the pointer to the
+                // parent's version row when the parent is edited in a workspace (ACE-907).
+                'dontRemapTablesOnCopy' => 'tx_academiccontacts4pages_domain_model_role',
                 'foreign_table_where' => 'AND {#tx_academiccontacts4pages_domain_model_role}.{#sys_language_uid} = 0 ORDER BY tx_academiccontacts4pages_domain_model_role.name ASC',
                 'minitems' => 1,
                 'default' => 0,
