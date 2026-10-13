@@ -2,7 +2,7 @@
 
 Defines what the e-mail address, phone number and postal address selects of a
 page contact offer an editor, what they store, and how a selection behaves
-when records are published, copied or deleted.
+when records are published, copied or translated.
 
 ## ADDED Requirements
 
