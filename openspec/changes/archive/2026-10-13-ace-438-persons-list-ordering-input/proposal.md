@@ -17,8 +17,8 @@ unknown input (ACE-625), so the two lists disagree.
   value.
 - An entry without a label is labelled with its value, and an entry without a
   value is ignored, instead of raising a PHP warning.
-- When the sort or group configuration cannot be read, the list still renders
-  and the backend offers only "none".
+- When the sort or group configuration is not declared or holds no text, the
+  list still renders and the backend offers only "none".
 - A sort direction is accepted in any letter case, and an unknown direction
   keeps the previous one, `asc` by default, so the field ordering stays.
 
