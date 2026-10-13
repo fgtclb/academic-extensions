@@ -1,35 +1,37 @@
 ## 1. Premises
 
-- [ ] 1.1 Re-check the context of design.md on v12 and v13: the two getter
+- [x] 1.1 Re-check the context of design.md on v12 and v13: the two getter
   bodies in both classes, `NullSite` not extending `Site`, the exception code
   1606222812.
 
 ## 2. Site and language
 
-- [ ] 2.1 Add unit tests to
+- [x] 2.1 Add unit tests to
   `academic-base/Tests/Unit/Domain/Model/Dto/PluginControllerActionContextTest.php`:
   the site and the language of the request are returned, a `NullSite` under
   `site` gives `null`, a foreign value (`new \stdClass()`) under `site` and
   under `language` gives `null`, and no attribute gives `null`. Run them on
   the unchanged class and record the `TypeError` of the three foreign value
   cases on v12 and v13 (red).
-- [ ] 2.2 Add a new unit test
+- [x] 2.2 Add a new unit test
   `academic-persons/Tests/Unit/Domain/Model/Dto/PluginControllerActionContextTest.php`
   with the cases of missing and foreign values, and record them red the same
   way. The site and the language the request carries are covered by the
   functional test of the same name.
-- [ ] 2.3 Add the `instanceof` checks to `getSite()` and `getLanguage()` in
+- [x] 2.3 Add the `instanceof` checks to `getSite()` and `getLanguage()` in
   both classes. Show each check is what makes its tests green by removing it
   again, watching the tests fail, and restoring from a backup.
 
 ## 3. Application type
 
-- [ ] 3.1 Add `@throws \RuntimeException` with code 1606222812 and one
-  sentence to `getApplicationType()` of both interfaces. No code change.
+- [x] 3.1 Add `@throws \RuntimeException` with code 1606222812, `@throws
+  \LogicException` with code 1678875015 and one sentence to
+  `getApplicationType()` of both interfaces. No code change. A unit test pins
+  the second exception with the CLI request type.
 
 ## 4. Documentation
 
-- [ ] 4.1 Add `Important-PluginControllerActionContextSiteAndLanguage.rst` to
+- [x] 4.1 Add `Important-PluginControllerActionContextSiteAndLanguage.rst` to
   `Changelog/2.4/` of `academic_base` and of `academic_persons`.
 
 ## 5. Definition of done

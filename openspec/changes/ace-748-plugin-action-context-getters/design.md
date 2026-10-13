@@ -16,9 +16,11 @@ worktree's vendor tree after `composerUpdate` for each.
   title provider hand it over.
 - `NullSite` implements `SiteInterface` and is no `Site`, and
   `ApplicationType::fromRequest()` throws `\RuntimeException` 1606222812
-  without the attribute, on both cores.
+  without the attribute and `\LogicException` 1678875015 for a type that is
+  neither frontend nor backend, on both cores.
 - `ProfileTitleProvider` reads `getLanguage()` and falls back to the backend
-  user's language when it is `null`.
+  user's language when it is `null`, and to English without a logged-in
+  backend user.
 
 ## Goals / Non-Goals
 
