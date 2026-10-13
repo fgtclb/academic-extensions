@@ -300,7 +300,7 @@ A representative selection, all paths relative to `packages/fgtclb/`:
 | `typo3-category-types/Classes/Domain/Repository/CategoryRepository.php`    | 166-169 | `...ToIntegerList()` with `in()`, the ACE-349 fix |
 | `typo3-category-types/Classes/Domain/Repository/CategoryRepository.php`    | 337-340 | `createNamedParameter()` array parameter          |
 | `academic-persons/Classes/Provider/FrontendUserProvider.php`               | 91-94   | `...ToIntegerList()` with `notIn()`               |
-| `academic-contact4pages/Classes/Backend/FormEngine/AddressRecordItems.php` | 158-161 | `...ToIntegerList()` on a literal list            |
+| `academic-contact4pages/Classes/Backend/FormEngine/AddressRecordItems.php` | 171-174 | `...ToIntegerList()` on a literal list            |
 | `academic-projects/Classes/Upgrades/FlexFormUpgradeWizard.php`             | 112-115 | `...ToStringList()` with `in()`                   |
 | `academic-jobs/Classes/Upgrades/PluginUpgradeWizard.php`                   | 64-67   | `...ToStringList()` with `in()`                   |
 

@@ -14,10 +14,14 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * The address record selects hold two markers besides the uid of an address record:
- * {@see Contact::DISPLAY_ALL} and the negative {@see Contact::DISPLAY_NONE}. They are
- * plain values of a select without a `foreign_table`, so they have to survive a backend
- * save unchanged - a dropped `-1` would turn "do not display" back into "display all"
- * without the editor noticing.
+ * {@see Contact::DISPLAY_ALL} and the negative {@see Contact::DISPLAY_NONE}. They have to
+ * survive a backend save unchanged - a dropped `-1` would turn "do not display" back into
+ * "display all" without the editor noticing.
+ *
+ * The selects declare their address table as `foreign_table` (ACE-481), so a save runs
+ * the value through the relation handling of TYPO3: a single table keeps any non-zero
+ * integer as a record id, `-1` included, drops `0`, and the empty result is stored as the
+ * TCA `default`, which is `0` again.
  */
 final class AddressRecordSelectionTest extends AbstractAcademicContacts4PagesTestCase
 {

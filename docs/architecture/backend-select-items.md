@@ -66,8 +66,10 @@ files themselves are split per core version in
 
 This is the trap. `AbstractItemProvider::processSelectFieldValue()` keeps only
 the values that are present in the item list when the field has no
-`foreign_table` — which is every select these handlers serve. What happens next
-depends on the render type:
+`foreign_table`, which is every select these handlers serve except the three
+address selects of a page contact, see
+[below](#the-address-selects-of-a-page-contact-are-relations). What happens
+next depends on the render type:
 
 | Render type                | Value not among the items                                                 |
 |----------------------------|---------------------------------------------------------------------------|
@@ -123,6 +125,11 @@ puts back in the list so the value survives the render. `EmploymentTypeItems`,
 `TypeItems` and `ProfileShowFieldsItems` still merge and are deliberately left
 as they are: their fields declare no items, so there is nothing to replace.
 
+A handler that reads the items it is handed gets each one as a `SelectItem`,
+which implements `ArrayAccess`, on v12 and v13 alike
+(`AbstractItemProvider::resolveItemProcessorFunction()`). `$item['value']`
+works, a parameter typed `array` fails.
+
 ## An appended item must not repeat the declared empty value
 
 The declared empty item of a select has a value too, usually `''` or `0`, and
@@ -151,6 +158,47 @@ SQLite run accepts it without an error. That happens to every column of a new
 record that has no TCA `default`. The profile select of a profile information
 reads `###REC_FIELD_sys_language_uid###` since ACE-842, which is why its
 language column declares `'default' => 0`.
+
+## The address selects of a page contact are relations
+
+The e-mail address, phone number and postal address selects of a page contact
+in `academic_contacts4pages` are served by `AddressRecordItems` and declare the
+address table of `academic_persons` as their `foreign_table` (ACE-481). The
+handler builds the list, the declaration makes TYPO3 treat the stored value as
+a relation, and that changes three things:
+
+- **A value that is not among the items stays in the row.**
+  `processSelectFieldValue()` keeps a relation id even when no item matches,
+  and `addInvalidItemsFromDatabase()` shows it with the "missing label" marker,
+  so a selection whose address belongs to another contract survives a save
+  instead of being written away.
+- **TYPO3 adds items of its own before the handler runs.**
+  `AbstractItemProvider::addItemsFromForeignTable()` queries the table with
+  the `foreign_table_where` and the page permission clause of the editor, which
+  joins `pages`. Every column of the clause therefore names its table, since
+  `pages` has `sys_language_uid`, `sorting` and `uid` as well, and the
+  `ORDER BY` part names them without `{#…}`, because core quotes that part
+  itself: `{#table}.{#sorting}` there becomes one quoted name, the query fails,
+  and the editor gets an error flash message on every form open. The clause
+  compares `CAST(contract AS CHAR(11))` with `###REC_FIELD_contract###`,
+  because the marker becomes `''` when the contract select drops the value, a
+  contract that is gone or one not saved yet, and PostgreSQL rejects `''` for
+  an integer column. The handler drops every record item core added and
+  appends its own list, which is not narrowed by the editor's access to the
+  folder of the person records, just as the contract select is not.
+- **A copy would be remapped by TYPO3, and so would a translation.**
+  `DataHandler::remapListedDBRecords()` rewrites a relation through the copy
+  mapping of the whole command. Translating a contract translates its
+  addresses and its page contacts in one command, and the mapping then holds
+  default language uid to translated uid, so the contact translation would
+  select the translated address. The fields name their table in
+  `dontRemapTablesOnCopy`, and `AddressSelectionCopyHook` remaps a copied
+  contact to a copied address only when that address is no translation of the
+  selected one.
+
+The reference index writes a row for each selected address, and one with the
+`ref_uid` `-1` for "display none", as it does for the `-1` and `-2` of
+`fe_group`.
 
 ## What the page list expansion does besides expanding
 

@@ -61,5 +61,5 @@ None.
 
 ## Source
 
-Backport of `ace-481-address-selection-live-records` on `main`. Analysis:
-the backport section of the ACE-481 prompt. Related: ACE-236, ACE-907.
+Backport of `ace-481-address-selection-live-records` on `main` (ACE-481).
+Related: ACE-236, ACE-907.
