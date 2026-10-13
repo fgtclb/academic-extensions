@@ -125,8 +125,8 @@ The 6 abstract classes and what each is for:
 
 | Class                                                                             | Purpose                                                   |
 |-----------------------------------------------------------------------------------|-----------------------------------------------------------|
-| `academic-persons/Classes/Types/AbstractTypes.php:17`                             | Type lists loaded from extension configuration            |
-| `academic-persons/Classes/DemandValues/AbstractDemandValues.php:17`               | The same pattern for demand and filter value lists        |
+| `academic-persons/Classes/Types/AbstractTypes.php:19`                             | Type lists loaded from extension configuration            |
+| `academic-persons/Classes/DemandValues/AbstractDemandValues.php:19`               | The same pattern for demand and filter value lists        |
 | `academic-persons/Classes/Profile/AbstractProfileFactory.php:28`                  | Shared profile factory state and collaborators            |
 | `academic-persons-edit/Classes/Controller/AbstractActionController.php:43`        | Shared services for the six edit controllers, `@internal` |
 | `academic-persons-edit/Classes/Domain/Validator/AbstractFormDataValidator.php:17` | Extbase validator base pulling `AcademicPersonsSettings`  |
