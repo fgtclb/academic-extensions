@@ -61,6 +61,12 @@ the two MUST render the same partnerships.
 - **WHEN** a partnership is hidden
 - **THEN** it renders in no language
 
+#### Scenario: A visible partnership with a hidden translation
+
+- **WHEN** a visitor views a partner page in a translated language and the
+  translation of one of its partnerships is hidden
+- **THEN** the partnership renders once, as its default language record
+
 ### Requirement: A translated partnership names its role in its language
 
 A partnership that renders as its translation SHALL show its role in the

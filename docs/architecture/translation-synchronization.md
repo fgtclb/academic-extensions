@@ -115,6 +115,44 @@ silently where an Extbase `persistAll()` threw: it collects messages in
 meant to change would otherwise retry the same record on every run — against an
 external service, in the geocoding case.
 
+## Reading the translated records of a page
+
+The page contacts and the partnerships of a page are found through a `page`
+column, not through their `pid`, so the query has to lift
+`respectSysLanguage`, and no Extbase language setting then selects the right
+rows: in a translated language they are the records of that language,
+translations and records of that language only alike, plus the default
+language records without a translation. `ContactRepository::findByPid()` of
+`academic_contacts4pages` and `PartnershipRepository::findByPid()` of
+`academic_partners` therefore resolve one uid per record and language in a
+pre-query, and the Extbase query fetches exactly those uids with the overlay
+pinned to `OVERLAYS_MIXED` (ACE-430, the read side of ACE-484 on `main`).
+The pin replaces the overlay type of the site language, so which records
+render does not depend on its fallback type. A contact translation, and a
+partnership translation attached to the default page, the copies a role
+localization made before ACE-874 included, then render once, as the record in
+its language, without any database cleanup.
+
+The pre-query applies what the Extbase frontend query applies: `deleted`, the
+workspace of the context and `hidden`, the last one unless the plugin option
+of the contacts shows hidden records or the context includes hidden content, as
+a frontend preview of hidden records does. Without the `hidden` filter a hidden
+translation would stand for its visible default record, and the record would
+vanish in that language.
+
+Two things the read side leaves to the core. When a partnership has a copy on
+the default page and a proper translation on the page translation, the copy
+decides its position, while the overlay looks the translation up by its
+default record without an order, so the database decides which of the two
+the object is mapped from. Both carry the partner and the role of their
+default record. And the data mapper of TYPO3 v12 and v13 resolves a relation
+from its identity map by the plain uid (`DataMapper.php:685` on 12.4.45,
+`:742` on 13.4.36), so once an untranslated partnership has loaded its role in
+the default language, every later partnership of the page with that role names
+it in the default language too. The partnership list and teaser group by the
+uid of the role for the same reason, since a translated and an untranslated
+partnership carry their role as two objects.
+
 ## Testing it
 
 The declaration itself needs a DataHandler test, or the TCA line can be removed

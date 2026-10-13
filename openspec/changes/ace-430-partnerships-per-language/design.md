@@ -62,8 +62,8 @@ of the context includes hidden content. For the contacts it is also left out
 when the plugin option shows hidden records, as on `main`. `main`'s
 `ContactRepository` leaves the preview out and therefore hides hidden contacts
 in a preview since ACE-484. Porting that would bring the same regression to
-this branch, so the contacts here follow the preview, and `main` gets a
-follow-up issue. The Extbase part of the contacts stays as this branch has it.
+this branch, so the contacts here follow the preview, and `main` has the
+follow-up ACE-905. The Extbase part of the contacts stays as this branch has it.
 
 Rejected: `HiddenRecordsFetcher` of `main` and folding the hidden translation
 handling of ACE-857 into this change. Out of scope here.
@@ -72,12 +72,19 @@ handling of ACE-857 into this change. Out of scope here.
 
 As on `main`: the templates compare `role.uid`, and `PartnershipRoles`
 collects the roles for the controller and the processor, keeping the role in
-the visitor's language for the heading. Injected into `PartnerController`
-the way the class injects the others.
+the visitor's language for the heading. `PartnerController` is not final on
+this branch, so a site package may extend it and call its constructor. It
+therefore gets the service through a final `injectPartnershipRoles()`, as it
+gets the `FilterTypeResolver`, and its constructor stays as it is
+(`docs/architecture/class-design.md`). The processor has no container
+instance and keeps `GeneralUtility::makeInstance()`.
 
 ### 4. Tests
 
-The tests of `main` are ported. The version pair about the identity map
+The tests of `main` are ported. A visible record with a hidden translation
+on the page is added for both repositories: without the `hidden` filter the
+pre-query would pick the hidden translation and the record would vanish in
+that language. The version pair about the identity map
 becomes one test without a group, since v12 and v13 behave the same. The four
 pinned contact tests are replaced by the language tests of `main`. The preview
 tests build the TypoScript of the simulated request without its constructor,
