@@ -109,6 +109,31 @@ into the items, or the narrowing is a data loss.
 reads the referenced uids out of the row and the repository returns them
 alongside the restricted ones, so their label comes from the same query.
 
+## A handler querying through Extbase states its enable fields
+
+`Typo3QuerySettings::__construct()` switches `ignoreEnableFields` on only when
+`$GLOBALS['TYPO3_REQUEST']` is a backend request, on TYPO3 v13 and v14 alike.
+Outside a frontend request, `Typo3DbQueryParser` then skips
+`BackendUtility::BEenableFields()` entirely, and only the soft delete clause
+remains. Its list `enableFieldsToBeIgnored` is not read on that path, so the
+flag is all or nothing there. A handler that inherits the default therefore
+offers hidden and timed records in the form, but not when it runs without a
+request, from a command or a test. TYPO3 v12 sets the flag only behind the
+deprecated feature toggle `ignoreAllEnableFieldsInBe`, so the same handler
+offered fewer records there.
+
+A handler sets the flag on the settings it builds, so its items no longer
+depend on the request. `PartnerItems` of `academic_partners` offers every
+partner page that is not deleted since ACE-672. The record selects of the core
+apply no enable fields either, only a `DeletedRestriction` and a
+`WorkspaceRestriction`, and for `pages` the page permissions. That keeps a
+stored partner among the items, which the section above requires. Set it in
+the handler, not in the repository method it calls: in a frontend request an
+ignore flag with an empty list drops every enable field, so a shared
+repository method would hand hidden records to a frontend caller.
+`PartnerItemsTest` calls the handler without a request, where the core default
+stays off and only the handler's own flag shows.
+
 ## A handler appends to the declared items
 
 `$parameters['items']` arrives holding the items the field declares itself,
