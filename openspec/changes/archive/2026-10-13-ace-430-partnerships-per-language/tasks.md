@@ -46,4 +46,4 @@
 - [x] 5.4 Commit as `[BUGFIX] ACE-430: Show translated records only once` in
   TYPO3 Core format, footers `Resolves: ACE-430`, `Related: ACE-484`,
   `Related: ACE-874` and `Related: ACE-905`, no attribution of any kind.
-- [ ] 5.5 Archive the change as the last commit of the same pull request.
+- [x] 5.5 Archive the change as the last commit of the same pull request.
