@@ -44,4 +44,4 @@
 - [x] 5.3 `lintMarkdown -n` and `checkRstRenderingAll` green.
 - [x] 5.4 Commit as `[BUGFIX] ACE-481: Make address selections relations` in
   TYPO3 Core format, no attribution of any kind.
-- [ ] 5.5 Archive the change as the last commit of the same pull request.
+- [x] 5.5 Archive the change as the last commit of the same pull request.
