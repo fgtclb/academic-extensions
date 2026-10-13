@@ -59,21 +59,21 @@
 
 ## 5. The issue and the commit
 
-- [ ] 5.1 YouTrack ACE-748 (exists, do not file a new one) to `In Progress`
+- [x] 5.1 YouTrack ACE-748 (exists, do not file a new one) to `In Progress`
   at the start, `Testing PR` with the pull request, `Done` after the merge.
-- [ ] 5.2 Commit as `[BUGFIX] ACE-748: Guard site and language getters`
+- [x] 5.2 Commit as `[BUGFIX] ACE-748: Guard site and language getters`
   (option A, 49 characters) in TYPO3 Core format, body at 72, footer
   `Resolves: ACE-748`, no attribution of any kind. Option B commits as
   `[!!!][BUGFIX] ACE-748: Context getters answer null` (50 characters).
 
 ## 6. Definition of done
 
-- [ ] 6.1 `composerUpdate -t 13`, then `lintPhp`, `cgl -n`, `phpstan`, `unit`
+- [x] 6.1 `composerUpdate -t 13`, then `lintPhp`, `cgl -n`, `phpstan`, `unit`
   and `functional` (SQLite, `-j auto`) for TYPO3 v13. Nothing is written to a
   database, so PostgreSQL and MariaDB runs are not required, say so in the
   pull request.
-- [ ] 6.2 `composerUpdate -t 14`, then the same for TYPO3 v14.
-- [ ] 6.3 `lintMarkdown -n` and `checkRstRenderingAll` green.
-- [ ] 6.4 `docs/` and the `Documentation/Changelog/3.0/` entry are part of
+- [x] 6.2 `composerUpdate -t 14`, then the same for TYPO3 v14.
+- [x] 6.3 `lintMarkdown -n` and `checkRstRenderingAll` green.
+- [x] 6.4 `docs/` and the `Documentation/Changelog/3.0/` entry are part of
   the change. `README.md` and `CONTRIBUTING.md` still only summarize and link.
-- [ ] 6.5 Archive the change as the last commit of the same pull request.
+- [x] 6.5 Archive the change as the last commit of the same pull request.
