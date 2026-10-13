@@ -49,8 +49,8 @@ None.
   deprecated context class of `academic_persons`. The persons interface
   extends the base one and changes with it.
 - The page title provider of `academic_persons` reads the language from the
-  context and falls back to the backend user's language for a foreign value
-  instead of failing.
+  context and falls back to the backend user's language, or English without
+  one, for a foreign value instead of failing.
 - An `Important-` changelog entry in `academic_base` (recommended option), or
   a `Breaking-` entry (alternative). The extension points page of
   `academic_base`, `docs/architecture/list-plugin-events.md`.

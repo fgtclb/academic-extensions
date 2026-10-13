@@ -64,7 +64,11 @@ The plugin name is the one the plugin was **registered** with, not the content
 element type: `List`, `Map`, `ProgramList`, `ProgramFinder`, `ProjectList` or
 `ProjectListSingle`. The settings on the context are the settings of the
 content element that is rendering, so a listener can read a FlexForm field an
-editor filled in.
+editor filled in. Every getter that can lack its value answers `null`, also
+for a foreign value under the attribute's name, such as the `NullSite` of a
+backend request outside any site (ACE-748). `getApplicationType()` is the one
+that raises: TYPO3 throws its own exception for a request without a type it
+can resolve, and only a request built by hand lacks one.
 
 `academic_persons` has a second, older context of its own under
 `FGTCLB\AcademicPersons\Domain\Model\Dto\`, which its page title placeholder

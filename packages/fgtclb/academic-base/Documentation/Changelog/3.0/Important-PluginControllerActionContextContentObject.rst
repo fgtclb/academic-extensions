@@ -19,7 +19,8 @@ attribute. A request that carries a content object, or none, gives the same
 result as before.
 
 :php:`getApplicationType()` is unchanged and still throws when the request
-carries no application type.
+carries no application type. The site and the language getters followed, see
+:ref:`important-plugin-controller-action-context-site-and-language`.
 
 Impact
 ======

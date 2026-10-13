@@ -1,11 +1,11 @@
 ## 1. Decision and premises
 
-- [ ] 1.1 Confirm the application type option with the maintainer (design.md,
+- [x] 1.1 Confirm the application type option with the maintainer (design.md,
   "The application type, decision for the maintainer", A recommended). For
   option B, rewrite the second requirement of the `academic-base` delta with
   `/opsx:update` before any code, and replace task 3.1 by the Breaking entry.
   Verified when the decision is recorded in design.md under "Decisions".
-- [ ] 1.2 Re-check the premises of design.md, "Context", on HEAD for both
+- [x] 1.2 Re-check the premises of design.md, "Context", on HEAD for both
   cores (`.Build/vendor` after `composerUpdate -t 14`, `core-13/vendor`): the
   three getter bodies in both classes, `NullSite` not extending `Site`, the
   exception code 1606222812, no production caller of the application type
@@ -13,43 +13,48 @@
 
 ## 2. Site and language
 
-- [ ] 2.1 Add unit tests to
+- [x] 2.1 Add unit tests to
   `academic-base/Tests/Unit/Domain/Model/Dto/PluginControllerActionContextTest.php`:
   the site and the language of the request are returned, a `NullSite` under
   `site` gives `null`, a foreign value (`new \stdClass()`) under `site` and
   under `language` gives `null`, and no attribute gives `null`. Run them on
   the unchanged class and record the `TypeError` of the three foreign value
   cases (red).
-- [ ] 2.2 Add the same tests for the persons class to
+- [x] 2.2 Add the same tests for the persons class to
   `academic-persons/Tests/Unit/Domain/Model/Dto/PluginControllerActionContextTest.php`
-  and record them red the same way.
-- [ ] 2.3 Add the `instanceof` checks to `getSite()` and `getLanguage()` in
+  and record them red the same way. The site and the language that the
+  request carries are already covered by the functional test of the same
+  name, so they are not repeated there.
+- [x] 2.3 Add the `instanceof` checks to `getSite()` and `getLanguage()` in
   both classes. The tests of 2.1 and 2.2 turn green. Show each check is what
   makes them green by removing it again, watching the test fail, and
   restoring from a backup.
 
 ## 3. Application type (option A)
 
-- [ ] 3.1 Add `@throws \RuntimeException` with code 1606222812 and one
+- [x] 3.1 Add `@throws \RuntimeException` with code 1606222812 and one
   sentence to `getApplicationType()` of the `academic_base` interface, and
   adjust the docblock of the unit test that pins the exception so it points at
   the interface. No code change, the existing test stays green on v13 and v14.
+  The review found core's second exception, `\LogicException` 1678875015 for
+  a type that is neither frontend nor backend: a second `@throws` line, and a
+  unit test that pins it with the CLI request type.
 
 ## 4. Documentation
 
-- [ ] 4.1 Add
+- [x] 4.1 Add
   `academic-base/Documentation/Changelog/3.0/Important-PluginControllerActionContextSiteAndLanguage.rst`
   from `Build/Documentation/Templates/`: both classes answer `null` for a
   foreign site or language value, what a listener saw before. Link it from
   the existing content object entry, whose sentence on the application type
   stays true under option A.
-- [ ] 4.2 Extend the row of the context in
+- [x] 4.2 Extend the row of the context in
   `academic-base/Documentation/Developers/ExtensionPoints/Index.rst` ("What
   an event hands over"): every getter answers with none when the request
   lacks the value, except the application type, which raises for a request
   no TYPO3 application handled. `checkRstRenderingAll` renders it without a
   definition list.
-- [ ] 4.3 Add one sentence to "Every event carries the plugin context" in
+- [x] 4.3 Add one sentence to "Every event carries the plugin context" in
   `docs/architecture/list-plugin-events.md`. `lintMarkdown -n` is green.
 
 ## 5. The issue and the commit
