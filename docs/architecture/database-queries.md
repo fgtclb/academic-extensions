@@ -258,7 +258,7 @@ A representative selection, all paths relative to `packages/fgtclb/`:
 | `typo3-category-types/Classes/Domain/Repository/CategoryRepository.php`                | 297-300 | `...ToIntegerList()` with `in()`, the ACE-349 fix |
 | `typo3-category-types/Classes/Domain/Repository/CategoryRepository.php`                | 468-471 | `createNamedParameter()` array parameter          |
 | `academic-persons/Classes/Provider/FrontendUserProvider.php`                           | 91-94   | `...ToIntegerList()` with `notIn()`               |
-| `academic-contact4pages/Classes/Backend/FormEngine/AddressRecordItems.php`             | 158-161 | `...ToIntegerList()` on a literal list            |
+| `academic-contact4pages/Classes/Backend/FormEngine/AddressRecordItems.php`             | 205-208 | `...ToIntegerList()` on a literal list            |
 | `academic-projects/Classes/Upgrades/FlexFormUpgradeWizard.php`                         | 112-115 | `...ToStringList()` with `in()`                   |
 | `academic-jobs/Classes/Upgrades/PluginUpgradeWizard.php`                               | 71-74   | `...ToStringList()` with `in()`                   |
 | `academic-persons-edit/Classes/Upgrades/RepairLocalizedProfileImagesUpgradeWizard.php` | 338-341 | `...ToIntegerList()` with `in()`                  |

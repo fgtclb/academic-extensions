@@ -53,11 +53,17 @@ TYPO3 v13 and v14.
 - **THEN** the published page contact selects that phone number, and the page
   shows it
 
+#### Scenario: Contract of a selection edited in a workspace
+- **WHEN** an editor in a workspace edits a contract whose page contact
+  selects one of its e-mail addresses, and publishes the workspace
+- **THEN** the published page contact still selects that e-mail address
+
 ### Requirement: A copied contract keeps its contacts' selections on its own addresses
 When a contract is copied together with its addresses and its page contacts,
 directly or as part of a copied profile, each copied page contact SHALL select
 the copy of the address the original selected, on TYPO3 v13 and v14. "Display
-all" and "display none" SHALL be copied unchanged.
+all" and "display none" SHALL be copied unchanged. A translation of the
+contract SHALL keep its page contacts on the default language addresses.
 
 #### Scenario: Contract copied
 - **WHEN** an editor copies a contract with an e-mail address and a page
@@ -70,6 +76,12 @@ all" and "display none" SHALL be copied unchanged.
   selecting a postal address
 - **THEN** the page contact of the copied contract selects the copied postal
   address
+
+#### Scenario: Contract translated
+- **WHEN** an editor translates a contract with its addresses and a page
+  contact that selects one of them
+- **THEN** the translated page contact selects the same default language
+  address as the page contact it translates
 
 ### Requirement: A selected address is known as referenced
 A selected address SHALL be listed as referenced by the page contact that
@@ -102,6 +114,6 @@ is saved without changing that select, on TYPO3 v13 and v14.
 
 #### Scenario: Selected address belongs to another contract
 - **WHEN** an editor opens a page contact whose e-mail selection points at an
-  address of another contract, and saves it after changing only its role
+  address of another contract, and saves it without changing that select
 - **THEN** the form showed the selection as an invalid value, and the stored
   selection is unchanged after the save

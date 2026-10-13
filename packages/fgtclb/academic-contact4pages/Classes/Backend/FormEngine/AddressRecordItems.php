@@ -11,11 +11,16 @@ use FGTCLB\AcademicPersons\Types\PhoneNumberTypes;
 use FGTCLB\AcademicPersons\Types\PhysicalAddressTypes;
 use FGTCLB\AcademicPersons\Types\TypesInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
+use TYPO3\CMS\Backend\Utility\BackendUtility;
+use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\Restriction\DeletedRestriction;
+use TYPO3\CMS\Core\Database\Query\Restriction\WorkspaceRestriction;
 use TYPO3\CMS\Core\Localization\LanguageService;
+use TYPO3\CMS\Core\Schema\Struct\SelectItem;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Core\Versioning\VersionState;
 
 /**
  * `itemsProcFunc` handlers for the dedicated address record selects of a contact record.
@@ -29,6 +34,16 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  * plugin, not here. Deleted records are left out. Only default language records are
  * offered: the selection is shared by all translations of a contact, and the frontend
  * resolves the language overlay itself.
+ *
+ * Each address is offered once, as the workspace of the editor shows it, with the uid of
+ * its live record as the value, the uid a selection keeps after publishing. A record of
+ * another workspace is not offered, nor one deleted in the editor's workspace (ACE-481).
+ *
+ * The fields declare the address table as their `foreign_table`, so core adds items of
+ * its own before the handler runs. Those are replaced by the handler's list: core limits
+ * them to the records on pages the editor may see, while the contract select offers the
+ * contract regardless, and an editor without access to the folder of the person records
+ * would see every selection as invalid.
  *
  * Dispatches {@see ModifyTcaSelectFieldItemsEvent} to allow projects or other extensions
  * to modify the available select items.
@@ -103,6 +118,12 @@ final class AddressRecordItems
     {
         $contractUid = $this->resolveContractUid($parameters);
         if ($contractUid > 0) {
+            // The record items core added from the `foreign_table`. TYPO3 v13 hands the items
+            // over as `SelectItem` objects, v14 as arrays.
+            $parameters['items'] = array_values(array_filter(
+                $parameters['items'],
+                static fn(array|SelectItem $item): bool => (int)($item['value'] ?? 0) <= 0,
+            ));
             foreach ($this->getAddressRecords($tableName, $contractUid) as $addressRecord) {
                 $parameters['items'][] = [
                     'label' => $this->buildLabel($tableName, $addressRecord),
@@ -138,16 +159,42 @@ final class AddressRecordItems
     }
 
     /**
+     * The live records and the records created in the editor's workspace, each overlaid with
+     * its version of that workspace. The overlay keeps the live uid. A move pointer is left
+     * out of the query, as core leaves it out of its own item query: it is the version of a
+     * moved record, which the overlay brings in.
+     *
      * @return array<int, array<string, mixed>>
      */
     private function getAddressRecords(string $tableName, int $contractUid): array
     {
+        $workspaceId = $this->getWorkspaceId();
+        $addressRecords = [];
+        foreach ($this->getLiveAndNewAddressRecords($tableName, $contractUid, $workspaceId) as $addressRecord) {
+            BackendUtility::workspaceOL($tableName, $addressRecord, $workspaceId);
+            if (!is_array($addressRecord)
+                || VersionState::tryFrom((int)($addressRecord['t3ver_state'] ?? 0)) === VersionState::DELETE_PLACEHOLDER
+                || (int)($addressRecord['contract'] ?? 0) !== $contractUid
+            ) {
+                continue;
+            }
+            $addressRecords[] = $addressRecord;
+        }
+
+        return $addressRecords;
+    }
+
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    private function getLiveAndNewAddressRecords(string $tableName, int $contractUid, int $workspaceId): array
+    {
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable($tableName);
         $queryBuilder->getRestrictions()
             ->removeAll()
-            ->add(GeneralUtility::makeInstance(DeletedRestriction::class));
-
-        return $queryBuilder
+            ->add(GeneralUtility::makeInstance(DeletedRestriction::class))
+            ->add(GeneralUtility::makeInstance(WorkspaceRestriction::class, $workspaceId));
+        $queryBuilder
             ->select('*')
             ->from($tableName)
             ->where(
@@ -159,7 +206,17 @@ final class AddressRecordItems
                     'sys_language_uid',
                     $queryBuilder->quoteArrayBasedValueListToIntegerList([-1, 0])
                 ),
-            )
+            );
+        if ($workspaceId > 0) {
+            $queryBuilder->andWhere(
+                $queryBuilder->expr()->neq(
+                    't3ver_state',
+                    $queryBuilder->createNamedParameter(VersionState::MOVE_POINTER->value, Connection::PARAM_INT)
+                )
+            );
+        }
+
+        return $queryBuilder
             ->orderBy('sorting', 'ASC')
             ->addOrderBy('uid', 'ASC')
             ->executeQuery()
@@ -212,6 +269,13 @@ final class AddressRecordItems
     private function getLanguageService(): LanguageService
     {
         return $GLOBALS['LANG'];
+    }
+
+    private function getWorkspaceId(): int
+    {
+        $backendUser = $GLOBALS['BE_USER'] ?? null;
+
+        return $backendUser instanceof BackendUserAuthentication ? (int)$backendUser->workspace : 0;
     }
 
     /**

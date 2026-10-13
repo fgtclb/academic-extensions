@@ -40,14 +40,15 @@ documents the SQLite defect that affects the command line path.
 
 ..  note::
 
-    The :php:`contract`, :php:`email_address`, :php:`phone_number` and
-    :php:`physical_address` columns of
-    :sql:`tx_academiccontacts4pages_domain_model_contact` are :php:`select`
-    fields with an :php:`itemsProcFunc` and no :php:`foreign_table`, so they
-    store bare uids that TYPO3 does not know to be relations.
-    :php:`DataHandler` cannot remap them when a record is published out of a
-    workspace. Making the tables versionable does not change that, and it is
-    tracked separately.
+    Publishing a workspace keeps the uid of every record: a changed record is
+    written into its live record, and a record created in the workspace keeps
+    its own uid. A page contact that stores the uid of an address therefore
+    needs no remapping on publish. What went wrong with the address selects
+    once the address tables became versionable was the list they offered: the
+    version rows of every workspace, the editor's own included, and the
+    records new in other workspaces. Apart from that, a copy kept the
+    addresses of the original and the reference index knew no selection. All
+    of it is fixed, see :ref:`important-address-selections-are-relations`.
 
 Affected Installations
 ======================

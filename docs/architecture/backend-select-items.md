@@ -92,8 +92,10 @@ which is the file to read when that identifier is in doubt.
 
 This is the trap. `AbstractItemProvider::processSelectFieldValue()` keeps only
 the values that are present in the item list when the field has no
-`foreign_table` — which is every select these handlers serve. What happens next
-depends on the render type:
+`foreign_table`, which is every select these handlers serve except the three
+address selects of a page contact, see
+[below](#the-address-selects-of-a-page-contact-are-relations). What happens
+next depends on the render type:
 
 | Render type                | Value not among the items                                                 |
 |----------------------------|---------------------------------------------------------------------------|
@@ -150,6 +152,12 @@ render. A test that looks for it compares without case for that reason.
 are deliberately left as they are: their fields declare no items, so there is
 nothing to replace.
 
+A handler that reads the items it is handed has to accept two shapes. TYPO3 v13
+passes each one as a `SelectItem`, which implements `ArrayAccess`, and v14 as an
+array (`AbstractItemProvider::resolveItemProcessorFunction()` on v13,
+`ItemProcessingService::processItems()` on v14). `$item['value']` works on
+both, a parameter typed `array` fails on v13.
+
 ## An appended item must not repeat the declared empty value
 
 The declared empty item of a select has a value too, usually `''` or `0`, and
@@ -178,6 +186,58 @@ SQLite run accepts it without an error. That happens to every column of a new
 record that has no TCA `default`. The profile select of a profile information
 reads `###REC_FIELD_sys_language_uid###` since ACE-868, which is why its
 language column declares `'default' => 0`.
+
+## The address selects of a page contact are relations
+
+The e-mail address, phone number and postal address selects of a page contact
+in `academic_contacts4pages` are served by `AddressRecordItems` and declare the
+address table of `academic_persons` as their `foreign_table` (ACE-481). The
+handler builds the list, the declaration makes TYPO3 treat the stored value as
+a relation, and that changes four things:
+
+- **A value that is not among the items stays in the row.**
+  `processSelectFieldValue()` keeps a relation id even when no item matches,
+  and `addInvalidItemsFromDatabase()` shows it with the "missing label" marker,
+  so a selection whose address belongs to another contract survives a save
+  instead of being written away. Both methods are identical on v13 and v14.
+- **TYPO3 adds items of its own before the handler runs.**
+  `AbstractItemProvider::addItemsFromForeignTable()` queries the table with
+  the `foreign_table_where` and the page permission clause of the editor, which
+  joins `pages`. Every column of the clause therefore names its table, since
+  `pages` has `sys_language_uid`, `sorting` and `uid` as well, and the
+  `ORDER BY` part names them without `{#…}`, because core quotes that part
+  itself: `{#table}.{#sorting}` there becomes one quoted name, the query fails,
+  and the editor gets a flash message instead of the items. The clause
+  compares `CAST(contract AS CHAR(11))` with `###REC_FIELD_contract###`,
+  because the marker becomes `''` when the contract select drops the value, a
+  contract that is gone or one not saved yet, and PostgreSQL rejects `''` for
+  an integer column. The handler drops every record item core added and
+  appends its own list, which is not narrowed by the editor's access to the
+  folder of the person records, just as the contract select is not. Its query
+  uses a `WorkspaceRestriction` without move pointers, as core's own item
+  query does, and `BackendUtility::workspaceOL()`, which keeps the live uid as
+  the value, and it leaves out delete placeholders.
+- **A copy would be remapped by TYPO3, and so would a version.**
+  `DataHandler::remapListedDBRecords()` rewrites a relation through the copy
+  mapping of the whole command. The first workspace edit of a contract
+  versions its addresses and its page contacts in one command, and the mapping
+  then holds live uid to version uid, so the contact version would select the
+  version row of its address, which publishing deletes. The fields name their
+  table in `dontRemapTablesOnCopy`, and `AddressSelectionCopyHook` remaps a
+  copied contact to a copied address only when that address is neither a
+  version nor a translation of the selected one. The parent pointers of
+  inline children that are declared as relations run into the same remapping,
+  see ACE-907.
+- **TYPO3 v14 removes the select when it has no record item.**
+  `TcaColumnsRemoveEmptyRelations` (v14.2, core issue #109366) drops a select
+  with a `foreign_table` from the form unless one of its items has a positive
+  value. The three fields set `showIfEmpty`, so a contract without an address
+  of that kind still offers "display all" and "display none", as on v13, which
+  has no such provider and ignores the key.
+
+The reference index writes a row for each selected address, and one with the
+`ref_uid` `-1` for "display none", as it does for the `-1` and `-2` of
+`fe_group`.
 
 ## What the page list expansion does besides expanding
 

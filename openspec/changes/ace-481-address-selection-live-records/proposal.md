@@ -46,7 +46,8 @@ None.
 ## Impact
 
 - TCA of `tx_academiccontacts4pages_domain_model_contact`, the items handler
-  of the three selects, an `Important-` entry in the 3.0 changelog, the
+  of the three selects, a `DataHandler` hook for copies registered in
+  `ext_localconf.php`, an `Important-` entry in the 3.0 changelog, the
   corrected ACE-477 entry and `docs/architecture/backend-select-items.md`.
 - Existing contacts get their reference index rows on the next save or a
   reference index update.
