@@ -115,7 +115,7 @@ All new tests extend the shared functional base class and load
 
 ## 5. The issue and the commit
 
-- [ ] 5.1 YouTrack ACE-481 (exists, do not file a new one) to `In Progress`
+- [x] 5.1 YouTrack ACE-481 (exists, do not file a new one) to `In Progress`
   at the start, `Testing PR` with the pull request, `Done` after the merge.
 - [x] 5.2 Commit as `[BUGFIX] ACE-481: Make address selections relations` in
   TYPO3 Core format, body at 72, footer `Resolves: ACE-481`, no attribution
@@ -130,4 +130,4 @@ All new tests extend the shared functional base class and load
 - [x] 6.3 `lintMarkdown -n` and `checkRstRenderingAll` green.
 - [x] 6.4 `docs/` and the `Documentation/Changelog/3.0/` entries are part of
   the change. `README.md` and `CONTRIBUTING.md` still only summarize and link.
-- [ ] 6.5 Archive the change as the last commit of the same pull request.
+- [x] 6.5 Archive the change as the last commit of the same pull request.
