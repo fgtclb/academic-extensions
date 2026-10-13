@@ -17,3 +17,6 @@ services:
   # Instantiated by the DataHandler through GeneralUtility::makeInstance() as well.
   FGTCLB\AcademicContacts4pages\Hook\ContactsRoleLocalizationHook:
     public: true
+
+  FGTCLB\AcademicContacts4pages\Hook\AddressSelectionCopyHook:
+    public: true

@@ -15,6 +15,7 @@ use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\Restriction\DeletedRestriction;
 use TYPO3\CMS\Core\Localization\LanguageService;
+use TYPO3\CMS\Core\Schema\Struct\SelectItem;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
@@ -29,6 +30,12 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  * plugin, not here. Deleted records are left out. Only default language records are
  * offered: the selection is shared by all translations of a contact, and the frontend
  * resolves the language overlay itself.
+ *
+ * The fields declare the address table as their `foreign_table` (ACE-481), so core adds
+ * items of its own before the handler runs. Those are replaced by the handler's list: core
+ * limits them to the records on pages the editor may see, while the contract select offers
+ * the contract regardless, and an editor without access to the folder of the person
+ * records would see every selection as invalid.
  *
  * Dispatches {@see ModifyTcaSelectFieldItemsEvent} to allow projects or other extensions
  * to modify the available select items.
@@ -103,6 +110,12 @@ final class AddressRecordItems
     {
         $contractUid = $this->resolveContractUid($parameters);
         if ($contractUid > 0) {
+            // The record items core added from the `foreign_table`. TYPO3 hands the items over
+            // as `SelectItem` objects.
+            $parameters['items'] = array_values(array_filter(
+                $parameters['items'],
+                static fn(array|SelectItem $item): bool => (int)($item['value'] ?? 0) <= 0,
+            ));
             foreach ($this->getAddressRecords($tableName, $contractUid) as $addressRecord) {
                 $parameters['items'][] = [
                     'label' => $this->buildLabel($tableName, $addressRecord),

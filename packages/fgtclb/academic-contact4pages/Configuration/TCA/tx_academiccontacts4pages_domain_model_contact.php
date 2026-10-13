@@ -20,6 +20,18 @@ $defaultAddressRecordItems = [
     ],
 ];
 
+// The address selects are relations to the address tables of the contract (ACE-481).
+// Core joins `pages` into the item query for the page permission clause, which has
+// `sys_language_uid`, `sorting` and `uid` as well, so every column names its table.
+// Core quotes the `ORDER BY` part itself, so it takes the names without `{#…}`.
+// The contract is compared as text: the marker becomes `''` when the contract select
+// dropped the value, a contract that is gone or one not saved yet, and PostgreSQL
+// rejects `''` for an integer column.
+$addressRecordsOfContract = static fn(string $tableName): string => sprintf(
+    'AND CAST({#%1$s}.{#contract} AS CHAR(11)) = ###REC_FIELD_contract### AND {#%1$s}.{#sys_language_uid} IN (-1, 0) ORDER BY %1$s.sorting, %1$s.uid',
+    $tableName
+);
+
 return [
     'ctrl' => [
         'title' => 'LLL:EXT:academic_contacts4pages/Resources/Private/Language/locallang_db.xlf:tx_academiccontacts4pages_domain_model_contact',
@@ -185,6 +197,9 @@ return [
                 'renderType' => 'selectSingle',
                 'items' => $defaultAddressRecordItems,
                 'itemsProcFunc' => AddressRecordItems::class . '->emailAddressItems',
+                'foreign_table' => 'tx_academicpersons_domain_model_email',
+                'foreign_table_where' => $addressRecordsOfContract('tx_academicpersons_domain_model_email'),
+                'dontRemapTablesOnCopy' => 'tx_academicpersons_domain_model_email',
                 'default' => Contact::DISPLAY_ALL,
             ],
         ],
@@ -198,6 +213,9 @@ return [
                 'renderType' => 'selectSingle',
                 'items' => $defaultAddressRecordItems,
                 'itemsProcFunc' => AddressRecordItems::class . '->phoneNumberItems',
+                'foreign_table' => 'tx_academicpersons_domain_model_phone_number',
+                'foreign_table_where' => $addressRecordsOfContract('tx_academicpersons_domain_model_phone_number'),
+                'dontRemapTablesOnCopy' => 'tx_academicpersons_domain_model_phone_number',
                 'default' => Contact::DISPLAY_ALL,
             ],
         ],
@@ -211,6 +229,9 @@ return [
                 'renderType' => 'selectSingle',
                 'items' => $defaultAddressRecordItems,
                 'itemsProcFunc' => AddressRecordItems::class . '->physicalAddressItems',
+                'foreign_table' => 'tx_academicpersons_domain_model_address',
+                'foreign_table_where' => $addressRecordsOfContract('tx_academicpersons_domain_model_address'),
+                'dontRemapTablesOnCopy' => 'tx_academicpersons_domain_model_address',
                 'default' => Contact::DISPLAY_ALL,
             ],
         ],

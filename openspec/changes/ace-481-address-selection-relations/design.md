@@ -52,15 +52,17 @@ contract translates its addresses and its page contacts in one command, and
 without `dontRemapTablesOnCopy` core rewrites the contact translation's
 selection to the translated address (measured on `main`). The hook is the one
 of `main`, in this branch's style: a `final class` with a `private readonly`
-constructor property, public in `Services.yaml`. Its version check is
-harmless here.
+constructor property, public in `Services.yaml`. It checks for a translation
+only: the address tables have no `t3ver_oid` column on this branch, and their
+copy mapping holds no versions.
 
 ### 3. The items handler drops core's record items
 
 With `foreign_table` set, core adds its own items, limited to the pages the
 editor may see. The handler drops every item with a positive value and appends
-its own list as before, as on `main` (option A, maintainer 2026-10-13). No
-workspace query, nothing to overlay on this branch.
+its own list as before, as on `main`, where the maintainer chose the handler
+over core as the source of the list on 2026-10-13. No workspace query, nothing
+to overlay on this branch.
 
 ### 4. No upgrade wizard
 
