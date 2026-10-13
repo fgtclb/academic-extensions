@@ -38,8 +38,8 @@ None.
 - The context class and interface of `academic_base`, and the context class
   and interface of `academic_persons`, which are separate on this branch.
 - The page title provider of `academic_persons` reads the language from the
-  context and falls back to the backend user's language for a foreign value
-  instead of failing.
+  context and falls back to the backend user's language, or English without
+  one, for a foreign value instead of failing.
 - One `Important-` changelog entry in `Changelog/2.4/` of each extension.
 
 ## Non-goals
