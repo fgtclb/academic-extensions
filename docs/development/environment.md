@@ -936,6 +936,7 @@ From here the instance is a normal one and the usual commands work:
 ddev composer system:refresh                       # extension:setup, languages, caches
 ddev exec vendor/bin/typo3 setup:begroups:default --no-interaction --groups=Both
 ddev composer instance:seed                        # import the "academics-instance" set
+ddev exec vendor/bin/typo3 referenceindex:update   # the import leaves parts of it out
 ddev composer sqlite:backup                        # commit the result
 ddev composer sqlite:apply                         # back to normal, clears the marker
 ```
