@@ -80,9 +80,9 @@
 - [x] 7.1 After `composerUpdate` for TYPO3 v13: `lintPhp`, `cgl -n`,
   `phpstan`, `unit` and `functional` on SQLite (`-j auto`), PostgreSQL
   (`-b docker -j 8`) and MariaDB (`-j 8`) green.
-  13.4.36: 2030 unit tests, 5611 functional tests on each database.
+  13.4.36: 2030 unit tests, 5610 functional tests on each database.
 - [x] 7.2 After `composerUpdate` for TYPO3 v14: the same gates green.
-  14.3.8: 2025 unit tests, 5631 functional tests on each database.
+  14.3.8: 2025 unit tests, 5630 functional tests on each database.
 - [x] 7.3 `lintMarkdown -n` and `checkRstRenderingAll` green.
 - [x] 7.4 `docs/` updated, `README.md` and `CONTRIBUTING.md` still only
   summarize and link.
@@ -90,4 +90,4 @@
   (a `[BUGFIX]` if decision 1 is not A) in TYPO3 Core format, body at 72
   columns, footer `Resolves: ACE-672` and `Resolves: ACE-671`, no
   attribution of any kind.
-- [ ] 7.6 Archive the change as the last commit of the same pull request.
+- [x] 7.6 Archive the change as the last commit of the same pull request.
