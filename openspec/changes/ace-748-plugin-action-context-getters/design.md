@@ -10,8 +10,10 @@ Measured on `main` `e75f86b95` against the installed cores, 14.3.7 in
   check with `instanceof` (lines 32 and 88, ACE-442).
 - `getApplicationType(): ApplicationType` (line 43) calls
   `ApplicationType::fromRequest()`, which throws `\RuntimeException`
-  1606222812 when the attribute `applicationType` is not an int. Same code on
-  both cores (`cms-core/Classes/Http/ApplicationType.php`).
+  1606222812 when the attribute `applicationType` is not an int, and
+  `\LogicException` 1678875015 for an int that is neither the frontend nor the
+  backend type. On v14 the install tool type resolves too, on v13 it is one of
+  those ints. Same codes on both cores (`cms-core/Classes/Http/ApplicationType.php`).
 - `NullSite` implements `SiteInterface`, `Site` does too, but a `NullSite` is no
   `Site`, so `getSite()` is a `TypeError` for it. The backend `SiteResolver`
   stores a `NullSite` for page id 0 and for pages outside a site
@@ -67,9 +69,13 @@ that says "no site" anyway.
 
 ### The application type, decision for the maintainer
 
+**Decided 2026-10-13: option A.** Stefan chose to keep the type and document
+the exception. He also chose to take the two type checks to branch `2` as a
+bugfix of their own, without the application type.
+
 **Option A, recommended: keep `ApplicationType` and document the exception.**
-The interface method gets `@throws \RuntimeException` with the core code and
-one sentence on when it happens, the extension points page gets one sentence
+The interface method gets `@throws` for the two core exceptions and one
+sentence on when they happen, the extension points page gets one sentence
 in the row of the context, and `docs/architecture/list-plugin-events.md` one
 in "Every event carries the plugin context". The unit test stays as it is.
 Reason: a plugin the frontend renders always carries the attribute, the
@@ -109,7 +115,8 @@ interface of `academic_base`.
 ### The title provider is left as it is
 
 With the guard, `ProfileTitleProvider` falls back to the backend user's
-language for a foreign value instead of failing. That is the branch it already
+language for a foreign value instead of failing, and to English without a
+logged-in backend user. That is the branch it already
 has for `null`, so it needs no change, only a sentence in the design and no
 test of its own.
 
@@ -132,5 +139,4 @@ test of its own.
 
 ## Open Questions
 
-None beyond the decision above, which has to be confirmed before the first
-code change.
+None. The decision above was confirmed before the first code change.

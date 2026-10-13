@@ -359,7 +359,11 @@ packages are not listed; their own documentation applies.
     *   -   :php:`\FGTCLB\AcademicBase\Domain\Model\Dto\PluginControllerActionContextInterface`
         -   every event a plugin action dispatches: the request, the site and
             its language, the content object, the settings of the content
-            element and the plugin name
+            element and the plugin name. Every getter that can lack its value
+            returns :php:`null`, without an error. The application type is the
+            exception: for a request without a type it can resolve, TYPO3
+            raises its own exception, which only a request built by hand can
+            cause.
     *   -   :php:`\FGTCLB\AcademicPersons\Domain\Model\Dto\PluginControllerActionContextInterface`
         -   the title placeholder event of :guilabel:`academic_persons`, which
             still declares this copy of the interface above. It adds nothing

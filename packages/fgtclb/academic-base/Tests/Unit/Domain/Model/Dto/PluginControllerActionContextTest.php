@@ -11,6 +11,9 @@ use Psr\Http\Message\ServerRequestInterface;
 use TYPO3\CMS\Core\Core\SystemEnvironmentBuilder;
 use TYPO3\CMS\Core\Http\ApplicationType;
 use TYPO3\CMS\Core\Http\ServerRequest;
+use TYPO3\CMS\Core\Site\Entity\NullSite;
+use TYPO3\CMS\Core\Site\Entity\Site;
+use TYPO3\CMS\Core\Site\Entity\SiteLanguage;
 use TYPO3\CMS\Extbase\Mvc\ExtbaseRequestParameters;
 use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
 use TYPO3\TestingFramework\Core\Unit\UnitTestCase;
@@ -23,8 +26,8 @@ use TYPO3\TestingFramework\Core\Unit\UnitTestCase;
  *
  * `EXT:academic_persons` carries its own copy of this class, deprecated for 4.0, with its own
  * functional test ({@see \FGTCLB\AcademicPersons\Tests\Functional\Domain\Model\Dto\PluginControllerActionContextTest}),
- * which covers the plain pass-through of request, site, language and settings. Not repeated here:
- * this covers the branching, the delegation and the raising instead.
+ * which covers the plain pass-through of request, site, language and settings of that class. Here
+ * the branching, the delegation and the raising are covered instead.
  */
 final class PluginControllerActionContextTest extends UnitTestCase
 {
@@ -59,6 +62,64 @@ final class PluginControllerActionContextTest extends UnitTestCase
         $this->assertNull($subject->getContentObjectRenderer());
     }
 
+    #[Test]
+    public function getSiteReturnsTheSiteOfTheRequest(): void
+    {
+        $site = $this->createStub(Site::class);
+        $subject = $this->subject((new ServerRequest())->withAttribute('site', $site));
+
+        $this->assertSame($site, $subject->getSite());
+    }
+
+    #[Test]
+    public function getSiteReturnsNullWithoutASite(): void
+    {
+        $this->assertNull($this->subject(new ServerRequest())->getSite());
+    }
+
+    /**
+     * The backend stores a `NullSite` for page 0 and for a page outside any site. It implements
+     * `SiteInterface` but is no `Site`, and it means "no site", which is what the getter answers.
+     */
+    #[Test]
+    public function getSiteReturnsNullForTheNullSiteOfARequestOutsideAnySite(): void
+    {
+        $subject = $this->subject((new ServerRequest())->withAttribute('site', new NullSite()));
+
+        $this->assertNull($subject->getSite());
+    }
+
+    #[Test]
+    public function getSiteReturnsNullForAForeignAttributeValue(): void
+    {
+        $subject = $this->subject((new ServerRequest())->withAttribute('site', new \stdClass()));
+
+        $this->assertNull($subject->getSite());
+    }
+
+    #[Test]
+    public function getLanguageReturnsTheLanguageOfTheRequest(): void
+    {
+        $language = $this->createStub(SiteLanguage::class);
+        $subject = $this->subject((new ServerRequest())->withAttribute('language', $language));
+
+        $this->assertSame($language, $subject->getLanguage());
+    }
+
+    #[Test]
+    public function getLanguageReturnsNullWithoutALanguage(): void
+    {
+        $this->assertNull($this->subject(new ServerRequest())->getLanguage());
+    }
+
+    #[Test]
+    public function getLanguageReturnsNullForAForeignAttributeValue(): void
+    {
+        $subject = $this->subject((new ServerRequest())->withAttribute('language', new \stdClass()));
+
+        $this->assertNull($subject->getLanguage());
+    }
+
     /**
      * A plugin renders in the frontend and in the backend preview alike, and listeners branch on
      * it, so the request type has to survive unaltered.
@@ -85,9 +146,10 @@ final class PluginControllerActionContextTest extends UnitTestCase
     }
 
     /**
-     * The only getter that raises instead of answering with null. It is core behaviour and not
-     * caught here on purpose - a request without that attribute did not come through a TYPO3
-     * application - but a caller has to know that this one getter can take the request down.
+     * The only getter that raises instead of answering with null, as
+     * {@see \FGTCLB\AcademicBase\Domain\Model\Dto\PluginControllerActionContextInterface::getApplicationType()}
+     * states. It is core behaviour and not caught on purpose: a request without that attribute
+     * did not come through a TYPO3 application.
      */
     #[Test]
     public function getApplicationTypeThrowsWithoutARequestType(): void
@@ -96,6 +158,20 @@ final class PluginControllerActionContextTest extends UnitTestCase
         $this->expectExceptionCode(1606222812);
 
         $this->subject(new ServerRequest())->getApplicationType();
+    }
+
+    /**
+     * The second exception the interface states: a type no academic plugin is rendered with.
+     */
+    #[Test]
+    public function getApplicationTypeThrowsForATypeThatIsNeitherFrontendNorBackend(): void
+    {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionCode(1678875015);
+
+        $this->subject(
+            (new ServerRequest())->withAttribute('applicationType', SystemEnvironmentBuilder::REQUESTTYPE_CLI)
+        )->getApplicationType();
     }
 
     #[Test]
