@@ -231,7 +231,7 @@ done, see
 The manifest is generated from an import in a **functional test instance** and
 then used to measure the `sqlite-databases/core-NN.sqlite` snapshot, which is
 produced by an import in a **real DDEV instance**. Those are two different
-environments, and three of their differences reach the stored data. All are
+environments, and four of their differences reach the stored data. All are
 pinned rather than excluded from the projection, because they are real
 differences that a reader would otherwise have to know about:
 
@@ -290,7 +290,32 @@ The rule that keeps it from coming back:
   manifest regenerated to match one release is red against the snapshots,
   which the other release produced.
 
-The rule behind all three: when the manifest and the snapshot disagree, ask
+### The core release
+
+The same holds for TYPO3 itself. The functional suites run on the latest patch
+release `composerUpdate` finds, the instances on the one their `composer.lock`
+pins. 14.3.9 writes the TCA default of a field into a new record even when its
+type does not show the field, which earlier releases left out. That changed at
+least one of four columns on all 258 `pages` rows of the seed
+(`geocode_status`, `link` and two project fields) and turned `SeedManifestTest`
+red on every v14 job, with no change in the repository (ACE-906). It moved
+columns of `tt_content` as well, which the manifest does not measure.
+
+When a core release changes what the import writes, three things move
+together, in one change: the instance's `composer.lock` moves to that release,
+the snapshot is rebuilt from nothing with it, and the manifest is regenerated.
+Without a raised floor, the `--minimal-changes` update of
+[Raising the supported core patch level](../development/monorepo-layout.md#raising-the-supported-core-patch-level)
+keeps the locked release, because no constraint forces it to move. Name every
+`typo3/cms-*` package of the lock instead, without `-W`, so nothing else moves.
+A dry run with the target release names the dependency that has to come along:
+
+```shell
+ddev composer update <every typo3/cms-* package> 'typo3/cms-core:14.3.9' --dry-run
+ddev composer update <every typo3/cms-* package> <the dependency it named>
+```
+
+The rule behind all four: when the manifest and the snapshot disagree, ask
 which environment is wrong before adjusting what is measured. Dropping a column
 from the projection hides a difference that is real.
 
