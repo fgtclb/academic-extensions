@@ -36,13 +36,13 @@
 
 ## 5. Definition of done
 
-- [ ] 5.1 `composerUpdate -t 12`, then `lintPhp`, `cgl -n`, `phpstan`,
+- [x] 5.1 `composerUpdate -t 12`, then `lintPhp`, `cgl -n`, `phpstan`,
   `unit` and `functional` (SQLite, `-j auto`) for TYPO3 v12. Nothing is
   written to a database, so PostgreSQL and MariaDB runs are not required.
-- [ ] 5.2 `composerUpdate -t 13`, then the same for TYPO3 v13.
-- [ ] 5.3 `lintMarkdown -n` and `checkRstRenderingAll` green. No `docs/`
+- [x] 5.2 `composerUpdate -t 13`, then the same for TYPO3 v13.
+- [x] 5.3 `lintMarkdown -n` and `checkRstRenderingAll` green. No `docs/`
   page describes the context, so `docs/` is unchanged.
-- [ ] 5.4 Commit as `[BUGFIX] ACE-748: Guard site and language getters` in
+- [x] 5.4 Commit as `[BUGFIX] ACE-748: Guard site and language getters` in
   TYPO3 Core format, footer `Resolves: ACE-748`, `Related: ACE-442`, no
   attribution of any kind.
-- [ ] 5.5 Archive the change as the last commit of the same pull request.
+- [x] 5.5 Archive the change as the last commit of the same pull request.
