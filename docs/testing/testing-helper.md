@@ -3,7 +3,7 @@
 [`packages-dev/testing-helper/`](../../packages-dev/testing-helper) is the
 composer package `fgtclb/academics-monorepo-testing-helper`. It holds the
 [base class every functional test case extends](#the-base-class-of-every-functional-test)
-and seventeen PHP traits, the parts of the test setup that were being copied
+and nineteen PHP traits, the parts of the test setup that were being copied
 between extensions, each one carrying the memory of a defect that made the copy
 necessary.
 
@@ -26,6 +26,8 @@ necessary.
 | [`CropVariantsAssertionTrait`](#cropvariantsassertiontrait)                     | Reads the crop variants the image cropper offers for a record.      |
 | [`StaticTemplateTypoScriptTrait`](#statictemplatetyposcripttrait)               | Builds the TypoScript a record delivers, and what its form keeps.   |
 | [`LabelReferencesResolveTestsTrait`](#labelreferencesresolveteststrait)         | Asserts every label the TCA and its FlexForms name resolves.        |
+| [`WorkspacePublishingTrait`](#workspacepublishingtrait)                         | Edits records in a workspace and publishes it, as an editor does.   |
+| [`InlineParentPointerAssertionTrait`](#inlineparentpointerassertiontrait)       | Asserts inline children keep their live parent through a publish.   |
 
 ## How an extension gets access
 
@@ -1106,6 +1108,79 @@ of TYPO3 breaks therefore turns every `LabelReferencesTest` red at once, and
 the message names the core file, not one of this repository.
 [`DeprecatedCoreLabelsTrait`](#deprecatedcorelabelstrait) is its counterpart for
 core labels that still resolve but are retired.
+
+## `WorkspacePublishingTrait`
+
+[`Classes/FunctionalTestCase/WorkspacePublishingTrait.php`](../../packages-dev/testing-helper/Classes/FunctionalTestCase/WorkspacePublishingTrait.php)
+
+**What it does.** Three methods for a test that follows a record through a
+workspace. `runDataHandlerInWorkspace()` runs a data map and a command map as
+the administrator `be_users:1` in a workspace and fails on any error
+`DataHandler` logged. `publishWorkspace()` publishes the whole workspace with
+the command the workspaces extension builds for it, from one of the two places
+core publishes from: the workspace module, whose user works in the workspace,
+or `workspace:autopublish`, which publishes a workspace on its publish date as
+a user of the live workspace. `getWorkspaceVersionUid()` returns the version a
+live record has in a workspace.
+
+**When to use it.** In a test case that loads `typo3/cms-workspaces` and
+imports the administrator and a `sys_workspace` row. Each run starts a backend
+user of its own, so `tearDown()` unsets `$GLOBALS['BE_USER']`, and a frontend
+request after publishing unsets it first:
+
+```php
+$this->runDataHandlerInWorkspace(1, [
+    'tx_academicpersons_domain_model_profile' => [1 => ['first_name' => 'Annabel']],
+    'tx_academicpersons_domain_model_contract' => [1 => ['position' => 'Dean']],
+]);
+$this->publishWorkspace(1, $fromTheWorkspace);
+unset($GLOBALS['BE_USER']);
+```
+
+— [`academic-persons/Tests/Functional/Plugins/AcademicPersonsWorkspacePublishTest.php`](../../packages/fgtclb/academic-persons/Tests/Functional/Plugins/AcademicPersonsWorkspacePublishTest.php)
+
+**The trap it exists for.** What goes wrong with a workspace edit often only
+shows once the workspace is published, which writes the version into the live
+record and deletes the version row, and the two places publish differently.
+From the workspace module, the workspaces extension writes the live parent into
+the swapped inline children once more, from live it does not. A test that
+publishes from one place proves nothing about the other: in ACE-907 the
+workspace module repaired most of what a publish from live lost. Run a
+publishing test from both places, with a data provider as
+`InlineChildrenWorkspacePublishTest` of `academic_persons` does.
+
+---
+
+## `InlineParentPointerAssertionTrait`
+
+[`Classes/FunctionalTestCase/InlineParentPointerAssertionTrait.php`](../../packages-dev/testing-helper/Classes/FunctionalTestCase/InlineParentPointerAssertionTrait.php)
+
+**What it does.** One assertion. It collects every inline relation of the
+compiled TCA whose child table has one of the given prefixes, compares them
+with the relations the test names, and fails for every pointer of a child to
+its parent that is a `group`, or a `select` with a `foreign_table`, and does
+not name the parent table in `dontRemapTablesOnCopy`.
+
+**When to use it.** Once per extension that owns inline children, in
+`Tests/Functional/Tca/InlineParentPointerTest.php`:
+
+```php
+$this->assertInlineParentPointersKeepTheLiveParent(['tx_academicpartners_'], [
+    'pages.tx_academicpartners_partnerships -> tx_academicpartners_domain_model_partnership.page',
+    'tx_academicpartners_domain_model_role.partnerships -> tx_academicpartners_domain_model_partnership.role',
+]);
+```
+
+— [`academic-partners/Tests/Functional/Tca/InlineParentPointerTest.php`](../../packages/fgtclb/academic-partners/Tests/Functional/Tca/InlineParentPointerTest.php)
+
+**The trap it exists for.** `DataHandler` rewrites every relation of the
+versions a workspace edit creates through its copy mapping, live uid to version
+uid. A pointer declared as a relation then follows the parent to its version
+row, which publishing deletes. Published from live, or with a page and the role
+of its children edited in the same workspace, the published child belongs to no
+record (ACE-907). Nothing reports it until a visitor misses the children. Why
+the setting is enough, and what still writes the pointer, is in
+[Backend select items](../architecture/backend-select-items.md#the-pointer-of-an-inline-child-to-its-parent-is-not-remapped).
 
 ## See also
 
