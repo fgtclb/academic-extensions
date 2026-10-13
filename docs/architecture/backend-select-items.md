@@ -71,7 +71,7 @@ depends on the render type:
 
 | Render type                | Value not among the items                                                 |
 |----------------------------|---------------------------------------------------------------------------|
-| `selectSingle`             | An `[ INVALID VALUE ]` *item* is added, but the row value is not restored |
+| `selectSingle`             | An `[ MISSING LABEL ]` *item* is added, but the row value is not restored |
 | `selectMultipleSideBySide` | Nothing — the value is dropped silently                                   |
 
 In both cases the rendered form no longer has the value selected, so the next
@@ -82,6 +82,32 @@ into the items, or the narrowing is a data loss.
 `ContractSelectScopeResolver` of `academic_persons` is the worked example: it
 reads the referenced uids out of the row and the repository returns them
 alongside the restricted ones, so their label comes from the same query.
+
+## A handler querying through Extbase states its enable fields
+
+`Typo3QuerySettings::__construct()` switches `ignoreEnableFields` on for a
+backend request on TYPO3 v13, and on TYPO3 v12 only when the deprecated Extbase
+feature toggle `ignoreAllEnableFieldsInBe` is enabled, which it is not by
+default. Outside a frontend request, `Typo3DbQueryParser` then skips
+`BackendUtility::BEenableFields()` entirely, and only the soft delete clause
+remains. Its list `enableFieldsToBeIgnored` is not read on that path, so the
+flag is all or nothing there. A handler that inherits the default therefore
+offers hidden and timed records in the form on v13 and not on v12, and on
+neither when it runs without a request, from a command or a test.
+
+A handler sets the flag on the settings it builds, so its items depend neither
+on the request nor on the core version. `PartnerItems` of `academic_partners`
+offers every partner page that is not deleted since ACE-672. The record
+selects of the core apply no enable fields either, only a `DeletedRestriction`
+and a `WorkspaceRestriction`, and for `pages` the page permissions. That keeps
+a stored partner among the items, which the section above requires. Before, a
+partnership whose partner page was hidden, started in the future or had
+expired lost it on the next save on v12. Set it in the handler, not in the
+repository method it calls: in a frontend request an ignore flag with an empty
+list drops every enable field, so a shared repository method would hand hidden
+records to a frontend caller. `PartnerItemsTest` calls the handler without a
+request, where the core default stays off and only the handler's own flag
+shows.
 
 ## A handler appends to the declared items
 
