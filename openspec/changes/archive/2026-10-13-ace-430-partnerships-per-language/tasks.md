@@ -79,4 +79,4 @@
   in TYPO3 Core format, body at 72 columns, footers `Resolves: ACE-430`,
   `Related: ACE-484` and `Related: ACE-874`, one key per line, no
   attribution of any kind.
-- [ ] 6.6 Archive the change as the last commit of the same pull request.
+- [x] 6.6 Archive the change as the last commit of the same pull request.
