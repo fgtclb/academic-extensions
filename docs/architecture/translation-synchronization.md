@@ -409,6 +409,36 @@ default record, the duplicated translations that pre-3.0 installations already
 carry collapse to one rendered contact **without any database cleanup** — the
 legacy rows stay, they just stop being selected alongside their originals.
 
+The partnerships of a partner page are read the same way since ACE-430.
+`PartnershipRepository::findByPid()`
+(`packages/fgtclb/academic-partners/Classes/Domain/Repository/PartnershipRepository.php`)
+has its own copy of the pre-query rather than a shared service, because the two
+already differ: the partnership has no option to show hidden records, so its
+pre-query filters `hidden` unless the context includes hidden content, as a
+frontend preview of hidden records does. The pre-query of the contacts does not
+look at the context yet, so a preview leaves hidden contacts out. A third
+repository with the same need is the point to extract one. The partnerships differ in which rows match the
+page for a partnership. Translating a partner page localizes its partnerships
+onto the page translation, and those rows never match the default page uid the
+callers pass, so they are reached through the overlay of their default record
+only. A translation attached to the default page, the copy a role localization
+made before ACE-874, does match, and then the copy decides the position of the
+partnership through its own `sorting`. When a proper translation exists as
+well, the overlay looks the translation up by its default record without an
+order, so the database decides which of the two the object is mapped from
+(SQLite returned the copy, PostgreSQL the translation). Both carry the partner
+and the role of their default record, which are not translated, so the visitor
+sees the same partnership. A partnership that renders as its translation and an
+untranslated one carry their role as two objects of different languages, so the
+partnerships list and teaser group by the uid of the role, and
+`PartnershipRoles` of `academic_partners` keeps the role in the visitor's
+language for the heading. One limit is left to the core: on TYPO3 v13 the data
+mapper resolves a relation from its identity map by the plain uid (v13.4.36,
+`DataMapper.php:742`), so once an untranslated partnership has loaded its role
+in the default language, every later partnership of the page with that role
+names it in the default language too. v14 keys the identity map by language
+(v14.3.8, `DataMapper.php:771`).
+
 ## The visibility switch does not wait for the synchronizer
 
 The owner's visibility switch of the profile editor (ACE-50) writes `hidden`,

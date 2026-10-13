@@ -70,9 +70,12 @@ overlay pinned to `OVERLAYS_MIXED`, keeps the `sorting`, `uid` order, and
 matches `uid = 0` for an empty list, as the contacts do.
 
 The pre-query applies what the Extbase query applies to this table:
-`DeletedRestriction`, `HiddenRestriction` and the `WorkspaceRestriction` of
-the current workspace. The partnership has no option to show hidden records,
-so `HiddenRestriction` is unconditional.
+`DeletedRestriction`, the `WorkspaceRestriction` of the current workspace and
+`HiddenRestriction`, the last one unless the visibility of the context
+includes hidden content, as a frontend preview of hidden records does. The
+Extbase frontend query honours that visibility for the `hidden` column, so the
+pre-query does too. The partnership has no option of its own to show hidden
+records.
 
 Rejected: respecting the language of the site instead, by dropping the lifted
 `respectSysLanguage`. No overlay type selects records of a language only
@@ -96,12 +99,18 @@ the reviewer can ask for it.
 
 When a default record has both a translation on the page translation and a
 copy on the default page in the same language, the pre-query sees only the
-copy and the copy stands for the partnership. Both carry the partner and the
-role of the default record, since those columns are not translated, so the
-visitor sees the same partnership. Its position follows the `sorting` of the
-copy, as a translated page contact follows the `sorting` of its translation.
+copy, and the copy decides the position of the partnership through its
+`sorting`, as a translated page contact follows the `sorting` of its
+translation. The Extbase overlay then maps the row through its default record
+and looks the translation up by `l10n_parent` and language without an order
+(`PageRepository::getLanguageOverlay()`), so which of the two the object is
+mapped from belongs to the database: SQLite returned the copy, PostgreSQL the
+translation, found by the PostgreSQL gate. Both carry the partner and the role
+of the default record, since those columns are not translated, so the visitor
+sees the same partnership. The test of this case asserts one object in the
+position of the copy and leaves the localized uid open.
 
-### 4. No upgrade wizard for copies made before ACE-874 (decision for the maintainer)
+### 4. No upgrade wizard for copies made before ACE-874 (maintainer's decision: no wizard)
 
 - **No wizard (recommended).** This change stops the copies from rendering
   twice, which is the defect a visitor sees. A translated partnership carries
@@ -117,11 +126,34 @@ copy, as a translated page contact follows the `sorting` of its translation.
   every run without deleting anything. More visible than a changelog query,
   and more code than this defect needs.
 
-Confirm with the maintainer before writing code. If he chooses a wizard or a
-finding, the requirement "Existing translations need no cleanup" and the task
-list change first, through `/opsx:update`.
+The maintainer chose no wizard before the implementation.
 
-### 5. Tests
+### 5. The role groups compare the role by uid (found in the implementation)
+
+The partnership list and teaser group the partnerships by role. The
+controller and `PartnershipProcessor` collect the roles keyed by uid, and the
+templates compare `{partnership.role} == {role}`, the role objects as a
+whole. A partnership that renders as its translation carries the role in the
+visitor's language, an untranslated one the role of the default language, and
+the identity map of Extbase holds them as two objects. The one collected last
+named the group, and the partnerships carrying the other object fell out of
+the list. Measured in German with two translated partnerships and one
+untranslated of one role: TYPO3 v13 listed only the untranslated one, before
+and after this change. TYPO3 v14 listed the translated ones before, because
+it dropped the untranslated one, and would list only the untranslated one
+after it.
+
+The templates compare `role.uid`, and the roles are collected by one small
+stateless service used by the controller and the processor, which keeps the
+role object in the visitor's language when a group has both. Maintainer's
+decision during the implementation.
+
+Rejected: resolving the role of an untranslated partnership in the visitor's
+language. The data mapper resolves a relation in the language of the parent
+record, so that needs a second lookup around it, and it changes the role
+requirement, which names the default language role for such a partnership.
+
+### 6. Tests
 
 - The two pinned tests flip: in the default language one object, uid 1,
   localized uid 1, role "Research partner". They are the red proof, red today.
@@ -144,10 +176,20 @@ list change first, through `/opsx:update`.
 - [A copy and a proper translation coexist] → Decision 3: one renders, both
   show the same partner and role. The changelog query finds the copies.
 - [The pre-query and the Extbase query disagree on visibility] → Both apply
-  the same three restrictions. A frontend preview that shows hidden records
-  through the admin panel is not covered by the pre-query, as it is not for
-  the contacts. Measured in the implementation and named in the changelog
-  entry if it differs from today.
+  `deleted`, `hidden` and the workspace. Measured on TYPO3 v14 in a frontend
+  request whose visibility includes hidden content: the query before the
+  change returned the hidden partnership, and a pre-query that filtered
+  `hidden` always did not, so the pre-query follows the visibility of the
+  context. Found in the implementation and covered by a repository test.
+- [TYPO3 v13 names the default language role after an untranslated
+  partnership] → The data mapper of v13 resolves a relation from the identity
+  map by the plain uid (`DataMapper.php:742` on 13.4.36), so a role loaded in
+  the default language for an untranslated partnership is handed to every
+  later partnership with that role, translated or not. v14 keys the identity
+  map by language (`DataMapper.php:771` on 14.3.8). Core behaviour, older than
+  this change, pinned per version in the repository test and named in the
+  changelog entry. The fixture of the language cases sorts the untranslated
+  partnership last, so the role requirement is asserted the same on both.
 - [A site language without fallback now shows untranslated partnerships] →
   It is the behaviour of the page contacts since ACE-484, and a translated
   partnership has no content of its own. The `Important` entry says it.

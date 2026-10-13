@@ -65,8 +65,10 @@ the two MUST render the same partnerships.
 
 A partnership that renders as its translation SHALL show its role in the
 language of that translation, and in the default language where the role has
-no translation into it. A partnership that renders as its default language
-record SHALL show the role as its default language record names it.
+no translation into it. On TYPO3 v13 this holds unless an untranslated
+partnership with the same role renders before it on the same page. A
+partnership that renders as its default language record SHALL show the role
+as its default language record names it.
 
 #### Scenario: A translated partnership with a translated role
 
@@ -85,6 +87,31 @@ record SHALL show the role as its default language record names it.
 
 - **WHEN** a partnership has no translation into the language of the page
 - **THEN** it shows the role name of its default language record
+
+#### Scenario: A translated partnership after an untranslated one on TYPO3 v13
+
+- **WHEN** a visitor views a partner page in a translated language on
+  TYPO3 v13, and a partnership that renders as its translation follows an
+  untranslated partnership with the same role
+- **THEN** it shows the default language role name, as the untranslated one
+  does, while TYPO3 v14 shows the translated role name
+
+### Requirement: Every partnership stays in its role group
+
+The partnership list and teaser SHALL render every partnership under the
+heading of its role in every language, also when one page holds partnerships
+of one role that render as their translation next to ones that render as
+their default language record. The heading SHALL name the role in the
+visitor's language when one partnership of the group carries the translated
+role.
+
+#### Scenario: Translated and untranslated partnerships share a role
+
+- **WHEN** a visitor views the partnership list or teaser in a translated
+  language, and of two partnerships with the same role one has a translation
+  and the other has none
+- **THEN** both render once, under one heading that names the role in the
+  visitor's language
 
 ### Requirement: The overlay setting of the site does not change the partnerships
 

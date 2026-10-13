@@ -17,6 +17,11 @@ this branch by ACE-484. The partnerships were not.
   exists only in the translated language renders there and nowhere else, and
   one valid in all languages renders everywhere.
 - The role a translated partnership shows is named in the visitor's language.
+- The partnership list and teaser keep every partnership under its role
+  heading in a translated language, also when the partnerships of one role
+  are partly translated. They used to keep only the ones whose role object
+  came last, on TYPO3 v13 always and on v14 once this change returns the
+  untranslated partnerships there as well.
 - Which partnerships render no longer depends on the overlay setting of the
   site, and TYPO3 v13 and v14 render the same. For the page contacts, whose
   query had the same shape, v14 dropped untranslated records in a translated
@@ -25,9 +30,8 @@ this branch by ACE-484. The partnerships were not.
   iterates.
 - Rows already in the database stop rendering twice, without a cleanup.
 
-**Decision for the maintainer**: whether an upgrade wizard removes the
-copies created before ACE-874. The recommendation is not to build one. See
-`design.md`.
+**Maintainer's decision**: no upgrade wizard removes the copies created
+before ACE-874. See `design.md`.
 
 ## Capabilities
 
@@ -44,8 +48,9 @@ None.
 ## Impact
 
 - `academic_partners` (`packages/fgtclb/academic-partners`): the repository
-  that reads the partnerships of a page, its functional tests, a
-  `Documentation/Changelog/3.0/` `Important` entry.
+  that reads the partnerships of a page, the role groups of the partnership
+  list and teaser (controller, page data processor, two templates), their
+  functional tests, a `Documentation/Changelog/3.0/` `Important` entry.
 - `docs/architecture/translation-synchronization.md`: the read side section
   names the partnerships next to the page contacts.
 - Frontend only. No schema change, no TCA change.
