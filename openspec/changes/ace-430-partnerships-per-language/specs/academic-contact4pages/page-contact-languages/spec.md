@@ -48,8 +48,7 @@ two MUST render the same contacts.
 ### Requirement: Hidden contacts follow the plugin option and the preview
 
 A hidden contact SHALL render only when the content element shows hidden
-records, or when a frontend preview shows hidden records, in each language as
-described above.
+records, or when a frontend preview shows hidden records, and then once.
 
 #### Scenario: Hidden records not shown
 
@@ -62,6 +61,12 @@ described above.
 - **WHEN** a backend user previews a page with hidden records shown and one
   of its contacts is hidden
 - **THEN** the contact renders
+
+#### Scenario: A visible contact with a hidden translation
+
+- **WHEN** a visitor views a page in a translated language and the
+  translation of one of its contacts is hidden
+- **THEN** the contact renders once, as its default language record
 
 ### Requirement: Counting the page contacts agrees with listing them
 
