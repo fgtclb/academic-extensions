@@ -53,4 +53,4 @@
 - [x] 5.3 `lintMarkdown -n` and `checkRstRenderingAll` green.
 - [x] 5.4 Commit `[BUGFIX] ACE-672: Offer every partner on TYPO3 v12`, footers
   `Resolves: ACE-672` and `Resolves: ACE-671`, no attribution of any kind.
-- [ ] 5.5 Archive the change as the last commit of the same pull request.
+- [x] 5.5 Archive the change as the last commit of the same pull request.
