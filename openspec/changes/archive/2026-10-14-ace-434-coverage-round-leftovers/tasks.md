@@ -34,7 +34,9 @@
 - [x] 3.3 Normalise the redirect page in `createAction()` after the
   `listPid` fallback, correct the docblock of `shouldBeCreated()`, the
   controller comment and the comment of `FlashMessageCreationModeTest`, and
-  drop the two `>= 0` guards. Show the tests green on both cores.
+  drop the two `>= 0` guards. Show the tests green on both cores. The data
+  set with a list page was shown red once more on v12 with the mapping
+  moved in front of the fallback, the visitor was sent to the list page.
 - [x] 3.4 `Important-RedirectPageZeroFromAListenerMeansNone.rst` in
   `academic-jobs/Documentation/Changelog/2.4/`, with the redirect target
   before the fix as measured on v12 and v13, and the new fixture extension in
@@ -98,17 +100,20 @@
 
 ## 8. Definition of done
 
-- [ ] 8.1 After `composerUpdate` for TYPO3 v12: `lintPhp`, `cgl -n`,
+- [x] 8.1 After `composerUpdate` for TYPO3 v12: `lintPhp`, `cgl -n`,
   `phpstan`, `unit`, and `functional` on SQLite (`-j auto`), PostgreSQL
   (`-b docker -j 8`) and MariaDB (`-j 8`) green on the head of the branch.
-- [ ] 8.2 The same after `composerUpdate` for TYPO3 v13.
-- [ ] 8.3 `lintMarkdown -n` and `checkRstRenderingAll` green, and no rendered
+  The review notes folded in afterwards changed text and one docblock, so
+  `lintPhp`, `cgl -n`, `unit` and `FileReferenceCollectionTest` on SQLite
+  ran again on the new head.
+- [x] 8.2 The same after `composerUpdate` for TYPO3 v13.
+- [x] 8.3 `lintMarkdown -n` and `checkRstRenderingAll` green, and no rendered
   changelog entry produces a definition list.
-- [ ] 8.4 `docs/` names what changed, and `README.md` and `CONTRIBUTING.md`
+- [x] 8.4 `docs/` names what changed, and `README.md` and `CONTRIBUTING.md`
   still only summarize.
-- [ ] 8.5 Every commit green on its own for `phpstan` and `unit` on both
+- [x] 8.5 Every commit green on its own for `phpstan` and `unit` on both
   cores, each message in TYPO3 Core format with its verified key, and no
   attribution of any kind.
-- [ ] 8.6 Archive the change as the last commit,
-  `[TASK] ACE-434: Archive the coverage leftovers for 2`, with a `Related:`
+- [x] 8.6 Archive the change as the last commit,
+  `[TASK] ACE-434: Archive coverage round fixes for 2`, with a `Related:`
   line for each of the six keys.
