@@ -57,11 +57,11 @@
 
 ## 5. ACE-441: sanitizer per setter call (commit 4)
 
-- [ ] 5.1 The two `ProfileTest` cases of `main` with the spy builder, red
+- [x] 5.1 The two `ProfileTest` cases of `main` with the spy builder, red
   against the method static on v12 and v13.
-- [ ] 5.2 The setters build one sanitizer per call, every `ProfileTest` case
+- [x] 5.2 The setters build one sanitizer per call, every `ProfileTest` case
   green, `anAmpersandInAProfileInformationLinkIsHtmlEncoded()` included.
-- [ ] 5.3 Gates on both cores, the functional tests of `academic-persons` and
+- [x] 5.3 Gates on both cores, the functional tests of `academic-persons` and
   `academic-persons-edit`, then commit 4.
 
 ## 6. ACE-443: dead code (commit 5)
