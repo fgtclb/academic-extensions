@@ -42,7 +42,7 @@ class DemandFactory
             if (isset($settings['categories'])
                 && (int)$settings['categories'] > 0
             ) {
-                $categoryCollection = $this->categoryRepository->getByDatabaseFields('projects', (int)$contentElementData['uid']);
+                $categoryCollection = $this->categoryRepository->getByDatabaseFields('projects', (int)($contentElementData['uid'] ?? 0));
             }
         } else {
             // Set demand properties, if form data is available
