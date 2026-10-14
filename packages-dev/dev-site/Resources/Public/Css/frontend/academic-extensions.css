@@ -85,6 +85,7 @@
   counter-reset: academic-persons-navigation;
   display: grid;
   gap: clamp(1.4rem, 3vw, 3rem);
+  list-style: none;
   margin: 0;
   padding: 0;
 }
@@ -144,9 +145,11 @@
   margin: 0;
   width: 100%;
 }
-.academic-persons-detail .ace-profile-image > .ace-image {
+.academic-persons-detail .ace-profile-image .ace-picture,
+.academic-persons-detail .ace-profile-image .ace-image {
   display: block;
   height: auto;
+  max-width: 100%;
   width: 100%;
 }
 .academic-persons-detail .ace-contact {
@@ -323,6 +326,7 @@
   grid-template-columns: auto minmax(0, 1fr);
   line-height: 1.12;
   margin: 0 0 clamp(1.75rem, 4vw, 3.5rem);
+  overflow-wrap: anywhere;
 }
 .academic-persons-detail .ace-timeline-sections > .ace-section > .ace-title::before {
   content: counter(academic-persons-sections, decimal-leading-zero);
@@ -410,18 +414,24 @@
   display: grid;
   gap: 0.5rem;
 }
-.academic-persons-list :is(select, input, textarea).ace-control,
-.academic-persons-card :is(select, input, textarea).ace-control,
-.academic-persons-profiles :is(select, input, textarea).ace-control,
-.academic-persons-contracts :is(select, input, textarea).ace-control {
+.academic-persons-list :is(select, textarea, input:not([type=button], [type=reset], [type=submit])).ace-control,
+.academic-persons-card :is(select, textarea, input:not([type=button], [type=reset], [type=submit])).ace-control,
+.academic-persons-profiles :is(select, textarea, input:not([type=button], [type=reset], [type=submit])).ace-control,
+.academic-persons-contracts :is(select, textarea, input:not([type=button], [type=reset], [type=submit])).ace-control {
   background-color: var(--bs-body-bg, #fff);
   border: 1px solid var(--ace-border-color);
   border-radius: var(--bs-border-radius, 0.375rem);
   color: var(--bs-body-color, #212529);
   display: block;
   line-height: 1.5;
-  padding: 0.375rem 2.25rem 0.375rem 0.75rem;
+  padding: 0.375rem 0.75rem;
   width: 100%;
+}
+.academic-persons-list :is(select, textarea, input:not([type=button], [type=reset], [type=submit])).ace-control:is(select),
+.academic-persons-card :is(select, textarea, input:not([type=button], [type=reset], [type=submit])).ace-control:is(select),
+.academic-persons-profiles :is(select, textarea, input:not([type=button], [type=reset], [type=submit])).ace-control:is(select),
+.academic-persons-contracts :is(select, textarea, input:not([type=button], [type=reset], [type=submit])).ace-control:is(select) {
+  padding-right: 2.25rem;
 }
 .academic-persons-list .ace-list,
 .academic-persons-card .ace-list,
@@ -451,7 +461,9 @@
 .academic-persons-card .ace-alphabet-navigation > .ace-list,
 .academic-persons-profiles .ace-alphabet-navigation > .ace-list,
 .academic-persons-contracts .ace-alphabet-navigation > .ace-list {
-  justify-content: center;
+  display: grid;
+  font-size: 0.875rem;
+  grid-template-columns: repeat(auto-fit, minmax(2rem, 1fr));
 }
 .academic-persons-list .ace-alphabet-navigation .ace-link,
 .academic-persons-list .ace-pagination .ace-link,
@@ -470,6 +482,25 @@
   display: block;
   padding: 0.375rem 0.75rem;
   text-decoration: none;
+}
+.academic-persons-list .ace-alphabet-navigation .ace-link,
+.academic-persons-card .ace-alphabet-navigation .ace-link,
+.academic-persons-profiles .ace-alphabet-navigation .ace-link,
+.academic-persons-contracts .ace-alphabet-navigation .ace-link {
+  padding-inline: 0;
+  text-align: center;
+  white-space: nowrap;
+}
+.academic-persons-list .ace-alphabet-navigation .visually-hidden,
+.academic-persons-card .ace-alphabet-navigation .visually-hidden,
+.academic-persons-profiles .ace-alphabet-navigation .visually-hidden,
+.academic-persons-contracts .ace-alphabet-navigation .visually-hidden {
+  clip-path: inset(50%);
+  height: 1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
 }
 .academic-persons-list .ace-alphabet-navigation .active .ace-link,
 .academic-persons-list .ace-pagination .active .ace-link,
@@ -504,8 +535,14 @@
 .academic-persons-contracts .ace-itemlist .ace-item {
   border: 1px solid var(--ace-border-color);
   display: flex;
-  flex-direction: column-reverse;
+  flex-direction: column;
   height: 100%;
+}
+.academic-persons-list .ace-itemlist .ace-item > :is(figure, picture, img),
+.academic-persons-card .ace-itemlist .ace-item > :is(figure, picture, img),
+.academic-persons-profiles .ace-itemlist .ace-item > :is(figure, picture, img),
+.academic-persons-contracts .ace-itemlist .ace-item > :is(figure, picture, img) {
+  order: -1;
 }
 .academic-persons-list .ace-item-content,
 .academic-persons-card .ace-item-content,

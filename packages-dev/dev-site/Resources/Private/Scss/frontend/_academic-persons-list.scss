@@ -22,15 +22,26 @@
         gap: 0.5rem;
     }
 
-    :is(select, input, textarea).ace-control {
+    // The filter submit carries "ace-control" as well, and it is a button, not
+    // a field: the theme styles it through "btn btn-primary". Only the fields
+    // a visitor types into or chooses from get the field look.
+    :is(select, textarea, input:not([type="button"], [type="reset"], [type="submit"])).ace-control {
         background-color: var(--bs-body-bg, #fff);
         border: 1px solid var(--ace-border-color);
         border-radius: var(--bs-border-radius, 0.375rem);
         color: var(--bs-body-color, #212529);
         display: block;
         line-height: 1.5;
-        padding: 0.375rem 2.25rem 0.375rem 0.75rem;
+        padding: 0.375rem 0.75rem;
         width: 100%;
+
+        // Room on the right for the arrow of the select, which a text field
+        // has no use for. Nested, because the field rule weighs as much as its
+        // heaviest argument, and a plain "select.ace-control" would lose to its
+        // padding.
+        &:is(select) {
+            padding-right: 2.25rem;
+        }
     }
 
     .ace-list {
@@ -47,8 +58,14 @@
         gap: 0.25rem;
     }
 
+    // One track per entry, all of the same width, filling the line. The 26
+    // letters and "A-Z" fit in one line of a container at the large
+    // breakpoint, and a narrower one wraps them into rows of equal boxes
+    // rather than leaving the last letter alone on a line of its own.
     .ace-alphabet-navigation > .ace-list {
-        justify-content: center;
+        display: grid;
+        font-size: 0.875rem;
+        grid-template-columns: repeat(auto-fit, minmax(2rem, 1fr));
     }
 
     .ace-alphabet-navigation .ace-link,
@@ -59,6 +76,26 @@
         display: block;
         padding: 0.375rem 0.75rem;
         text-decoration: none;
+    }
+
+    // "A-Z" is the widest entry and has to stay on one line in a box as narrow
+    // as the one of a single letter.
+    .ace-alphabet-navigation .ace-link {
+        padding-inline: 0;
+        text-align: center;
+        white-space: nowrap;
+    }
+
+    // The letters without profiles say so in a text for screen readers only.
+    // A page without Bootstrap has no rule for "visually-hidden", and that
+    // text would widen the box of its letter over its neighbours.
+    .ace-alphabet-navigation .visually-hidden {
+        clip-path: inset(50%);
+        height: 1px;
+        overflow: hidden;
+        position: absolute;
+        white-space: nowrap;
+        width: 1px;
     }
 
     .ace-alphabet-navigation .active .ace-link,
@@ -75,11 +112,19 @@
         pointer-events: none;
     }
 
+    // The image comes after the content in the markup and is shown above it.
+    // It is moved by "order" rather than by reversing the column, which would
+    // pack a short item at the bottom of a card stretched to the height of its
+    // row and leave an empty band above the image.
     .ace-itemlist .ace-item {
         border: 1px solid var(--ace-border-color);
         display: flex;
-        flex-direction: column-reverse;
+        flex-direction: column;
         height: 100%;
+    }
+
+    .ace-itemlist .ace-item > :is(figure, picture, img) {
+        order: -1;
     }
 
     .ace-item-content {
