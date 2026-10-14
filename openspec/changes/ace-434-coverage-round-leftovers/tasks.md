@@ -66,19 +66,20 @@
 
 ## 6. ACE-443: dead code (commit 5)
 
-- [ ] 6.1 Deprecate `FileReferenceCollection` with an `E_USER_DEPRECATED`, and
+- [x] 6.1 Deprecate `FileReferenceCollection` with an `E_USER_DEPRECATED`, and
   assert the notice in every test of `FileReferenceCollectionTest`. Show the
-  suite red without `#[IgnoreDeprecations]`, and the capture assertion red
-  without the `trigger_error()`.
-- [ ] 6.2 In the same file: `@throws \Doctrine\DBAL\Exception` (checked on
+  capture assertion red without the `trigger_error()`, and the suite red on
+  the deprecation when the notice is not captured. The captured notice never
+  reaches PHPUnit, so the tests need no `#[IgnoreDeprecations]`.
+- [x] 6.2 In the same file: `@throws \Doctrine\DBAL\Exception` (checked on
   DBAL 3 for v12 and DBAL 4 for v13), the unused import and the unused
   parameter removed.
-- [ ] 6.3 Remove `ProfileFactory::createFromFormData()` and its test, with
+- [x] 6.3 Remove `ProfileFactory::createFromFormData()` and its test, with
   `createdProfile.csv` if nothing else uses it. A search finds no caller.
-- [ ] 6.4 `Deprecation-FileReferenceCollection.rst` in
+- [x] 6.4 `Deprecation-FileReferenceCollection.rst` in
   `academic-programs/Documentation/Changelog/2.4/`, with the core
   replacement and its restriction and workspace behaviour on v12 and v13.
-- [ ] 6.5 Gates on both cores, the functional tests of `academic-programs`
+- [x] 6.5 Gates on both cores, the functional tests of `academic-programs`
   and `academic-persons-edit`, then commit 5.
 
 ## 7. ACE-444: slips (commit 6)

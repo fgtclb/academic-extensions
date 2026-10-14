@@ -141,7 +141,9 @@ port.
 `FileRepository::findByRelation()`. Every test of `FileReferenceCollectionTest`
 asserts the notice with a capture helper, as `ProfileFormDataTest` does,
 because PHPUnit 10, installed on this branch for v12 and v13, has no
-`expectUserDeprecationMessage()`. A
+`expectUserDeprecationMessage()`. Unlike there, the tests carry no
+`#[IgnoreDeprecations]`: the captured notice never reaches PHPUnit, so the
+attribute would only hide other deprecations. A
 `Deprecation` entry. ACE-444 item 10 in the same file: `@throws
 \Doctrine\DBAL\Exception`, the unused import and parameter go. Rejected:
 removing it, a break in a minor release. `createFromFormData()` and its test

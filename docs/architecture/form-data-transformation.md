@@ -12,7 +12,7 @@ six factories, one private setter per property — plus
 ## The decision, in order
 
 Every factory setter is guarded by the same private helper, `mayApplyProperty()`,
-identical in all six (`ProfileFactory.php:63`, `ContractFactory.php:56`,
+identical in all six (`ProfileFactory.php:42`, `ContractFactory.php:56`,
 `AddressFactory.php:58`, `ProfileInformationFactory.php:49`,
 `EmailFactory.php:39`, `PhoneNumberFactory.php:39`):
 
