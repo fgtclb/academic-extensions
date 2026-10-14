@@ -138,15 +138,16 @@ they are used in production code across ten of the twelve packages
 Measured with
 `grep -rhoP '#\[<name>[(\]]' --include='*.php' packages/fgtclb/*/Classes packages-dev/*/Classes | wc -l`:
 
-| Attribute             | Sites | Examples                                                                     |
-|-----------------------|-------|------------------------------------------------------------------------------|
-| `#[Autoconfigure]`    | 26    | `academic-base/Classes/Service/ArrayObjectMapper.php:24` (`public: true`)    |
-| `#[Autowire]`         | 7     | same file, line 28 — `#[Autowire(service: 'academic-base.serializer')]`      |
-| `#[AsAlias]`          | 3     | `academic-persons/Classes/Service/RecordSynchronizer.php:49`                 |
-| `#[Exclude]`          | 27    | `academic-base/Classes/Settings/Validation.php:23` and the settings graph    |
-| `#[AsEventListener]`  | 17    | `academic-partners/Classes/EventListener/RegisterAcademicPageDoktype.php:33` |
-| `#[AsCommand]`        | 3     | `academic-partners/Classes/Command/GeocodeCommand.php:23`                    |
-| `#[AutoconfigureTag]` | 1     | `dev-site/Classes/DataProcessing/IconOverviewProcessor.php:38`               |
+| Attribute             | Sites | Examples                                                                                                         |
+|-----------------------|-------|------------------------------------------------------------------------------------------------------------------|
+| `#[Autoconfigure]`    | 26    | `academic-base/Classes/Service/ArrayObjectMapper.php:24` (`public: true`)                                        |
+| `#[Autowire]`         | 7     | same file, line 28, `#[Autowire(service: 'academic-base.serializer')]`                                           |
+| `#[AsAlias]`          | 3     | `academic-persons/Classes/Service/RecordSynchronizer.php:49`                                                     |
+| `#[Exclude]`          | 28    | `academic-base/Classes/Settings/Validation.php:23` and the settings graph                                        |
+| `#[AsEventListener]`  | 17    | `academic-partners/Classes/EventListener/RegisterAcademicPageDoktype.php:33`                                     |
+| `#[AsCommand]`        | 3     | `academic-partners/Classes/Command/GeocodeCommand.php:23`                                                        |
+| `#[AutoconfigureTag]` | 2     | `dev-site/Classes/DataProcessing/IconOverviewProcessor.php:38`, an interface in `academic-base/Classes/Upgrade/` |
+| `#[AutowireIterator]` | 1     | `academic-base/Classes/Upgrade/ConfigurationChecker.php:148`                                                     |
 
 `#[AsCommand]` there is Symfony's **Console** attribute
 (`Symfony\Component\Console\Attribute\AsCommand`), not a DI one, on the
@@ -173,8 +174,9 @@ each of its two methods and lifts the visibility for the language overlay of a
 hidden record on TYPO3 v13, see [Hidden records](hidden-records.md).
 `#[AsTaggedItem]` and `#[AsController]` have zero sites.
 
-For the twenty-two `#[Exclude]` sites and why `LegacySettingsMigration` is among
-them, see [Class design](class-design.md#keep-data-objects-out-of-the-container).
+For the twenty-eight `#[Exclude]` sites and why `LegacySettingsMigration` is
+among them, see
+[Class design](class-design.md#keep-data-objects-out-of-the-container).
 
 The `#[Autowire]` example is the clearest illustration of the two styles working
 together: `academic-base/Configuration/Services.yaml` lines 13–15 define a

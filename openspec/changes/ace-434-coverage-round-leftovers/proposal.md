@@ -19,14 +19,16 @@ to close together. Two of them change what an integrator observes.
 - ACE-441: the persons profile builds its HTML sanitizer per setter call
   instead of keeping one per process.
 - ACE-443: **BREAKING** the unused file reference collection of
-  `academic_programs` is removed. A test without its test attribute runs
-  again, and a dead null check of the partner select goes, unless the change
-  of ACE-672 took it.
-- ACE-444: wrong file headers and a misspelled `@todo` are corrected, and two
-  fields of the settings on one column combine their backend flags.
-  **BREAKING**, only if the maintainer agrees: the misspelled synchronizer
-  namespace of `academic_persons` and the lower case start date sorting
-  constant of `academic_projects` are renamed.
+  `academic_programs` is removed. The dead null check of the partner select
+  goes, which ACE-672 left in place, and **BREAKING** `findAll()` of the
+  partner repository declares the result interface it returns. The missing
+  test attribute was added by ACE-748, the test is only shown to fail here.
+- ACE-444: wrong file headers and a misspelled `@todo` are corrected. Two
+  fields of the persons settings on one column keep giving the column the
+  flags of the later field, which the manual now says, and the upgrade check
+  and the persons settings status name such a column. **BREAKING**: the
+  misspelled synchronizer namespace of `academic_persons` and the lower case
+  start date sorting constant of `academic_projects` are renamed.
 
 Each issue is one commit that resolves its key. The behaviour is the same on
 TYPO3 v13 and v14.
@@ -41,8 +43,10 @@ None.
 
 - `academic-jobs/new-job-form`: what happens after saving when a listener
   hands in a redirect page that is no page.
-- `academic-persons/validation-flags`: two fields of the settings on one
-  column.
+- `academic-base/upgrade-configuration-check`: a column that two fields of
+  the persons settings share is reported.
+- `academic-persons/settings-overrides`: the persons settings status names
+  the same column.
 
 ## Impact
 
@@ -52,11 +56,10 @@ None.
   `academic_persons_edit` (`academic-persons-edit`), `academic_jobs`
   (`academic-jobs`), `academic_base` (`academic-base`) and
   `academic_contacts4pages` (`academic-contact4pages`, tests only).
-- Four or five phpstan baseline entries per core version disappear.
-- `Changelog/3.0/`: one `Important` entry each in `academic_jobs` and
-  `academic_base`, one `Breaking` entry in `academic_programs`, and with the
-  renames one in `academic_persons` and one in `academic_projects`, one in
-  `academic_partners` if the null check is still there.
+- Five phpstan baseline entries per core version disappear.
+- `Changelog/3.0/`: one `Important` entry in `academic_jobs`, and one
+  `Breaking` entry each in `academic_programs`, `academic_partners`,
+  `academic_persons` and `academic_projects`.
 - Backport to branch `2`, a change of its own: ACE-434, ACE-435 (in the jobs
   controller there) and ACE-436, ACE-443 with a deprecation instead of the
   removal and with the factory method open only there, the header and strict

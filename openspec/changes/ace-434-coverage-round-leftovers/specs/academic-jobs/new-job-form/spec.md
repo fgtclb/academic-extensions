@@ -25,7 +25,8 @@ that listener set. This applies on TYPO3 v13 and v14.
 #### Scenario: A listener sets a page
 
 - **WHEN** a listener of the after-save event sets the redirect page to an
-  existing page other than the page of the form
+  existing page other than the page of the form, and the message mode
+  suppresses the message only for a redirect to another page
 - **THEN** the visitor is redirected to that page without a message, as
   before
 

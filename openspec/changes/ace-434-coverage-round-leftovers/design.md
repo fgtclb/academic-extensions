@@ -92,7 +92,8 @@ ACE-443, dead code:
   leaves `findAll()` and the null check as they are, so the check is expected
   to be still there.
 - Item 6: `academic-persons/Tests/Functional/Domain/Model/Dto/PluginControllerActionContextTest.php:45`
-  has no `#[Test]`. A scan of all test classes on both branches found no other.
+  has no `#[Test]` at `e75f86b95`. A scan of all test classes on both branches
+  found no other. ACE-748 added the attribute since (`990a49bb5`).
 
 ACE-444, small slips, open on `main`:
 
@@ -129,8 +130,8 @@ ACE-444, small slips, open on `main`:
 
 - One commit per issue, each resolving its key and green on its own.
 - Every behaviour change proven by a test that is red without it.
-- No new phpstan baseline entry, four entries fewer per core version, five
-  when this change takes the null check of the partner select.
+- No new phpstan baseline entry, five entries fewer per core version: the
+  four of ACE-436 and the one of `PartnerRepository::findAll()`.
 
 **Non-Goals:**
 
@@ -149,14 +150,13 @@ ACE-444, small slips, open on `main`:
 | 3 | `[BUGFIX] ACE-436: Allow no uid on unsaved entities`   | `Resolves: ACE-436`                     |
 | 4 | `[TASK] ACE-441: Build profile sanitizer per setter`   | `Resolves: ACE-441`, `Related: ACE-425` |
 | 5 | `[!!!][TASK] ACE-443: Remove coverage round dead code` | `Resolves: ACE-443`, `Related: ACE-672` |
-| 6 | `[TASK] ACE-444: Fix the coverage round slips`         | `Resolves: ACE-444`                     |
+| 6 | `[!!!][TASK] ACE-444: Fix the coverage round slips`    | `Resolves: ACE-444`                     |
 | 7 | `[TASK] ACE-434: Archive the coverage round leftovers` | `Related:` each of the six keys         |
 
 The defects go first, so each is reviewable without the clean-up around it.
 ACE-443 comes before ACE-444 because removing the collection settles ACE-444
-item 10. The renames sit in the last code commit, so they can be dropped
-without touching the others. With the renames, commit 6 becomes
-`[!!!][TASK] ACE-444: Fix the coverage round slips`.
+item 10. The renames sit in the last code commit. All seven commits go into
+one pull request, as the maintainer confirmed on 2026-10-14.
 
 ### 2. ACE-434: fall back per key, as ACE-777 did
 
@@ -177,7 +177,7 @@ mode, so redirect and message agree. The deprecated `listPid` fallback runs
 before `decide()` and only for `null`, so a 0 from a listener does not reach
 it, and the visitor returns to the form page as for no redirect page.
 Rejected: normalising in `setRedirectPageId()`. A later listener would read
-something else than the earlier one set, and a 0 would then fall into the
+something other than the earlier one set, and a 0 would then fall into the
 deprecated `listPid` fallback. The docblock of `shouldBeCreated()` names the
 `> 0` condition, and the controller comment names
 `SUPPRESS_WITH_CONFIGURED_REDIRECT_PAGE`. An `Important` entry in
@@ -190,7 +190,10 @@ deprecated `listPid` fallback. The docblock of `shouldBeCreated()` names the
 empty collection for an unsaved partner. `Project::getAttributes()` keeps its
 cast, a page id of 0 has no categories. `GeocodeCommand` keeps its `int`
 signature and reads the uid once per partner, which is always set for a
-partner it found in the database, with no new baseline entry. A subclass that
+partner it found in the database, with no new baseline entry. Its null check,
+unreachable in `writeGeocodeResult()`, moves in front of the Nominatim
+request: a partner without a uid is refused before a request is spent on it,
+and the command ends with a failure. A subclass that
 overrides a getter with `int` stays compatible. No changelog entry: code typed
 against the Extbase entity already had to handle `null`, and every partner and
 project the extensions render carries a uid.
@@ -214,37 +217,65 @@ ACE-425.
   the replacement. A deprecation first is not needed on `main`, the 3.0 major
   removes public API with a `Breaking` entry throughout. Branch `2` deprecates
   instead.
-- Item 5 is done here only when ACE-672 has not taken it: the `if` goes and
+- Item 5 is done here, ACE-672 left the check in place: the `if` goes and
   `findAll()` declares the result interface the query returns, which also
   removes its baseline entry. That is a signature change of a repository that
   is not `final`, so it gets a `Breaking` entry in `academic_partners`.
-- Item 6: the attribute is added, and the test is shown to fail once against
-  another request object.
+- Item 6: ACE-748 added the attribute, so the test is only shown to fail once
+  against another request object here.
 - Item 4: won't fix. The guard costs nothing, removing it would ask for its
   unit tested twin in `academic_persons_edit` as well, and neither is
   observable.
 
-### 7. ACE-444: two validations on one column (Decision for the maintainer)
+### 7. ACE-444: two validations on one column
 
 Every fragment carries `readOnly` and `required`, so a recursive merge, the
 fix the triage proposed, lets the later field reset `required` to `false`
-while keeping the earlier `minitems`. That is worse than today.
+while keeping the earlier `minitems`. That is worse than today. Three ways
+were weighed: combine the flags per column as the normalizer combines the
+flags of one field (A), keep the later field winning and say so (B), or the
+recursive merge (C, rejected for the reason above).
 
-- A. Combine the flags of all fields of one column as the normalizer combines
-  the flags of one field: read only when any field locks it, required when
-  any field requires it and none locks it, `minitems` only for a required
-  column, any other key from the field declared later. Small, local to the
-  merger, and what the spec describes. **Recommended.**
-- B. Keep the last field winning and document it, with a hint in the upgrade
-  check for a column named twice. No behaviour change, but the silent loss
-  stays.
-- C. Recursive merge. Rejected, see above.
+The maintainer chose B on 2026-10-14. The merger stays as it is, and the
+existing unit test that pins the later fragment stays the proof. What
+changes is that the loss is no longer silent:
 
-If B is chosen, the spec delta of `academic-persons/validation-flags` is
-dropped with `/opsx:update` before code is written. Option A takes an
-`Important` entry in `academic_base`, whose merger serves persons and jobs.
+- The persons settings manual says that two fields naming one column leave
+  the column with the flags of the field applied later, the profile fields in
+  section order and then the special fields.
+- `academic:upgrade:check` reports a column that two fields of the persons
+  settings share, as a warning naming the column and both fields. The check
+  lives in `academic_base` and cannot read the settings of another extension,
+  so `ConfigurationChecker` gains an `@internal` interface for finding
+  providers, collected by a service tag, and `academic_persons` registers one.
+  Internal rather than an extension point: it exists for the academic
+  extensions only, and the extension points page stays as it is. The status
+  report entry of the upgrade check shows the finding as well, since it lists
+  every finding of the check.
+- The persons settings entry of the status report names the same column with
+  the same severity.
 
-### 8. ACE-444: the two renames (Decision for the maintainer)
+Only the persons settings can produce the case: they let an integrator set
+`fieldName`, while `academic_jobs` derives every column from the property
+name. The check looks at the same validation sets the persons settings merge
+into a table: the profile fields with the special fields, the contract fields,
+the three contact sets and the profile information sections per record type.
+Two cases stay out of its reach, and the manual, `docs/` and the finder name
+them: fields that collapse while the settings are built (two fields of one
+property name, a special field named like a profile property) never reach a
+set, and the listener judges project fields against the TCA before the merge
+while the reports read the merged TCA. The merge can turn a column into an
+`email` or `number` column, so the two can judge a project field
+differently, which changes what is reported only where the field shares
+the column with another field. Decision B asks for a hint without a
+behaviour change, so neither is closed here.
+
+No changelog entry: nothing changes for a configuration that works, and the
+hint is found by the check itself. The `academic-persons/validation-flags`
+delta is dropped, deltas for `academic-base/upgrade-configuration-check` and
+`academic-persons/settings-overrides` take its place.
+
+### 8. ACE-444: the two renames
 
 - `Dto\Syncronizer\` to `Dto\Synchronizer\`, and `$recordSyncronizer` to
   `$recordSynchronizer` everywhere, including the property and the named
@@ -255,11 +286,11 @@ dropped with `/opsx:update` before code is written. Option A takes an
   constant (it would show the option twice). Stored values do not change, no
   migration.
 
-Options: rename both on `main` now, with one `Breaking` entry each in
-`academic_persons` and `academic_projects` (**recommended**, 3.0 is the
-cheapest moment and the interface is `@internal` already), rename only the
-namespace, or close both as won't fix. Branch `2` keeps the names in every
-case.
+The maintainer chose both renames on `main` on 2026-10-14, with one
+`Breaking` entry each in `academic_persons` and `academic_projects`. 3.0 is
+the cheapest moment, and the interface is `@internal` already. Branch `2`
+keeps the names. Commit 6 is `[!!!][TASK] ACE-444: Fix the coverage round
+slips`.
 
 ### 9. Backport to branch `2`
 
@@ -295,14 +326,18 @@ A change of its own, re-derived from a backport analysis
 
 - [The changes of ACE-438 (#124), ACE-672 (#125) and ACE-624 (#129) touch the
   same parsers, the partner select and `PartnerRepository`] → this change is
-  implemented after them and re-checks each premise on `HEAD`. ACE-624
-  changes how the list repositories order by "last updated", not
-  `SortingOptions` of `academic_projects`, so the constant rename and it do
-  not overlap. In `PartnerRepository` it changes `findByDemand()`, task 6.3
-  changes `findAll()`.
+  implemented after ACE-438 and ACE-672 and re-checks each premise on `HEAD`.
+  ACE-624 is postponed to 3.1.0 and lands after this change. It changes how
+  the list repositories order by "last updated", not `SortingOptions` of
+  `academic_projects`, so the constant rename and it do not overlap. In
+  `PartnerRepository` it changes `findByDemand()`, task 6.3 changes
+  `findAll()`.
 - [ACE-425 changes the same setters as ACE-441] → whichever lands second
   rebases, the setter bodies are small.
 - [Removing the collection breaks a project that calls it] → `Breaking`
   entry with the core replacement, and the deprecation on `2` warns first.
 - [The renames break third-party code naming the old namespace, property or
-  constant] → only if the maintainer agrees, each with a `Breaking` entry.
+  constant] → each with a `Breaking` entry, as the maintainer agreed.
+- [A finding provider of the upgrade check loads the persons settings] → the
+  settings are read through the same service the TCA listener uses, and a
+  settings file that cannot be read already fails there first.

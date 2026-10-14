@@ -6,7 +6,7 @@ injection, a template override that TypoScript must be able to find, an
 `ext_localconf.php` that has to run during bootstrap. For those, the test ships
 a small TYPO3 extension of its own.
 
-Seventy-eight such fixture extensions exist, in eleven of the twelve extensions.
+Seventy-nine such fixture extensions exist, in eleven of the twelve extensions.
 That is the whole population — this is a mechanism used sparingly and only
 where nothing smaller works. Measured with
 
@@ -92,6 +92,7 @@ They sit next to the tests that use them, under
 | `test_public_profile_settings`              | `tests/test-public-profile-settings`              | `academic-persons`       | A `Settings.yaml` overriding the public profile layout.                       |
 | `test_settings_copy`                        | `tests/test-settings-copy`                        | `academic-persons`       | A copy of the contract fields that leaves the room out, removes one with `~`. |
 | `test_settings_removal`                     | `tests/test-settings-removal`                     | `academic-persons`       | A delta removing one profile field with `~` and copying nothing.              |
+| `test_settings_shared_column`               | `tests/test-settings-shared-column`               | `academic-persons`       | A second profile field naming the column of the teaching area.                |
 | `test_study_plan_icons`                     | `tests/study-plan-icons`                          | `academic-study-plan`    | A shared glyph replaced in `FrontendIcons.php`, another in `Icons.php`.       |
 | `test_tca_override_after_settings`          | `tests/tca-override-after-settings`               | `academic-persons`       | TCA overrides and listeners changing columns and a type the settings set.     |
 | `test_upgrade_check`                        | `tests/test-upgrade-check`                        | `academic-base`          | The extension whose templates the upgrade check compares an override with.    |
@@ -104,8 +105,8 @@ They sit next to the tests that use them, under
 
 Each is a real, complete TYPO3 extension: a `composer.json` of type
 `typo3-cms-extension`, an `ext_emconf.php`, and whatever it exists to provide.
-Twenty-three of the seventy-eight have a `Classes/` folder with a `TESTS\…` PSR-4
-root. The other fifty-five are pure resources. The `ext_emconf.php` is checked
+Twenty-three of the seventy-nine have a `Classes/` folder with a `TESTS\…` PSR-4
+root. The other fifty-six are pure resources. The `ext_emconf.php` is checked
 like every other one: its `depends` names extension keys, and a fixture
 extension may name another fixture extension, which a real extension may not —
 see [Unit tests](unit-tests.md#the-ext_emconfphp-dependency-keys).

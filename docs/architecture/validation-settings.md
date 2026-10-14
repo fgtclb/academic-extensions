@@ -371,6 +371,38 @@ exactly when editors are meant to decide instead. The listener therefore leaves
 the validation of that column out of the merge, and the backend checkbox stays
 writable whatever the YAML says.
 
+Which validations reach which table is decided in one place,
+`Settings\TcaValidationSets` of `academic_persons`: the five table sets with
+the disabled column, refused project fields and columns the TCA lacks left
+out. The listener merges what it returns.
+
+### Two fields on one column
+
+`TcaValidationMerger::toTcaTableConfig()` assigns the fragment of each
+validation to `columns.<field>.config`, and
+`getDocumentValidationTcaTypesConfig()` does the same per record type. Two
+fields of one set that name the same column, a second profile field with
+`fieldName: teaching_area` for instance, therefore leave the column with the
+fragment of the field applied later, and the flags of the earlier one are lost.
+The profile set applies the profile fields in section order, then the special
+fields.
+`TcaValidationMergerTest::twoValidationsOnOneColumnKeepTheLastTcaConfig()` pins
+that.
+
+It is kept and documented rather than changed (ACE-444). A recursive merge is
+no fix: every fragment carries `readOnly` and `required`, so the later field
+would reset `required` while keeping the earlier `minitems`. Instead
+`TcaValidationSets::findSharedColumns()` looks for such columns in the same
+sets the listener merges, counting only fields with a TCA fragment, and two
+places report it as a warning with the table, the column and the fields: the
+`shared-column` finding of `academic:upgrade:check`, through the finding
+provider `academic_persons` registers, see
+[Upgrade checks](upgrade-checks.md#findings-of-other-extensions), and the
+persons settings entry of the status report. Neither changes the TCA. Fields
+that collapse while the settings are built, and a project field on a column
+whose type the merge changes, stay out of its reach, see
+[Upgrade checks](upgrade-checks.md#the-configuration-group).
+
 ### Project fields and the column check
 
 A project field is merged like any other field once its column may be used, so a

@@ -21,7 +21,7 @@ final class SortingOptions
     public const SORT_BY_BUDGET_ASC = 'tx_academicprojects_budget asc';
     public const SORT_BY_BUDGET_DESC = 'tx_academicprojects_budget desc';
     public const SORT_BY_STARTDATE_ASC = 'tx_academicprojects_start_date asc';
-    public const SORT_BY_STARTDATE_desc = 'tx_academicprojects_start_date desc';
+    public const SORT_BY_STARTDATE_DESC = 'tx_academicprojects_start_date desc';
 
     /**
      * Returns all sorting option constants (excluding the `__default` alias),

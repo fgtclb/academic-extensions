@@ -221,20 +221,22 @@ that branch on both versions.
 `FGTCLB\AcademicBase\Upgrade\ConfigurationChecker` takes no argument. It reads
 the `sys_template` records, the page TSconfig of the `pages` table and of the
 site configurations, the declared set dependencies of every site and the XCLASS
-registry, and answers with a list of findings:
+registry, adds what the finding providers of other academic extensions report,
+and answers with a list of findings:
 
-| Finding                   | Severity         | What it means                                                                        |
-|---------------------------|------------------|--------------------------------------------------------------------------------------|
-| `static-template`         | warning          | A TypoScript record includes an academic static template that delivers no TypoScript |
-| `tsconfig-import`         | warning          | A page or a site references an academic page TSconfig file that is not there         |
-| `tsconfig-syntax`         | warning          | A page or a site uses `<INCLUDE_TYPOSCRIPT:`, which TYPO3 v14 no longer reads        |
-| `typoscript-import`       | warning          | The Constants or Setup field of a TypoScript record imports a file that is not there |
-| `typoscript-syntax`       | warning          | The same field uses `<INCLUDE_TYPOSCRIPT:`                                           |
-| `set-branch-cleared`      | warning          | A record on a set-driven site's root page clears a branch those sets deliver         |
-| `alias-set`               | notice           | A site depends on a set that only forwards to another one                            |
-| `unavailable-set`         | error            | A site depends on an academic set TYPO3 cannot provide                               |
-| `set-and-static-template` | warning          | A site delivers one extension through a set and through a static template            |
-| `xclass`                  | notice to error  | An academic class is replaced through the XCLASS registry                            |
+| Finding                   | Severity        | What it means                                                                        |
+|---------------------------|-----------------|--------------------------------------------------------------------------------------|
+| `static-template`         | warning         | A TypoScript record includes an academic static template that delivers no TypoScript |
+| `tsconfig-import`         | warning         | A page or a site references an academic page TSconfig file that is not there         |
+| `tsconfig-syntax`         | warning         | A page or a site uses `<INCLUDE_TYPOSCRIPT:`, which TYPO3 v14 no longer reads        |
+| `typoscript-import`       | warning         | The Constants or Setup field of a TypoScript record imports a file that is not there |
+| `typoscript-syntax`       | warning         | The same field uses `<INCLUDE_TYPOSCRIPT:`                                           |
+| `set-branch-cleared`      | warning         | A record on a set-driven site's root page clears a branch those sets deliver         |
+| `alias-set`               | notice          | A site depends on a set that only forwards to another one                            |
+| `unavailable-set`         | error           | A site depends on an academic set TYPO3 cannot provide                               |
+| `set-and-static-template` | warning         | A site delivers one extension through a set and through a static template            |
+| `xclass`                  | notice to error | An academic class is replaced through the XCLASS registry                            |
+| `shared-column`           | warning         | Two fields of the persons settings name one column, only the later one's flags apply |
 
 Everything the group looks at belongs to an academic extension: an `EXT:` path
 below `academic_*` or `category_types`, a set of one of those packages, a class
@@ -438,6 +440,52 @@ The class name prefix is used rather than the autoload configuration of the
 active packages, because the interesting case is an XCLASS of a class 3.0
 *removed* — and that class is in no active package any more.
 
+**Shared columns**: `TcaValidationMerger` assigns the TCA fragment of each
+validation of a set to its column, so of two fields of the persons settings
+that name one column the one applied later decides the backend flags and the
+fragment of the earlier one is lost. The profile set applies the profile fields
+in section order, then the special fields. That is the documented behaviour
+(ACE-444). A recursive merge is no fix: every fragment carries `readOnly` and
+`required`, so the later field would reset `required` while the earlier
+`minitems` stayed. The check reports the column instead, so the loss is not
+silent. `academic_base` cannot read the persons settings, so `academic_persons`
+contributes the finding through a provider, see below. The column is found by
+`TcaValidationSets` of `academic_persons` in the same sets `ApplySettingsToTca`
+merges: a field counts when it has a TCA fragment and its column is one the
+merge reaches, the profile set leaves out the disabled column and refused
+project fields as the listener does, and the timeline sections are grouped per
+record type as their `columnsOverrides` are. The persons settings entry of the
+status report names the same columns from the same class.
+
+Two cases stay unreported, and the finder cannot close them:
+
+- Fields that collapse while the settings are built never reach a set. Two
+  fields of one set with the same property name keep only the later one, so
+  do two profile fields of one property name in different sections, which
+  `getProfileValidationSet()` combines with `array_replace()`, and a special
+  field whose identifier is the property name of a profile field replaces that
+  field in `getProfileUpdateValidationSet()`.
+- The listener refuses project fields against the TCA before the merge, the
+  reports against the merged `$GLOBALS['TCA']`. The merge can turn a column
+  into an `email` or `number` column, so the two can judge a project field
+  differently, which changes what is reported only where the field shares its
+  column with another field.
+
+### Findings of other extensions
+
+`ConfigurationFindingProviderInterface` lets another academic extension add
+findings about configuration `academic_base` cannot read. The interface
+carries `#[AutoconfigureTag]`, so every service implementing it is tagged by
+autoconfiguration, and `ConfigurationChecker` takes the tagged services as an
+`#[AutowireIterator]` constructor argument and appends their findings to its
+own. Both attributes are Symfony's and exist on both core versions.
+
+The interface is `@internal`, not an extension point: it exists for the
+academic extensions, and the extension points page of `academic_base` does
+not list it. A provider only reads and keeps no state. The one provider today
+is `SharedColumnFindingProvider` of `academic_persons`. Without that extension
+installed nothing is contributed, and the check runs as before.
+
 ### Where the findings are shown
 
 In the status report of EXT:reports, and on the command line. One implementation
@@ -461,11 +509,12 @@ active. The registration is covered in the other direction instead: with
 EXT:reports active, exactly one provider of this class is in the status
 registry.
 
-The finding texts are English in both places, built in the checker. They are
-made of record uids, stored paths and class names and are read next to the
-command output; one wording for both is worth more here than a translated one
-for each. Only the provider label and the "nothing stale" entry are language
-references.
+The finding texts are English in both places, built in the checker, and the
+text of a shared column in `SharedColumnFindingProvider` of `academic_persons`.
+They are made of record uids, stored paths, class names and column names and
+are read next to the command output. One wording for both is worth more here
+than a translated one for each. Only the provider label and the "nothing stale"
+entry are language references.
 
 ### What it does not check
 
@@ -507,17 +556,20 @@ references.
 
 ## Where the code is
 
-| File                                                                            | Contents                                                          |
-|---------------------------------------------------------------------------------|-------------------------------------------------------------------|
-| `packages/fgtclb/academic-base/Classes/Upgrade/TemplateOverrideChecker.php`     | The comparison, over two folders and nothing else.                |
-| `packages/fgtclb/academic-base/Classes/Upgrade/TemplateOverrideFinding.php`     | One file and its finding.                                         |
-| `packages/fgtclb/academic-base/Classes/Upgrade/TemplateOverrideFindingKind.php` | The three kinds, and which of them is a problem.                  |
-| `packages/fgtclb/academic-base/Classes/Upgrade/ConfigurationChecker.php`        | The six configuration checks, over the installation.              |
-| `packages/fgtclb/academic-base/Classes/Upgrade/ConfigurationFinding.php`        | One piece of stale configuration, with its severity.              |
-| `packages/fgtclb/academic-base/Classes/Upgrade/ConfigurationFindingKind.php`    | The six kinds, and the title the status report groups them by.    |
-| `packages/fgtclb/academic-base/Classes/Report/UpgradeConfigurationStatus.php`   | The status report entries, one per finding.                       |
-| `packages/fgtclb/academic-base/Configuration/Services.php`                      | The compiler pass that registers the provider with EXT:reports.   |
-| `packages/fgtclb/academic-base/Classes/Command/UpgradeCheckCommand.php`         | Option parsing, path and site resolution, output and exit status. |
+| File                                                                                      | Contents                                                            |
+|-------------------------------------------------------------------------------------------|---------------------------------------------------------------------|
+| `packages/fgtclb/academic-base/Classes/Upgrade/TemplateOverrideChecker.php`               | The comparison, over two folders and nothing else.                  |
+| `packages/fgtclb/academic-base/Classes/Upgrade/TemplateOverrideFinding.php`               | One file and its finding.                                           |
+| `packages/fgtclb/academic-base/Classes/Upgrade/TemplateOverrideFindingKind.php`           | The three kinds, and which of them is a problem.                    |
+| `packages/fgtclb/academic-base/Classes/Upgrade/ConfigurationChecker.php`                  | The configuration checks, over the installation.                    |
+| `packages/fgtclb/academic-base/Classes/Upgrade/ConfigurationFinding.php`                  | One piece of stale configuration, with its severity.                |
+| `packages/fgtclb/academic-base/Classes/Upgrade/ConfigurationFindingKind.php`              | The kinds, and the title the status report groups them by.          |
+| `packages/fgtclb/academic-base/Classes/Upgrade/ConfigurationFindingProviderInterface.php` | The tagged findings of other academic extensions.                   |
+| `packages/fgtclb/academic-persons/Classes/Settings/SharedColumnFindingProvider.php`       | The shared column finding of the persons settings.                  |
+| `packages/fgtclb/academic-persons/Classes/Settings/TcaValidationSets.php`                 | The sets the TCA listener merges, and the columns two fields share. |
+| `packages/fgtclb/academic-base/Classes/Report/UpgradeConfigurationStatus.php`             | The status report entries, one per finding.                         |
+| `packages/fgtclb/academic-base/Configuration/Services.php`                                | The compiler pass that registers the provider with EXT:reports.     |
+| `packages/fgtclb/academic-base/Classes/Command/UpgradeCheckCommand.php`                   | Option parsing, path and site resolution, output and exit status.   |
 
 The checker is covered by
 `packages/fgtclb/academic-base/Tests/Unit/Upgrade/TemplateOverrideCheckerTest.php`
@@ -536,6 +588,17 @@ extension `academic_test_configuration` stands in for an academic extension
 after an upgrade: it ships one static template folder that still holds
 TypoScript and one that does not, one page TSconfig file, one set and one class
 that is not final.
+
+The shared column finding is covered in `academic_persons`, where the
+provider is:
+`Tests/Functional/Upgrade/UpgradeCheckSharedColumnTest.php` loads the fixture
+extension `test_settings_shared_column`, whose settings declare a second
+profile field on the column of the teaching area, and
+`UpgradeCheckWithoutSharedColumnTest.php` shows that the shipped settings
+report nothing, `Tests/Functional/Report/SharedColumnStatusTest.php` the
+persons settings entry of the status report, and
+`Tests/Unit/Settings/TcaValidationSetsTest.php` the other sets and every field
+the merge leaves out.
 
 ## See also
 

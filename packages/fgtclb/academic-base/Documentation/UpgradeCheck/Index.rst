@@ -27,7 +27,9 @@ It runs two groups of checks:
         -   Runs
     *   -   :ref:`Configuration <upgrade-check-configuration>`
         -   The TypoScript records, the page TSconfig, the site configurations
-            and the XCLASS registry of the installation.
+            and the XCLASS registry of the installation. With
+            :php:`EXT:academic_persons` installed, also its settings and the
+            TCA of its tables.
         -   Always. It takes no argument.
     *   -   :ref:`Template overrides <upgrade-check-findings>`
         -   The Fluid files below the override folders of one extension.
@@ -93,9 +95,9 @@ What it reports about the configuration
 
 The configuration group reads the stored configuration of the installation and
 reports what no longer reaches the academic extensions, or what reaches them
-twice. Every finding names where the configuration is stored - a TypoScript
-record, a page, a site or a class - so it can be opened in the backend right
-away.
+twice. Every finding names where to look, so it can be found right away: the
+TypoScript record, page, site or class that stores the configuration, or the
+database column a setting reaches, as ``table.column``.
 
 ..  list-table::
     :header-rows: 1
@@ -196,6 +198,20 @@ away.
             this way; see :ref:`developers-extension-points`. For a model,
             make sure the getters and setters the subclass overrides still
             exist.
+    *   -   :bash:`shared-column`
+        -   Two fields of one part of the settings of
+            :php:`EXT:academic_persons` name the same database column. The
+            column takes the backend flags of the field applied later, and
+            the flags of the earlier one are lost, so a field the settings
+            mark as required or read only may not be either in the backend.
+            Reported only while :php:`EXT:academic_persons` is installed,
+            with the table, the column and the fields.
+        -   Give each field a column of its own, or remove the field whose
+            flags the column should not get.
+
+Every finding but :bash:`shared-column` is found by :php:`EXT:academic_base`
+itself. That one is contributed by :php:`EXT:academic_persons`, which can read
+its own settings.
 
 Only the academic extensions are looked at: an :bash:`EXT:` path below
 :bash:`academic_*` or :bash:`category_types`, a set of one of those extensions,

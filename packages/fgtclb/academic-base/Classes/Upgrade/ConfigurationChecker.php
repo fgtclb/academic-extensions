@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace FGTCLB\AcademicBase\Upgrade;
 
+use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\Yaml\Yaml;
 use TYPO3\CMS\Core\Core\Environment;
 use TYPO3\CMS\Core\Database\Connection;
@@ -33,6 +34,10 @@ use TYPO3\CMS\Extbase\DomainObject\DomainObjectInterface;
  * twice, or that replaces a class the extension has since made `final`. Two
  * fail loudly, but only once the upgraded installation runs: an XCLASS of a
  * `final` class, and a site depending on a set TYPO3 cannot provide.
+ *
+ * Another academic extension adds findings about configuration of its own
+ * through a {@see ConfigurationFindingProviderInterface}, which is how a
+ * column two fields of the persons settings share is reported here.
  *
  * The service only reads - no record, file or site configuration is written -
  * and behaves the same on TYPO3 v13 and v14.
@@ -137,6 +142,11 @@ final readonly class ConfigurationChecker
         private SiteFinder $siteFinder,
         private FileNameValidator $fileNameValidator,
         private SetRegistry $setRegistry,
+        /**
+         * @var iterable<ConfigurationFindingProviderInterface>
+         */
+        #[AutowireIterator(ConfigurationFindingProviderInterface::TAG_NAME)]
+        private iterable $findingProviders = [],
     ) {}
 
     /**
@@ -152,7 +162,24 @@ final readonly class ConfigurationChecker
             ...$this->checkPageTsConfig(),
             ...$this->checkSites($sysTemplateRows),
             ...$this->checkXclasses(),
+            ...$this->collectProvidedFindings(),
         ];
+    }
+
+    /**
+     * The findings other academic extensions contribute about configuration
+     * this extension cannot read, the persons settings for one.
+     *
+     * @return list<ConfigurationFinding>
+     */
+    private function collectProvidedFindings(): array
+    {
+        $findings = [];
+        foreach ($this->findingProviders as $findingProvider) {
+            array_push($findings, ...$findingProvider->findings());
+        }
+
+        return $findings;
     }
 
     /**

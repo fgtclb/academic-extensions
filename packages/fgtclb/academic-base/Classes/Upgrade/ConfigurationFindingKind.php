@@ -73,6 +73,13 @@ enum ConfigurationFindingKind: string
     case Xclass = 'xclass';
 
     /**
+     * Two fields of one part of the persons settings name the same database
+     * column, so the column takes the backend flags of the later one only.
+     * Reported by `academic_persons`.
+     */
+    case SharedColumn = 'shared-column';
+
+    /**
      * The title the status report shows for a finding of this kind. The report
      * groups by it, so one title per kind is what makes the entries readable.
      */
@@ -89,6 +96,7 @@ enum ConfigurationFindingKind: string
             self::SetAndStaticTemplate => 'Set and static template',
             self::SetBranchCleared => 'Cleared set branch',
             self::Xclass => 'XCLASS',
+            self::SharedColumn => 'Shared column',
         };
     }
 }

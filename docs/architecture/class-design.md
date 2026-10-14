@@ -220,7 +220,7 @@ The immutable data objects in this repository share one recognisable shape:
 final class SynchronizerContext
 {
     public function __construct(
-        public readonly RecordSynchronizerInterface $recordSyncronizer,
+        public readonly RecordSynchronizerInterface $recordSynchronizer,
         public readonly Site $site,
         public readonly SiteLanguage $defaultLanguage,
         public readonly array $allowedSiteLanguages,
@@ -250,13 +250,14 @@ a service from a data object. Two mechanisms keep them out, and both are in use:
 - The `exclude:` key in `Configuration/Services.yaml`, which is how the Extbase
   models are excluded in most packages.
 - Symfony's `#[Exclude]` attribute on the class, for data objects that do not
-  sit under an excluded path. Twenty-seven sites
+  sit under an excluded path. Twenty-eight sites
   (`grep -rn '#\[Exclude\]' --include='*.php' packages/fgtclb/*/Classes`):
   `Validation` and `ValidationSet` in `academic-base/Classes/Settings/`,
-  `AfterSaveDecision` in `academic-base/Classes/Form/`, fourteen
+  `AfterSaveDecision` in `academic-base/Classes/Form/`, fifteen
   classes under `academic-persons/Classes/Settings/` (the value objects of the
   settings graph, of the frontend user synchronisation and of the managed
-  fields, plus `LegacySettingsMigration` and `SettingsOverride`), the two value
+  fields, plus `LegacySettingsMigration`, `SettingsOverride` and
+  `SharedColumn`), the two value
   objects of the contract selection, `ContractSelection` and
   `ContractSelectionResult` in `academic-persons/Classes/Service/`, the five
   data objects of the import writer in `academic-persons/Classes/Import/`, the
