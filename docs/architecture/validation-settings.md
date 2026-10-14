@@ -117,7 +117,12 @@ Three consequences worth knowing:
 `Validation::$fieldName` is the property name converted with
 `GeneralUtility::camelCaseToLowerCaseUnderscored()`, i.e. the database column:
 `firstName` becomes `first_name`. That is what lets one entry address both the
-Extbase property and the TCA column.
+Extbase property and the TCA column. It also means that two spellings of one
+property in one set, `firstName` and `first_name`, address the same column,
+and the backend column takes the TCA of the entry listed later, as
+`AcademicPersonsSettingsTest::twoValidationsOnOneColumnKeepTheLastTcaConfig()`
+pins (ACE-444). It is documented rather than changed: a set cannot name a
+column otherwise, so it takes a property spelled twice in the YAML.
 
 ## Consumer 1 — the TYPO3 backend FormEngine
 
