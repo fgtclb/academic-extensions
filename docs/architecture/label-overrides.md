@@ -66,8 +66,8 @@ That is why the PHP places pass it in one of two ways:
 - **A controller or a service builds the argument list** and appends the request on v14
   only, then spreads it: `LocalizationUtility::translate(...$parameters)`. One call fits
   both signatures and phpstan accepts it on both; a direct fifth argument fails phpstan on
-  v13. `JobController::translateAlert()`, the profile editor's `ProfileController::
-  translate()` and `ProfileFieldOptionsService`, and the select items trait of
+  v13. `JobController::translateAlert()`, `EditorLabels::translate()` of the profile
+  editor and `ProfileFieldOptionsService`, and the select items trait of
   `academic_base` do this, each with a `@todo` to drop the switch with v13. A translation
   in PHP names its extension as well: without one, neither version reads any
   `_LOCAL_LANG` - the help texts and the country options of the editor did not.
