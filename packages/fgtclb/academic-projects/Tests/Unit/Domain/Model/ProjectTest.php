@@ -35,4 +35,17 @@ final class ProjectTest extends UnitTestCase
         yield 'ending tomorrow' => [new \DateTime('+1 day'), 'active'];
         yield 'ended yesterday' => [new \DateTime('-1 day'), 'completed'];
     }
+
+    /**
+     * A project that was never saved has neither uid nor pid, which Extbase keeps as
+     * `null`. Reading them must answer that instead of failing with a `TypeError`.
+     */
+    #[Test]
+    public function anUnsavedProjectHasNeitherUidNorPid(): void
+    {
+        $project = new Project();
+
+        $this->assertNull($project->getUid());
+        $this->assertNull($project->getPid());
+    }
 }
