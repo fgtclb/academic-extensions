@@ -6,7 +6,7 @@ injection, a template override that TypoScript must be able to find, an
 `ext_localconf.php` that has to run during bootstrap. For those, the test ships
 a small TYPO3 extension of its own.
 
-Fifteen such fixture extensions exist, in seven of the twelve extensions, and
+Sixteen such fixture extensions exist, in seven of the twelve extensions, and
 the table below lists all of them. That is the whole population — this is a
 mechanism used sparingly and only where nothing smaller works. Count them with:
 
@@ -29,6 +29,7 @@ They sit next to the tests that use them, under
 | `test_category_types_summary_override` | `tests/category-types-summary-override` | `typo3-category-types` | A page TSconfig override of the page module category summary template.   |
 | `test_frontend_readonly`               | `tests/test-frontend-readonly`          | `academic-persons`     | A `validations` map locking four fields for the frontend editor only.    |
 | `test_hidden_content_types`            | `tests/hidden-content-types`            | `academic-base`        | Page TSconfig and TCA hiding content types, for the wizard tests.        |
+| `test_job_after_save_listener`         | `tests/test-job-after-save-listener`    | `academic-jobs`        | A listener setting the redirect page after a save, a response recorder.  |
 | `test_jobcontact_schema`               | `tests/test-jobcontact-schema`          | `academic-jobs`        | `ext_tables.sql` only, for a removed table an upgrade wizard reads.      |
 | `test_language_files`                  | `tests/language-files`                  | `academic-persons`     | An XLF pair with awkward label keys (dots, dashes).                      |
 | `test_messy_profile_factory`           | `tests/test-messy-profile-factory`      | `academic-persons`     | A deliberately misbehaving profile factory and two event listeners.      |
@@ -40,8 +41,8 @@ They sit next to the tests that use them, under
 
 Each is a real, complete TYPO3 extension: a `composer.json` of type
 `typo3-cms-extension`, an `ext_emconf.php`, and whatever it exists to provide.
-Six of the fourteen have a `Classes/` folder with a `TESTS\…` PSR-4 root. The
-other eight are pure resources. Only `test_bitejobs_stub` and
+Eight of the sixteen have a `Classes/` folder with a `TESTS\…` PSR-4 root.
+The other eight are pure resources. Only `test_bitejobs_stub` and
 `test_partners_stub` ship an `ext_localconf.php`, which is how they replace the
 Guzzle handler stack before any request is built. The `ext_emconf.php` is
 checked like every other one: its `depends` names extension keys, and a
@@ -114,10 +115,10 @@ Two globs, two jobs:
 - The first finds every fixture extension and merges **both** its `autoload` and
   `autoload-dev` sections into the root autoloader. That is what makes
   `TESTS\TestMessyProfileFactory\Persons\MessyProfileFactory` resolvable at all.
-  The four fixture extensions that ship classes declare
-  `TESTS\BaseTestDependencyInjection\`, `TESTS\TestBitejobsStub\`,
-  `TESTS\TestMessyProfileFactory\` and `TESTS\CategoryTypesGroup\`; each is mapped to its own `Classes/` folder in
-  the generated `.Build/vendor/composer/autoload_psr4.php`.
+  The eight fixture extensions that ship classes each declare a root of their
+  own, `TESTS\BaseTestDependencyInjection\` or `TESTS\TestJobAfterSaveListener\`
+  for example, and each is mapped to its own `Classes/` folder in the generated
+  `.Build/vendor/composer/autoload_psr4.php`.
 - The second merges the `autoload-dev` of every package, which is how each
   extension's own `FGTCLB\<Name>\Tests\` namespace reaches the root autoloader.
 
@@ -232,7 +233,11 @@ The existing ones show the cases that justify one:
   registers one. `test_bitejobs_listener` is the same case for the request and
   result events of `academic_bite_jobs`. Its recording listener keeps the
   events in a static property, so a test reads what a listener was handed
-  during a frontend request too.
+  during a frontend request too. `test_job_after_save_listener` hands in the
+  redirect page a test sets in TypoScript from a listener of the after-save
+  event of the new job form, and records the response of the form plugin from
+  the Extbase dispatch event the same way, because TYPO3 v12 and v13 pass a
+  redirect to `header()`, where a test cannot read it.
 - **Resources resolved through `EXT:` paths.** `test_plugin_templates` and
   `test_language_files` exist because TypoScript and `LLL:` references need a
   real extension path.
