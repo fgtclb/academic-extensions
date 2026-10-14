@@ -39,12 +39,18 @@ class Project extends AbstractEntity implements GetCategoryCollectionInterface
         $this->media = new ObjectStorage();
     }
 
-    public function getPid(): int
+    /**
+     * @return int<0, max>|null
+     */
+    public function getPid(): ?int
     {
         return $this->pid;
     }
 
-    public function getUid(): int
+    /**
+     * @return int<1, max>|null
+     */
+    public function getUid(): ?int
     {
         return $this->uid;
     }

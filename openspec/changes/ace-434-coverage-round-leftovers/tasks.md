@@ -44,15 +44,15 @@
 
 ## 4. ACE-436: nullable uid (commit 3)
 
-- [ ] 4.1 `PartnerTest` (no uid, no categories), the new `ProjectTest` cases
+- [x] 4.1 `PartnerTest` (no uid, no categories), the new `ProjectTest` cases
   and `academic-partners/Tests/Unit/Command/GeocodeCommandTest.php`. Show them
   red with the `TypeError` on v12 and v13, and `Project::getPid()` alone once.
-- [ ] 4.2 `?int` on the three getters, the empty collection, the null check
+- [x] 4.2 `?int` on the three getters, the empty collection, the null check
   of `GeocodeCommand` before the request, the four baseline entries removed
   in `Core12` and `Core13`, none added. The baseline sizes in
   `docs/development/quality-gates.md` and
   `docs/architecture/core-version-aware-code.md` measured again.
-- [ ] 4.3 Gates on both cores, the functional tests of `academic-partners`
+- [x] 4.3 Gates on both cores, the functional tests of `academic-partners`
   and `academic-projects`, then commit 3.
 
 ## 5. ACE-441: sanitizer per setter call (commit 4)

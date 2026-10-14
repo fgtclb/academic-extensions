@@ -136,7 +136,7 @@ have to be a pair:
 | File                    | Core12                                          | Core13                                          |
 |-------------------------|-------------------------------------------------|-------------------------------------------------|
 | `phpstan.neon`          | excludes `Classes/Core13/*`, `Tests/*/Core13/*` | excludes `Classes/Core12/*`, `Tests/*/Core12/*` |
-| `phpstan-baseline.neon` | its own findings, 226 lines                     | its own findings, 236 lines                     |
+| `phpstan-baseline.neon` | its own findings, 201 lines                     | its own findings, 211 lines                     |
 
 A class written for one core version cannot be analysed against the other one —
 it references API that is not installed — so each configuration excludes the
