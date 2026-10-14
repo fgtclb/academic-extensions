@@ -110,6 +110,9 @@
     counter-reset: academic-persons-navigation;
     display: grid;
     gap: clamp(1.4rem, 3vw, 3rem);
+    // The numbers are the counter of each link, the marker of the ordered list
+    // would show them a second time.
+    list-style: none;
     margin: 0;
     padding: 0;
 }
@@ -186,9 +189,14 @@
     width: 100%;
 }
 
-.academic-persons-detail .ace-profile-image > .ace-image {
+// The image partial of academic_base wraps the image in a "picture" when it
+// has sources to offer and renders it bare otherwise, so the image is reached
+// at any depth below the wrapper.
+.academic-persons-detail .ace-profile-image .ace-picture,
+.academic-persons-detail .ace-profile-image .ace-image {
     display: block;
     height: auto;
+    max-width: 100%;
     width: 100%;
 }
 
@@ -419,6 +427,9 @@
     grid-template-columns: auto minmax(0, 1fr);
     line-height: 1.12;
     margin: 0 0 clamp(1.75rem, 4vw, 3.5rem);
+    // A long word at this size, such as "Memberships/Committee", is wider
+    // than the column of a phone and would make the page scroll sideways.
+    overflow-wrap: anywhere;
 
     &::before {
         content: counter(academic-persons-sections, decimal-leading-zero);
