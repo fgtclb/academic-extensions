@@ -43,11 +43,15 @@ listener can replace them, and calls `decide()` with what the listeners left.
 The jobs controller applies the deprecated `listPid` redirect in between,
 because that is jobs configuration.
 
-`decide()` redirects whenever a redirect page is given, while the message
-follows the mode, which counts a page id of `0` or below as no redirect page.
-Only a listener can hand in such a page id, and the form then redirects and
-queues the message. ACE-435 tracks that disagreement. It is kept in one place,
-`decide()`, so fixing it changes every form at once.
+`decide()` counts a page id of `0` or below as no redirect page, for the
+redirect and for the message alike, as the mode does. Only a listener can hand
+in such a page id, and the form then behaves as for no redirect page: it
+returns to the form page, where the message of the mode is shown. It used to
+redirect to that page id while the mode queued the message for the form page
+(ACE-435). The page id is normalised in `decide()`, not in the setter of the
+event, so a later listener still reads what an earlier one set, and in the jobs
+controller after the `listPid` fallback, which therefore never takes over a
+`0`.
 
 ## The field partials
 
@@ -121,6 +125,9 @@ its wrapper.
   of the resolver and the decision for every mode.
 - `academic-jobs/Tests/Unit/ClassAliasMapTest.php` resolves the old enum name
   and changes the mode of an `AfterSaveJobEvent` through it.
+- `academic-jobs/Tests/Functional/Plugins/AcademicJobsNewJobFormRedirectPageTest.php`
+  sends a job while a listener hands in a redirect page of `0` or `-1`, and
+  asserts the redirect to the form page and the message, on v13 and v14.
 - `academic-jobs/Tests/Functional/Plugins/AcademicJobsNewJobFormPartialOverrideTest.php`
   renders the form with a project copy of `Job/Forms/Textfield.html` and with
   one of `Job/Forms/FieldWrapper.html`, made from the files as they were before

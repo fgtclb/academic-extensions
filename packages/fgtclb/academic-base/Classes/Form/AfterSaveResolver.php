@@ -55,16 +55,20 @@ final readonly class AfterSaveResolver
     }
 
     /**
-     * The plugin redirects whenever a redirect page is given, while the flash message
-     * follows the mode, which counts a page id of 0 or below as no redirect page. Only
-     * a listener of the after-save event can hand in such a page id, and the plugin then
-     * does both (ACE-435).
+     * The redirect page and the flash message, decided from what the listeners of the
+     * after-save event left. A page id of 0 or below is no page and counts as no redirect
+     * page, for the redirect and for the mode alike. Only a listener can hand in such a
+     * page id, {@see self::redirectPageId()} never returns one. It is normalised here and
+     * not in the event, so a later listener still reads what an earlier one set.
      */
     public function decide(
         int $currentPageId,
         ?int $redirectPageId,
         FlashMessageCreationMode $flashMessageCreationMode,
     ): AfterSaveDecision {
+        if ($redirectPageId !== null && $redirectPageId <= 0) {
+            $redirectPageId = null;
+        }
         return new AfterSaveDecision(
             redirectPageId: $redirectPageId,
             createFlashMessage: $flashMessageCreationMode->shouldBeCreated($currentPageId, $redirectPageId),

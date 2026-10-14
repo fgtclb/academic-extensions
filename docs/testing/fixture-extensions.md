@@ -6,7 +6,7 @@ injection, a template override that TypoScript must be able to find, an
 `ext_localconf.php` that has to run during bootstrap. For those, the test ships
 a small TYPO3 extension of its own.
 
-Seventy-seven such fixture extensions exist, in eleven of the twelve extensions.
+Seventy-eight such fixture extensions exist, in eleven of the twelve extensions.
 That is the whole population — this is a mechanism used sparingly and only
 where nothing smaller works. Measured with
 
@@ -51,6 +51,7 @@ They sit next to the tests that use them, under
 | `test_frontend_user_sync_relations_by_name` | `tests/test-frontend-user-sync-relations-by-name` | `academic-persons`       | A synchronisation map matching units by name and creating function types.     |
 | `test_hidden_content_types`                 | `tests/hidden-content-types`                      | `academic-base`          | Two content types hidden by page TSconfig, one in the academic group.         |
 | `test_icon_rules`                           | `tests/icon-rules`                                | `academic-base`          | Icons following every icon rule, in both registries and category types.       |
+| `test_job_after_save_listener`              | `tests/test-job-after-save-listener`              | `academic-jobs`          | A listener setting the redirect page after a save, and a response recorder.   |
 | `test_job_icons`                            | `tests/job-icons`                                 | `academic-jobs`          | Job icons replaced in `FrontendIcons.php`, and without effect in `Icons.php`. |
 | `test_job_validation_override`              | `tests/job-validation-override`                   | `academic-jobs`          | A jobs `Settings.yaml` naming nine fields, a TCA override, two TCA listeners. |
 | `test_jobcontact_schema`                    | `tests/test-jobcontact-schema`                    | `academic-jobs`          | `ext_tables.sql` without TCA for a removed table an upgrade wizard reads.     |
@@ -80,6 +81,7 @@ They sit next to the tests that use them, under
 | `test_programs_category_type_priority`      | `tests/programs-category-type-priority`           | `academic-programs`      | A `CategoryTypes.yaml` raising the priority of a type of the programs group.  |
 | `test_programs_extra_category_type`         | `tests/programs-extra-category-type`              | `academic-programs`      | A `CategoryTypes.yaml` adding one type to the programs group.                 |
 | `test_programs_frontend_icons`              | `tests/programs-frontend-icons`                   | `academic-programs`      | Fact icons replaced in `FrontendIcons.php` and `Icons.php`, a `frontendIcon`. |
+| `test_programs_plain_text_facts`            | `tests/programs-plain-text-facts`                 | `academic-programs`      | The rich text editor of three program fields switched in three ways.          |
 | `test_programs_removed_category_type`       | `tests/programs-removed-category-type`            | `academic-programs`      | A `CategoryTypes.yaml` removing a type from the programs group.               |
 | `test_programs_titled_category_type`        | `tests/programs-titled-category-type`             | `academic-programs`      | A program type with a translated title, and the shipped degree retitled.      |
 | `test_project_list_events`                  | `tests/test-project-list-events`                  | `academic-projects`      | Two listeners on the project demand and list events, and a list template.     |
@@ -102,7 +104,7 @@ They sit next to the tests that use them, under
 
 Each is a real, complete TYPO3 extension: a `composer.json` of type
 `typo3-cms-extension`, an `ext_emconf.php`, and whatever it exists to provide.
-Twenty-two of the seventy-seven have a `Classes/` folder with a `TESTS\…` PSR-4
+Twenty-three of the seventy-eight have a `Classes/` folder with a `TESTS\…` PSR-4
 root. The other fifty-five are pure resources. The `ext_emconf.php` is checked
 like every other one: its `depends` names extension keys, and a fixture
 extension may name another fixture extension, which a real extension may not —
@@ -333,6 +335,11 @@ The existing ones show the cases that justify one:
   `academic_bite_jobs`. Its recording listener keeps those events and the
   plugin view event of the job list in a static property, so a test reads what
   a listener was handed during a frontend request too.
+  `test_job_after_save_listener` hands in the redirect page a test sets in
+  TypoScript from a listener of the after-save event of the new job form, and
+  records the response of the form plugin from the Extbase dispatch event the
+  same way, because TYPO3 v13 passes a redirect to `header()`, where a test
+  cannot read it.
   `test_frontend_user_sync_events` needs a package for two reasons: its
   listeners of the synchronisation events register through
   the container, and its `frontendUserSync` map, which reads a value one of
