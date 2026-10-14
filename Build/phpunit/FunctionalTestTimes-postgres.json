@@ -325,7 +325,6 @@
     "packages/fgtclb/academic-programs/Tests/Functional/Backend/PageModuleCategorySummaryTest.php": 3.31,
     "packages/fgtclb/academic-programs/Tests/Functional/CategoryTypes/CategoryTypePriorityTest.php": 4.04,
     "packages/fgtclb/academic-programs/Tests/Functional/CategoryTypes/CategoryTypesTest.php": 2.85,
-    "packages/fgtclb/academic-programs/Tests/Functional/Collection/FileReferenceCollectionTest.php": 5.13,
     "packages/fgtclb/academic-programs/Tests/Functional/Domain/Repository/ProgramRepositoryOrderingTest.php": 2.56,
     "packages/fgtclb/academic-programs/Tests/Functional/Domain/Repository/ProgramRepositoryShowHiddenRecordsTest.php": 2.81,
     "packages/fgtclb/academic-programs/Tests/Functional/Domain/Repository/ProgramRepositorySubcategoriesTest.php": 3.92,

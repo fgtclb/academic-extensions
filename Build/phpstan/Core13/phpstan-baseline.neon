@@ -51,11 +51,6 @@ parameters:
 			path: ../../../packages/fgtclb/academic-jobs/Tests/Functional/ExtensionLoadedTest.php
 
 		-
-			message: "#^Method FGTCLB\\\\AcademicPartners\\\\Domain\\\\Repository\\\\PartnerRepository\\:\\:findAll\\(\\) should return TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\Generic\\\\QueryResult\\<FGTCLB\\\\AcademicPartners\\\\Domain\\\\Model\\\\Partner\\>\\|null but returns TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\QueryResultInterface\\.$#"
-			count: 1
-			path: ../../../packages/fgtclb/academic-partners/Classes/Domain/Repository/PartnerRepository.php
-
-		-
 			message: "#^Method FGTCLB\\\\AcademicPartners\\\\Domain\\\\Repository\\\\PartnerRepository\\:\\:findByDemand\\(\\) should return TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\Generic\\\\QueryResult\\<FGTCLB\\\\AcademicPartners\\\\Domain\\\\Model\\\\Partner\\> but returns TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\QueryResultInterface\\<int, FGTCLB\\\\AcademicPartners\\\\Domain\\\\Model\\\\Partner\\>\\.$#"
 			count: 1
 			path: ../../../packages/fgtclb/academic-partners/Classes/Domain/Repository/PartnerRepository.php
