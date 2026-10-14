@@ -14,7 +14,8 @@ six factories, one private setter per property — plus
 ## Where the values come from
 
 There is no Extbase form. The editing frontend posts JSON to the actions of
-`ProfileController`, and the payload carries only what changed:
+`ProfileController`, `DocumentController` and `ContractContactController`, and
+the payload carries only what changed:
 
 ```json
 { "profile": 123, "data": { "website": "https://example.org", "websiteTitle": "" } }

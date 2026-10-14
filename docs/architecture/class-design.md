@@ -2,8 +2,8 @@
 
 Conventions for classes under `packages/fgtclb/*/Classes/` and
 `packages-dev/*/Classes/`. Where the codebase is inconsistent this page says so
-rather than describing an intention as a rule: 389 PHP files declaring 342
-classes, 11 interfaces, 21 traits and 15 enums do not follow one style yet.
+rather than describing an intention as a rule: 408 PHP files declaring 358
+classes, 12 interfaces, 23 traits and 15 enums do not follow one style yet.
 
 The counts on this page are measured over `packages/fgtclb/*/Classes/` and
 `packages-dev/*/Classes/` together, unless a section says otherwise:
@@ -16,20 +16,20 @@ grep -rhoP '^(?:(?:final|abstract|readonly)\s+)*class\b' --include='*.php' \
 
 ## `final` by default, and where it is impossible
 
-235 of the 342 classes are `final` (69 %). The distribution is not random: it
+251 of the 358 classes are `final` (70 %). The distribution is not random: it
 tracks whether the framework instantiates the class or the container does.
 
 | Directory                                  | final | plain | abstract | % final |
 |--------------------------------------------|-------|-------|----------|---------|
 | `Classes/Upgrades/`                        | 18    | 0     | 0        | 100 %   |
-| `Classes/Service/` and `Classes/Services/` | 32    | 2     | 0        | 94 %    |
+| `Classes/Service/` and `Classes/Services/` | 43    | 2     | 0        | 96 %    |
 | `Classes/EventListener/`                   | 18    | 1     | 0        | 95 %    |
-| `Classes/Controller/`                      | 9     | 0     | 0        | 100 %   |
+| `Classes/Controller/`                      | 11    | 0     | 0        | 100 %   |
 | `Classes/Domain/Model/Dto/`                | 8     | 10    | 1        | 42 %    |
 | `Classes/ViewHelpers/`                     | 9     | 6     | 0        | 60 %    |
 | `Classes/Domain/Model/` (excluding `Dto/`) | 1     | 23    | 0        | 4 %     |
 | `Classes/Domain/Repository/`               | 0     | 16    | 0        | 0 %     |
-| Everything else                            | 140   | 43    | 5        | 74 %    |
+| Everything else                            | 143   | 43    | 5        | 75 %    |
 
 Make a new class `final` unless something concrete prevents it. Services are
 replaced through the container, not through inheritance, so extensibility is
@@ -55,8 +55,8 @@ this and is the pattern to copy:
 
 ## `readonly` on properties, and on stateless service classes
 
-`readonly` is used heavily, mostly on individual properties: 379 modifiers, of
-which 366 are constructor-promoted, across 114 files. The thirteen non-promoted
+`readonly` is used heavily, mostly on individual properties: 405 modifiers, of
+which 392 are constructor-promoted, across 123 files. The thirteen non-promoted
 declarations are the nine documented fields of
 `academic-persons/Classes/Settings/AcademicPersonsSettings.php`, the three
 fields `typo3-category-types/Classes/Routing/Aspect/CategoryFilterMapper.php`
@@ -74,7 +74,7 @@ The second command counts the promoted ones: a promoted parameter never ends
 the line with a semicolon and a declared property always does.
 
 `final readonly class` is the shape of a **stateless service that extends
-nothing**, and of an immutable data object. There are 76:
+nothing**, and of an immutable data object. There are 101:
 
 ```bash
 grep -rh '^final readonly class' --include='*.php' \
@@ -98,8 +98,8 @@ The split by visibility says what each is for:
 
 | Modifier             | Count | Means                                             |
 |----------------------|-------|---------------------------------------------------|
-| `private readonly`   | 237   | An injected collaborator                          |
-| `public readonly`    | 122   | A field of an immutable data object               |
+| `private readonly`   | 259   | An injected collaborator                          |
+| `public readonly`    | 126   | A field of an immutable data object               |
 | `protected readonly` | 20    | Either, in classes with subclasses or older style |
 
 Use `private readonly` for every constructor-injected dependency. It states that
@@ -119,11 +119,28 @@ required, not a deviation.
 
 ## Constructor injection, and the abstract class exception
 
-Constructor injection with promoted properties is the default: 95 files declare
-312 promoted `readonly` parameters. The fullest example by a wide margin is
-`academic-persons-edit/Classes/Controller/ProfileController.php` — 36 promoted
-`private readonly` dependencies and an empty constructor body. That number is a
-known problem rather than a model: splitting the controller is ACE-507.
+Constructor injection with promoted properties is the default: 120 files
+declare 392 promoted `readonly` parameters. The fullest example is
+`academic-persons-edit/Classes/Controller/ProfileController.php`, with 22
+promoted `private readonly` dependencies and an empty constructor body. It had
+39 until ACE-507 split it into three controllers of one plugin, and
+`DocumentController` beside it has 14 and `ContractContactController` 9.
+
+A plugin with several controllers shares what they have in common through
+stateless services, not through a base controller: the three controllers of
+the profile editor call `EditorEndpoint` for the header check, the JSON error
+answer and the payload readers, and `EditorWrites` for the write lifecycle. A
+base controller's constructor would be inherited API, and a subclass that
+overrides `initializeAction()` without calling the parent would lose the
+header check without a sound. A test per endpoint is what holds the check, not
+the structure.
+
+A service of the profile editor that refuses a request throws
+`EditorRequestException` (error, status, message, field errors) rather than
+building a response. Every action catches it ahead of its `catch (\Throwable)`
+and answers it through `EditorEndpoint::answerRefusal()`. An action without
+that catch turns a `422` into a logged `500`, so a new action of the editor
+gets it together with its first service call.
 
 **Method injection is used where a constructor is not available to take
 dependencies.** There are 13 `inject*()` methods across 7 files and **zero**
@@ -185,8 +202,8 @@ because its injected property is nullable and therefore mutable state.
 another example, with three `inject*()` methods and no constructor. The moment
 it needed a fourth collaborator, the four became a constructor with promoted
 `private readonly` properties — an Extbase `ActionController` has no
-constructor of its own, so nothing has to be forwarded. The `ProfileController`
-of `academic-persons-edit` is built the same way, with 36 of them.
+constructor of its own, so nothing has to be forwarded. The three controllers
+of `academic-persons-edit` are built the same way.
 
 ### `GeneralUtility::makeInstance()`
 
@@ -406,7 +423,7 @@ retired core labels. See [Testing helper](../testing/testing-helper.md).
 
 ## Strict types
 
-367 of the 370 files declare `strict_types=1` (99 %), here counted over
+384 of the 387 files declare `strict_types=1` (99 %), here counted over
 `packages/fgtclb/` only. New files must. Measured with
 `find packages/fgtclb/*/Classes -name '*.php' | wc -l` against
 `grep -rl 'declare(strict_types=1)' --include='*.php' packages/fgtclb/*/Classes | wc -l`;

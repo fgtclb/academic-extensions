@@ -74,8 +74,8 @@ added, updated or removed. It resolves the profile of the written entity and flu
 Every other entity is left alone, an Extbase write of another extension costs an
 `instanceof` chain. The events cover every Extbase write of these records, the profile
 synchronisation from frontend users and the reordering of the editor through
-`PersistenceManager::update()` included, which is why the editor controller carries no
-flush of its own.
+`PersistenceManager::update()` included, which is why the editor controllers carry no
+flush of their own.
 
 A write that touches several records flushes once per record: the listener keeps no
 state to collect them. Only a changed record dispatches an event, Extbase writes a

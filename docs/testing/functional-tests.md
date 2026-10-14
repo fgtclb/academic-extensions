@@ -294,12 +294,13 @@ a fixture from being quietly reused by a test it was not written for.
 
 ## Testing a JSON endpoint
 
-`academic-persons-edit` answers fourteen actions as JSON — the thirteen of
-`ProfileController::JSON_ACTIONS` plus the multipart `uploadImage` — and they
-are tested
-through the real plugin rather than by calling the controller: the gate that
-refuses a request lives partly in `initializeAction()` and partly in a service,
-and only a real request exercises both.
+`academic-persons-edit` answers seventeen actions as JSON, served by three
+controllers of one plugin: the four of `ProfileController::JSON_ACTIONS` and
+the multipart `uploadImage`, and every action of `DocumentController` and
+`ContractContactController`. They are tested through the real plugin rather
+than by calling a controller: the gate that refuses a request lives partly in
+`initializeAction()` and partly in a service, and only a real request exercises
+both.
 
 The pattern is a helper on the test class. The one below is composed from
 `AcademicPersonsEditProfileEditingTest` and shortened for the page; read the

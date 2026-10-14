@@ -16,6 +16,14 @@ as `data-*` attributes on one element, the plugin root of
 | Messages  | 26    | `data-message-saving`, `data-message-document-delete-confirm`    |
 | Labels    | 6     | `data-label-document-add`, `data-label-document-empty`           |
 
+Each endpoint address names the controller of its family, through the one
+profile editing plugin and the page type `1733735`: `Profile` for the profile
+fields, the two switches and the image, `Document` for the contracts and
+profile information entries, `ContractContact` for the contacts of a contract.
+A template override builds them the way the shipped template does. An address
+that names an action under another controller is refused by Extbase before any
+controller runs.
+
 Only the labels a *value* is composed from travel this way — the heading of a
 contact editor is `${documentAdd} ${section.singularLabel}`, an empty display
 value shows `documentEmpty`. A label that is only ever *rendered* is written by

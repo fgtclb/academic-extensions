@@ -172,7 +172,7 @@ final class ExtensionPointTest extends TestCase
     public function everyPluginControllerIsFound(): void
     {
         $this->assertCount(
-            9,
+            11,
             self::pluginControllers(),
             'The number of plugin controllers below packages/fgtclb/*/Classes changed. Adjust it when a'
             . ' controller was added or removed, otherwise the scan is broken.',
