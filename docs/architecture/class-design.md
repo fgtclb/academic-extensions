@@ -206,7 +206,7 @@ a service from a data object. Two mechanisms keep them out, and both are in use:
   models are excluded in most packages.
 - Symfony's `#[Exclude]` attribute on the class, for data objects that do not
   sit under an excluded path. Three sites, all in
-  `academic-persons/Classes/Settings/`: `Validation.php:12`,
+  `academic-persons/Classes/Settings/`: `Validation.php:14`,
   `ValidationSet.php:13`, `ProfileInformationType.php:12`.
 
 The `Settings/` classes show why the attribute is needed: they are immutable
@@ -293,11 +293,11 @@ be set.
 
 ## Strict types
 
-283 of the 290 files declare `strict_types=1`, here counted over
+286 of the 292 files declare `strict_types=1`, here counted over
 `packages/fgtclb/` only. New files must. Measured with
 `find packages/fgtclb/*/Classes -name '*.php' | wc -l` against
 `grep -rl 'declare(strict_types=1)' --include='*.php' packages/fgtclb/*/Classes | wc -l`;
-`packages-dev/` and `Tests/` are not counted. The 7 that do not are worth
+`packages-dev/` and `Tests/` are not counted. The 6 that do not are worth
 knowing so they are fixed rather than copied:
 
 | File                                                                 |
@@ -307,13 +307,18 @@ knowing so they are fixed rather than copied:
 | `academic-programs/Classes/DataProcessing/ProgramDataProcessor.php`  |
 | `academic-persons/Classes/Event/ModifySelectedProfilesEvent.php`     |
 | `academic-persons/Classes/Event/ModifySelectedContractsEvent.php`    |
-| `academic-persons/Classes/Settings/Validation.php`                   |
 | `academic-projects/Classes/ViewHelpers/Format/ReplaceViewHelper.php` |
 
-Three of the seven are `DataProcessing/` classes, which suggests one origin
-rather than seven independent omissions. A fourth,
+Three of the six are `DataProcessing/` classes, which suggests one origin
+rather than six independent omissions. A fourth,
 `academic-contact4pages/Classes/DataProcessing/ContactsProcessor.php`, was one
 of them until it gained a constructor (ACE-101) and was fixed on the way.
+`academic-persons/Classes/Settings/Validation.php` was fixed on its own
+(ACE-444). Strict mode governs the calls a file makes, and the only call in
+that file is `new self()` in `__set_state()`, fed with typed values from the
+settings cache, so nothing observable changed. The six left hand values to
+other code, where strict mode could turn a coercion into a `TypeError`, so
+they are a change of their own.
 
 ## Static analysis
 

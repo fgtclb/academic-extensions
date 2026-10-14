@@ -84,16 +84,16 @@
 
 ## 7. ACE-444: slips (commit 6)
 
-- [ ] 7.1 The nine headers, `@toodo`, strict types in
+- [x] 7.1 The nine headers, `@toodo`, strict types in
   `Settings/Validation.php`, and `docs/architecture/class-design.md` updated.
   A search finds no header and no `@toodo` left.
-- [ ] 7.2 `ProfileInformationType::__set_state(): self`, and `isValid()`
+- [x] 7.2 `ProfileInformationType::__set_state(): self`, and `isValid()`
   requires a field name, with the row of `ProfileInformationTypeTest`
   flipped first and shown red on v12 and v13.
-- [ ] 7.3 One sentence on two spellings of one property in
+- [x] 7.3 One sentence on two spellings of one property in
   `academic-persons/Documentation/Configuration/Validations/Index.rst` and
   `docs/architecture/validation-settings.md`.
-- [ ] 7.4 Gates on both cores, the functional tests of `academic-persons`,
+- [x] 7.4 Gates on both cores, the functional tests of `academic-persons`,
   then commit 6.
 
 ## 8. Definition of done
