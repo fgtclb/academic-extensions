@@ -106,9 +106,11 @@ final class AfterSaveResolverTest extends UnitTestCase
             yield $mode->name . ', no redirect page' => [$mode, null, null, $stays];
             yield $mode->name . ', redirect to the current page' => [$mode, 10, 10, $stays];
             yield $mode->name . ', redirect to another page' => [$mode, 11, 11, $mode === FlashMessageCreationMode::ALWAYS];
-            // A listener may hand in a page id of 0. The plugin redirects to it, while the
-            // mode counts it as no redirect page (ACE-435).
-            yield $mode->name . ', redirect page zero' => [$mode, 0, 0, $stays];
+            // A listener may hand in a page id of 0 or below. It is no page, so the plugin
+            // does not redirect to it, and the message follows the mode as for no redirect
+            // page (ACE-435).
+            yield $mode->name . ', redirect page zero' => [$mode, 0, null, $stays];
+            yield $mode->name . ', negative redirect page' => [$mode, -1, null, $stays];
         }
     }
 }
