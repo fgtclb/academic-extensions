@@ -1,22 +1,22 @@
 ## 1. Premises
 
-- [ ] 1.1 Re-check the context of `design.md` on `HEAD` for TYPO3 v12 and v13
+- [x] 1.1 Re-check the context of `design.md` on `HEAD` for TYPO3 v12 and v13
   after a `composerUpdate` each, the v12 core reads with file and line. A
   premise that no longer holds stops the work, and the change is updated
   first.
 
 ## 2. ACE-434: guarded reads (commit 1)
 
-- [ ] 2.1 Add `aRecordWithoutThePageColumnsMapsToEmptyValues()` to
+- [x] 2.1 Add `aRecordWithoutThePageColumnsMapsToEmptyValues()` to
   `academic-programs/Tests/Functional/Factory/ProgramDataFactoryTest.php`,
   without the application link assertions of `main`, and
   `aContentElementRecordWithoutUidGetsAnEmptyFilter()` to the demand factory
   tests of `academic-partners`, `academic-programs` and `academic-projects`.
   Show each red on the unchanged factories on v12 and v13 (PHP warning under
   `failOnWarning`).
-- [ ] 2.2 Read the ten keys and the content element uid with a fallback, and
+- [x] 2.2 Read the ten keys and the content element uid with a fallback, and
   show the tests green on both cores.
-- [ ] 2.3 Gates on both cores, the functional tests of the three extensions,
+- [x] 2.3 Gates on both cores, the functional tests of the three extensions,
   then commit 1 of `design.md`.
 
 ## 3. ACE-435: redirect page 0 (commit 2)
