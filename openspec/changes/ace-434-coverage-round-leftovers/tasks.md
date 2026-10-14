@@ -21,25 +21,25 @@
 
 ## 3. ACE-435: redirect page 0 (commit 2)
 
-- [ ] 3.1 `academic-jobs/Tests/Unit/Event/AfterSaveJobEventTest.php`: a later
+- [x] 3.1 `academic-jobs/Tests/Unit/Event/AfterSaveJobEventTest.php`: a later
   listener reads the 0 or negative page an earlier one set. Show it red once
   against a setter that normalises.
-- [ ] 3.2 The fixture extension `test_job_after_save_listener` (a listener
+- [x] 3.2 The fixture extension `test_job_after_save_listener` (a listener
   setting the redirect page from a TypoScript setting, and a recorder of the
   response of the form plugin, both registered by tag) and the functional
   test `AcademicJobsNewJobFormRedirectPageTest` with the data sets 0, -1, and
   0 with a list page configured: the recorded answer is a 303 to `/new-job`
   with a `cHash`, and the confirmation message is shown. Show it red on the
   unchanged controller on v12 and on v13.
-- [ ] 3.3 Normalise the redirect page in `createAction()` after the
+- [x] 3.3 Normalise the redirect page in `createAction()` after the
   `listPid` fallback, correct the docblock of `shouldBeCreated()`, the
   controller comment and the comment of `FlashMessageCreationModeTest`, and
   drop the two `>= 0` guards. Show the tests green on both cores.
-- [ ] 3.4 `Important-RedirectPageZeroFromAListenerMeansNone.rst` in
+- [x] 3.4 `Important-RedirectPageZeroFromAListenerMeansNone.rst` in
   `academic-jobs/Documentation/Changelog/2.4/`, with the redirect target
   before the fix as measured on v12 and v13, and the new fixture extension in
   `docs/testing/fixture-extensions.md` with the counts measured again.
-- [ ] 3.5 Gates on both cores, the functional tests of `academic-jobs`, then
+- [x] 3.5 Gates on both cores, the functional tests of `academic-jobs`, then
   commit 2.
 
 ## 4. ACE-436: nullable uid (commit 3)
