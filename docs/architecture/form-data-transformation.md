@@ -92,11 +92,11 @@ Three decisions shape it:
   them. When a listener changed them, the controller runs the same
   normalisation and validation on the new values that it ran on the submitted
   ones: `createFormData()` and the validator for the profile,
-  `normalizeAndValidateDocumentFields()` and
-  `normalizeAndValidateContractContactFields()` for the rest. A locked field is
-  dropped again, an invalid value is a `422`, and rich text runs through the
-  sanitiser. A listener never touches the override store, so the factories
-  only ever read normalised values from it.
+  `normalizeAndValidateDocumentFields()` of `DocumentFieldNormalizer` and
+  `normalizeAndValidateContractContactFields()` of `ContractContactFields` for
+  the rest. A locked field is dropped again, an invalid value is a `422`,
+  and rich text runs through the sanitiser. A listener never touches the
+  override store, so the factories only ever read normalised values from it.
 - **A refusal is `422` `write_refused`** with the listener's reason as the
   message, the error shape the editor already shows as text. The event is
   stoppable and a refusal stops it.
