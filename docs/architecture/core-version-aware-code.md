@@ -251,7 +251,7 @@ The two `phpstan.neon` files differ in exactly one place — the last two
 | File                    | Difference                                                            |
 |-------------------------|-----------------------------------------------------------------------|
 | `phpstan.neon`          | `excludePaths` — Core12 excludes `Core13/`, Core13 excludes `Core12/` |
-| `phpstan-baseline.neon` | separate baselines (226 lines on Core12, 236 on Core13)               |
+| `phpstan-baseline.neon` | separate baselines (201 lines on Core12, 211 on Core13)               |
 | `phpstan-constants.php` | none — byte identical, it only defines `ORIGINAL_ROOT`                |
 
 The exclusion covers both `Classes/*/Core1x/*` and `Tests/*/Core1x/*`, and it

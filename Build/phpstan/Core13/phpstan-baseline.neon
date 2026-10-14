@@ -66,16 +66,6 @@ parameters:
 			path: ../../../packages/fgtclb/academic-jobs/Tests/Functional/ExtensionLoadedTest.php
 
 		-
-			message: "#^Method FGTCLB\\\\AcademicPartners\\\\Domain\\\\Model\\\\Partner\\:\\:getUid\\(\\) should return int but returns int\\<1, max\\>\\|null\\.$#"
-			count: 1
-			path: ../../../packages/fgtclb/academic-partners/Classes/Domain/Model/Partner.php
-
-		-
-			message: "#^PHPDoc tag @return with type int\\<0, max\\>\\|null is not subtype of native type int\\.$#"
-			count: 1
-			path: ../../../packages/fgtclb/academic-partners/Classes/Domain/Model/Partner.php
-
-		-
 			message: "#^Method FGTCLB\\\\AcademicPartners\\\\Domain\\\\Repository\\\\PartnerRepository\\:\\:findAll\\(\\) should return TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\Generic\\\\QueryResult\\<FGTCLB\\\\AcademicPartners\\\\Domain\\\\Model\\\\Partner\\>\\|null but returns TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\QueryResultInterface\\.$#"
 			count: 1
 			path: ../../../packages/fgtclb/academic-partners/Classes/Domain/Repository/PartnerRepository.php
@@ -184,16 +174,6 @@ parameters:
 			message: "#^Static property FGTCLB\\\\AcademicPrograms\\\\Tests\\\\Functional\\\\ExtensionLoadedTest\\:\\:\\$expectedLoadedExtensions is never read, only written\\.$#"
 			count: 1
 			path: ../../../packages/fgtclb/academic-programs/Tests/Functional/ExtensionLoadedTest.php
-
-		-
-			message: "#^Method FGTCLB\\\\AcademicProjects\\\\Domain\\\\Model\\\\Project\\:\\:getPid\\(\\) should return int but returns int\\<0, max\\>\\|null\\.$#"
-			count: 1
-			path: ../../../packages/fgtclb/academic-projects/Classes/Domain/Model/Project.php
-
-		-
-			message: "#^Method FGTCLB\\\\AcademicProjects\\\\Domain\\\\Model\\\\Project\\:\\:getUid\\(\\) should return int but returns int\\<1, max\\>\\|null\\.$#"
-			count: 1
-			path: ../../../packages/fgtclb/academic-projects/Classes/Domain/Model/Project.php
 
 		-
 			message: "#^Method FGTCLB\\\\AcademicProjects\\\\Domain\\\\Repository\\\\ProjectRepository\\:\\:findByDemand\\(\\) should return TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\Generic\\\\QueryResult\\<FGTCLB\\\\AcademicProjects\\\\Domain\\\\Model\\\\Project\\> but returns TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\QueryResultInterface\\.$#"
