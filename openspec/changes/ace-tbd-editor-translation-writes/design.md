@@ -5,11 +5,12 @@ See `proposal.md`. Verified by reading `main`, not executed:
 - `ProfileUpdateRequestService::findEditableProfile()` resolves the profile
   through `ProfileRepository::findByFrontendUser()` in the request language,
   which yields the overlay object.
-- `createDocumentAction()` hands that object to
+- `DocumentController::createDocumentAction()` hands that object to
   `ProfileInformationFactory::createFromFormData()`. Extbase writes the
   relation as `getUid()`, the default-language uid, and the new row with
   `sys_language_uid = 0`.
-- `persistAndDispatchProfileUpdate()` returns without dispatching when
+- `EditorWrites::persistAndDispatchProfileUpdate()`, which the three
+  controllers of the editor share, returns without dispatching when
   `$profile->getIsTranslation()` is true, for every endpoint.
 - Profile field edits on the overlay are written to the translation row.
 - `profile_information.profile` only offers default-language profiles

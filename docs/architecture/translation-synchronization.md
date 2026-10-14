@@ -73,16 +73,17 @@ keeps working and yields no site and the origin `Unknown`. Listeners read the
 database, not the object, so a dispatch is only meaningful after
 `persistAll()`, with a real uid, and never for a translation overlay.
 
-| Dispatch site                                                     | Context                                                                                                 | Origin, site                                          | Notes                                                                         |
-|-------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------|-------------------------------------------------------|-------------------------------------------------------------------------------|
-| `AbstractProfileFactory::createProfileForUser()` (persons)        | Profile auto-creation via the `academic:createprofiles` CLI command (login-time wiring is project-side) | `Creation`, none                                      | The only in-repo dispatch between 2.0 and 3.0                                 |
-| `AbstractProfileFactory::updateProfileForUser()` (persons)        | Profile updates from fe_users data via the `academic:updateprofiles` CLI command                        | `Synchronization`, none                               | Dispatches per profile the update ran through (ACE-490)                       |
-| `ProfileController::dispatchProfileUpdate()` (persons_edit)       | Every JSON endpoint of the profile editing frontend that persists a change to the profile aggregate     | `FrontendEditing`, the request's                      | Restored with ACE-485; the six controllers it covered became one with ACE-262 |
-| `DataHandlerHooks::processDatamap_afterAllOperations()` (persons) | Every DataHandler save: the backend form, and imports that write through the DataHandler                | `Backend` or `Import`, the site of the profile's page | Replaces the project-side hooks that did this before 3.0, see below           |
+| Dispatch site                                                     | Context                                                                                                 | Origin, site                                          | Notes                                                                                                        |
+|-------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------|-------------------------------------------------------|--------------------------------------------------------------------------------------------------------------|
+| `AbstractProfileFactory::createProfileForUser()` (persons)        | Profile auto-creation via the `academic:createprofiles` CLI command (login-time wiring is project-side) | `Creation`, none                                      | The only in-repo dispatch between 2.0 and 3.0                                                                |
+| `AbstractProfileFactory::updateProfileForUser()` (persons)        | Profile updates from fe_users data via the `academic:updateprofiles` CLI command                        | `Synchronization`, none                               | Dispatches per profile the update ran through (ACE-490)                                                      |
+| `EditorWrites::dispatchProfileUpdate()` (persons_edit)            | Every JSON endpoint of the profile editing frontend that persists a change to the profile aggregate     | `FrontendEditing`, the request's                      | Restored with ACE-485. The six controllers it covered became one with ACE-262, shared by three since ACE-507 |
+| `DataHandlerHooks::processDatamap_afterAllOperations()` (persons) | Every DataHandler save: the backend form, and imports that write through the DataHandler                | `Backend` or `Import`, the site of the profile's page | Replaces the project-side hooks that did this before 3.0, see below                                          |
 
-The helper `persistAndDispatchProfileUpdate()` in `ProfileController`
-(`packages/fgtclb/academic-persons-edit/Classes/Controller/ProfileController.php`)
-enforces the contract in one place: it calls `persistAll()` first, then skips
+The helper `persistAndDispatchProfileUpdate()` of `EditorWrites`
+(`packages/fgtclb/academic-persons-edit/Classes/Service/EditorWrites.php`),
+which the three controllers of the editor share, enforces the contract in one
+place: it calls `persistAll()` first, then skips
 the dispatch for a `null` profile, an unpersisted one, or a translation
 overlay. `GenerateSlugForProfile` listens to the same event and has no
 translation guard of its own, so dispatching an overlay would regenerate the
