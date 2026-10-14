@@ -95,6 +95,8 @@ final class UpgradeCheckCommand extends Command
                 '                           so every page of the site fails',
                 '  set-and-static-template  a site delivers one extension through both mechanisms',
                 '  xclass                   an academic class is replaced through the XCLASS registry',
+                '  shared-column            two fields of the persons settings name one column, so',
+                '                           the column takes the flags of the later field only',
                 '',
                 'The template override group runs when an extension key is named. It compares the',
                 'Fluid files below one or more override folders with those the installed extension',

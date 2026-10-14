@@ -34,7 +34,7 @@ final class SortingOptionsTest extends UnitTestCase
                 'SORT_BY_BUDGET_ASC' => 'tx_academicprojects_budget asc',
                 'SORT_BY_BUDGET_DESC' => 'tx_academicprojects_budget desc',
                 'SORT_BY_STARTDATE_ASC' => 'tx_academicprojects_start_date asc',
-                'SORT_BY_STARTDATE_desc' => 'tx_academicprojects_start_date desc',
+                'SORT_BY_STARTDATE_DESC' => 'tx_academicprojects_start_date desc',
             ],
             SortingOptions::getConstants(),
         );

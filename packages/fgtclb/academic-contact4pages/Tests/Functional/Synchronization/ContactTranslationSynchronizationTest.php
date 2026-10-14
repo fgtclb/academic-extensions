@@ -7,7 +7,7 @@ namespace FGTCLB\AcademicContacts4pages\Tests\Functional\Synchronization;
 use FGTCLB\AcademicContacts4pages\Domain\Model\Contact;
 use FGTCLB\AcademicContacts4pages\Domain\Repository\ContactRepository;
 use FGTCLB\AcademicContacts4pages\Tests\Functional\AbstractAcademicContacts4PagesTestCase;
-use FGTCLB\AcademicPersons\Domain\Model\Dto\Syncronizer\SynchronizerContext;
+use FGTCLB\AcademicPersons\Domain\Model\Dto\Synchronizer\SynchronizerContext;
 use FGTCLB\AcademicPersons\Service\RecordSynchronizerInterface;
 use PHPUnit\Framework\Attributes\Test;
 use SBUERK\TYPO3\Testing\SiteHandling\SiteBasedTestTrait;
@@ -75,7 +75,7 @@ final class ContactTranslationSynchronizationTest extends AbstractAcademicContac
     {
         $recordSynchronizer = $this->get(RecordSynchronizerInterface::class);
         $context = SynchronizerContext::create(
-            recordSyncronizer: $recordSynchronizer,
+            recordSynchronizer: $recordSynchronizer,
             site: $this->get(SiteFinder::class)->getSiteByPageId(1),
             allowedLanguageIds: [1],
             tableName: $tableName,

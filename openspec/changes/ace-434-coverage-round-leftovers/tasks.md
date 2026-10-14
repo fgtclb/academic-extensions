@@ -7,15 +7,17 @@
   merged with the rule for entries without a label or a value (ACE-434 item
   3), `ace-672-partner-select-offers` merged and whether it removed the null
   check of the partner select (ACE-443 item 5, it plans to leave it), and
-  `ace-624-last-updated-sorting` merged with its change of
+  `ace-624-last-updated-sorting` postponed to 3.1.0 and not merged, so
   `PartnerRepository::findByDemand()` and `SortingOptions` of
-  `academic-projects` untouched. Record the outcome in
+  `academic-projects` are as ACE-672 left them. Record the outcome in
   the pull request. If ACE-438 did not take item 3, update this change before
   writing code.
-- [ ] 1.3 Confirm with the maintainer decision 7 (two fields on one column, A
-  recommended) and decision 8 (the two renames, both recommended). If 7 is
-  B, drop the `academic-persons/validation-flags` delta. If a rename is
-  declined, drop its tasks in group 7 and keep commit 6 a `[TASK]`.
+- [ ] 1.3 Confirm with the maintainer decision 7 (two fields on one column)
+  and decision 8 (the two renames). Answered on 2026-10-14: 7 is B, the
+  later field keeps winning and the upgrade check and the persons settings
+  status name the column, so the `academic-persons/validation-flags` delta
+  is dropped. 8 is both renames. Decision 1 is one pull request with seven
+  commits.
 
 ## 2. ACE-434: guarded reads (commit 1)
 
@@ -102,17 +104,19 @@
   more, apart from the 2.4 changelog, which stays as it is.
 - [ ] 6.2 `academic_programs` `Documentation/Changelog/3.0/Breaking-*.rst`: the
   class is removed, the core `FileRepository::findByRelation()` replaces it.
-- [ ] 6.3 Only if task 1.2 found the null check still in place: drop the `if`
+- [ ] 6.3 Task 1.2 found the null check still in place, so drop the `if`
   of the partner select, declare the result interface the query returns on
   `findAll()`, remove its baseline entry on both cores, adapt
   `PartnerRepositoryFindAllTest` to the declared type (the nullable
   parameter of its `resultUids()` helper and
   `anEmptyResultIsAQueryResultAndNotNull()`), and add a
-  `Breaking-*.rst` in `academic_partners` for the changed return type. phpstan
-  is the proof that the check was dead.
-- [ ] 6.4 Add `#[Test]` to
-  `PluginControllerActionContextTest::getRequestReturnsExpectedRequest()`,
-  show it red once against another request object, and restore.
+  `Breaking-*.rst` in `academic_partners` for the changed return type. The
+  declared return type is the proof that the check was dead, phpstan 1.12 at
+  level 8 does not report the always true comparison.
+- [ ] 6.4 The `#[Test]` of
+  `PluginControllerActionContextTest::getRequestReturnsExpectedRequest()`
+  came with ACE-748. Only show the test red once against another request
+  object, and restore.
 - [ ] 6.5 phpstan and unit for v13 and v14, the functional tests of
   `academic-programs`, `academic-partners` and `academic-persons` on both
   cores, then commit as `[!!!][TASK] ACE-443: Remove coverage round dead code`
@@ -125,32 +129,39 @@
   `academic_persons`, and `@toodo` to `@todo` in `Profile.php`. A search for
   `"academic_persons_edit" Extension` below `academic-persons` and for
   `@toodo` in `packages/` finds nothing.
-- [ ] 7.2 With decision 7 A: replace
-  `TcaValidationMergerTest::twoValidationsOnOneColumnKeepTheLastTcaConfig()`
-  by cases for a required and a flagless field, and for a required and a
-  read only field, on one column, and show them red. Combine the fragments
-  per column in `TcaValidationMerger::toTcaTableConfig()` and show them green.
-  A functional test of the persons backend TCA with two profile fields on
-  one column, shown red the same way. An `Important-*.rst` in `academic_base`
-  `Changelog/3.0/`.
-- [ ] 7.3 With the namespace rename agreed: move `Dto\Syncronizer\` to
+- [ ] 7.2 Decision 7 B. `TcaValidationMerger` stays as it is, and
+  `twoValidationsOnOneColumnKeepTheLastTcaConfig()` stays the proof that
+  the later fragment wins. Add an `@internal` interface for finding providers
+  to `academic_base`, collected by `ConfigurationChecker` through a service
+  tag, and a provider in `academic_persons` that reports every column two
+  fields of one validation set of the persons settings name (profile,
+  contracts, the three contact sets, the profile information sections per
+  record type) as a warning with table, column and both fields. A functional
+  test of the upgrade check with a settings fixture that declares a second
+  profile field on the teaching area column, red before the provider
+  exists, and one without such a field that reports nothing. The same
+  warning in the persons settings entry of the status report
+  (`LegacySettingsStatus`), with a test shown red the same way. The persons
+  settings manual says that the later field wins. No changelog entry.
+- [ ] 7.3 Move `Dto\Syncronizer\` to
   `Dto\Synchronizer\`, rename the property to `$recordSynchronizer` in
   `SynchronizerContext` and in the persons edit listener, rename the tests of
   `academic-persons`, `academic-persons-edit` and `academic-contact4pages`
   and the test class `RecordSyncronizerTest`, and update
   `Documentation/Developers/Index.rst` and `docs/architecture/class-design.md`.
-  A search for `yncronizer` in the repository finds nothing. A
+  A search for `yncronizer` in the repository finds nothing outside the 3.0
+  `Breaking-*.rst` of `academic_persons` and `openspec/changes/`. A
   `Breaking-*.rst` in `academic_persons`.
-- [ ] 7.4 With the constant rename agreed: `SORT_BY_STARTDATE_desc` to
+- [ ] 7.4 `SORT_BY_STARTDATE_desc` to
   `SORT_BY_STARTDATE_DESC` and `SortingOptionsTest`, no alias constant. A
   `Breaking-*.rst` in `academic_projects` says that stored values are
   unaffected.
 - [ ] 7.5 phpstan and unit for v13 and v14, the functional tests of the
   touched extensions on both cores, then commit as
-  `[TASK] ACE-444: Fix the coverage round slips`, or
-  `[!!!][TASK] ACE-444: Fix the coverage round slips` with a rename, with
-  `Resolves: ACE-444`. The message names items 6 and 9 as won't fix and the
-  items done elsewhere.
+  `[!!!][TASK] ACE-444: Fix the coverage round slips`, with
+  `Resolves: ACE-444`. The message names item 6 as won't fix, item 9 as
+  fixed by ACE-711 and the other items done elsewhere. The updates of this
+  change for decisions 7 and 8 go into the same commit.
 
 ## 8. Definition of done
 
