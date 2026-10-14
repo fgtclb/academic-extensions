@@ -103,6 +103,22 @@ final class DemandFactorySettingsTest extends AbstractAcademicProjectsTestCase
     }
 
     /**
+     * `listAction()` falls back to `[]` when there is no content object, so the setting can
+     * meet a record without a uid. It then finds no related category instead of raising a
+     * PHP warning, which the Debug preset turns into an exception.
+     */
+    #[Test]
+    public function aContentElementRecordWithoutUidGetsAnEmptyFilter(): void
+    {
+        $this->importCSVDataSet(__DIR__ . '/Fixtures/DemandFactorySettings/pluginCategories.csv');
+
+        $demand = $this->createDemandFromSettings(['categories' => '1'], []);
+
+        $this->assertNotNull($demand->getFilterCollection());
+        $this->assertSame([], $this->filteredUids($demand));
+    }
+
+    /**
      * Without the setting the relations are not even looked at, and no `FilterCollection`
      * is built - `null` rather than an empty one, which is what
      * `ProjectRepository::findByDemand()` checks for before adding a `contains` constraint
