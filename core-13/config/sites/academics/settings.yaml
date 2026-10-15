@@ -29,7 +29,8 @@ plugin:
       sortBy: lastName
       sortByDirection: asc
     pagination:
-      # The set ships 1.
+      # The set ships 10 as well, which it did not before 2.4. Kept so the
+      # seeded lists do not depend on the shipped default.
       resultsPerPage: 10
   tx_academicjobs:
     persistence:
