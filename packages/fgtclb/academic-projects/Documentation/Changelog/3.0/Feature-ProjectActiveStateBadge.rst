@@ -19,7 +19,7 @@ completed.
         <p class="text-muted">This project has ended.</p>
     </f:if>
 
-The :guilabel:`Projects` and the :guilabel:`Projects (selected)` content
+The :guilabel:`Projects` and the :guilabel:`Selected Projects` content
 elements have a new option, :guilabel:`Show active state badge`
 (:typoscript:`settings.showActiveStateBadge`). Switched on, every project card
 shows its state as a badge with the labels "Active" and "Completed" the

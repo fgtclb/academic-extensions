@@ -50,6 +50,11 @@ modules, and categorization features.
         Install :guilabel:`academic_study_plan` via Composer, the Extension
         Manager or a TER upload.
 
+    ..  card:: :ref:`Upgrade <upgrade>`
+
+        The steps to upgrade :guilabel:`academic_study_plan` to a newer
+        version, in the order to take them.
+
     ..  card:: :ref:`For integrators <integrator>`
 
         The study plan content element: what it shows, and the semesters,
@@ -94,6 +99,7 @@ modules, and categorization features.
 
     Introduction/Index
     Installation/Index
+    Upgrade/Index
     Integrator/Index
     Configuration/Index
     Templates/Index

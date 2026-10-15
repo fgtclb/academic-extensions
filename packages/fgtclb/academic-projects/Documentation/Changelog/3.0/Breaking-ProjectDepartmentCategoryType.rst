@@ -26,8 +26,9 @@ its changelog. The previous versions of the two extensions, installed
 together, were such a case.
 
 The command `academic:projects:department:migrate` moves the stored
-categories. It is a console command rather than an upgrade wizard, because no
-new upgrade wizard is added while TYPO3 v13 is supported.
+categories. It is a console command and not an upgrade wizard, so
+:guilabel:`Admin Tools > Upgrade > Upgrade Wizard` does not offer it. Run it as
+described below.
 
 Impact
 ======
@@ -43,7 +44,7 @@ type removes nothing any more, so the projects department is back, as
 
 Until the command has run, a stored project department keeps the type
 `department`. With `academic_programs` installed it is a department of study
-programs; without it, it has a type no extension declares. Either way the
+programs. Without it, it has a type no extension declares. Either way the
 project page, the project list items and the department filter of the project
 list no longer show it.
 
@@ -89,9 +90,9 @@ Migration
     With `academic_programs` installed, a `department` category moves when it
     is assigned to a project page and to no program page, and stays when it is
     assigned to program pages only. Hidden pages count, deleted pages do not,
-    and pages of other types decide nothing; a translation or workspace version
-    of a page counts by its own page type, which is normally the one of the
-    page. A category assigned to program and project pages, or to no program or
+    and pages of other types decide nothing. A translation or workspace
+    version of a page counts by its own page type, which is normally the one
+    of the page. A category assigned to program and project pages, or to no program or
     project page, keeps its type and is listed by uid and title: open it in the
     backend and set its type. Without `academic_programs` every `department`
     category moves.

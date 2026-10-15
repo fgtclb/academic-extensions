@@ -262,23 +262,23 @@ inside interactive content, which assistive technology reads differently and
 which no keyboard order describes well. It is supported because an installation
 that wants it should not have to fork the script for it.
 
-..  _templates-3-0:
+..  _templates-2-x:
 
-Markup of version 3.0 keeps working
+Markup of version 2.x keeps working
 ===================================
 
 Before these attributes existed the script found its parts by class name:
 :html:`.academic-study-plan`, :html:`.filter`, the first :html:`<li>` inside it,
 :html:`.col`, :html:`.header`, :html:`.module`, :html:`.modal-trigger` and the
 :html:`<dialog>` inside a module. Each of those *inside* a plan is still read,
-per part, when the attribute of that part is nowhere in that plan - so an
-override written for 3.0 keeps working, and one that carries the attributes on
+per part, when the attribute of that part is nowhere in that plan. So an
+override written for 2.x keeps working, and one that carries the attributes on
 some parts and not on others works too.
 
 The container is the exception: :html:`.academic-study-plan` is read **next to**
 :html:`data-study-plan` rather than instead of it, because two plans of one page
-can come from different templates and a 3.0 one must not disappear because the
-other carries the attribute.
+can come from different templates, and one whose template lacks the attribute
+must not disappear because the other one carries it.
 
 That fallback is deprecated and is removed in 4.0. See
 :ref:`Deprecation: The study plan class selectors

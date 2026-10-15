@@ -58,6 +58,11 @@ project managers, research participants or cooperation partners.
         Install :guilabel:`academic_projects` via Composer, the Extension
         Manager or a TER upload.
 
+    ..  card:: :ref:`Upgrade <upgrade>`
+
+        The steps to upgrade :guilabel:`academic_projects` to a newer version,
+        in the order to take them.
+
     ..  card:: :ref:`For integrators <integrator>`
 
         The two content elements, what each one shows and every option of
@@ -98,6 +103,7 @@ project managers, research participants or cooperation partners.
 
     Introduction/Index
     Installation/Index
+    Upgrade/Index
     Integrator/Index
     Configuration/Index
     Templates/Index

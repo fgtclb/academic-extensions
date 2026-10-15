@@ -8,7 +8,7 @@ Description
 ===========
 
 The header and the subheader an editor enters on a :guilabel:`Projects` or
-:guilabel:`Projects (selected)` content element are rendered by the content
+:guilabel:`Selected Projects` content element are rendered by the content
 element layout of the site, like those of any other content element. The layouts
 of :guilabel:`EXT:fluid_styled_content` and of the bootstrap package do that. A
 site package whose layout leaves the header out, because its element templates

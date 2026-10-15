@@ -144,10 +144,10 @@ configured it.
 
 :php:`EXT:academic_base` requires `fgtclb/environment-state-manager` for the
 :bash:`--site` mode and declares it in :file:`composer.json` and in
-:file:`ext_emconf.php`. That is the dependency it already carries since 2.4.0;
-it keeps it, now for this command rather than for the internal environment
-subsystem that 3.0 removed. Composer managed installations pull the package in
-automatically; classic installations have to have the
-:php:`environment_state_manager` extension installed as before.
+:file:`ext_emconf.php`. The dependency came with 2.4.0, for the internal
+environment subsystem that 3.0 removed, and 3.0 raises it to version 2, see
+:ref:`important-environment-state-manager-2`. Composer managed installations
+update the package on their own. Classic installations update the
+:php:`environment_state_manager` extension to 2.x first.
 
 ..  index:: CLI, ext:academic_base
