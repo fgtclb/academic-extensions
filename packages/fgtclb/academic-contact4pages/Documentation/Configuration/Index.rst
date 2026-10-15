@@ -40,6 +40,9 @@ Both depend on `fgtclb/academic-base-ctype-group`, the set of
 :guilabel:`EXT:academic_base` that labels the content element group all academic
 extensions sort their elements into.
 
+What the content element shows, and the options an editor sets on it, is
+described in :ref:`integrator`.
+
 ..  note::
 
     The setup of this extension reads
@@ -184,31 +187,9 @@ one mechanism per site and the question does not arise.
 The contact list
 ================
 
-..  _configuration-group-by-role:
-
-Group by role
--------------
-
-The :guilabel:`Configuration` tab of the content element offers
-:guilabel:`Group by role` (:typoscript:`settings.groupByRole`), switched on by
-default.
-
-*   **On** – one heading per role, each followed by the contacts of that role,
-    then the contacts without a role. A page on which no contact has a role
-    renders one list without headings.
-*   **Off** – all contacts in one list, in the order they are sorted on the
-    page. A contact with a role shows its role name above its card, in an
-    element with the class `ace-role`.
-
-A content element saved before the option existed stores no value for it and
-reads the TypoScript default, so it keeps grouping:
-
-..  code-block:: typoscript
-    :caption: Shipped TypoScript setup
-
-    plugin.tx_academiccontacts4pages.settings.groupByRole = 1
-
-A value stored in the content element always wins over it.
+The options of the content element, :guilabel:`Show hidden records` and
+:guilabel:`Group by role`, are described on its page,
+:ref:`integrator-contacts-list`.
 
 ..  _configuration-contact-item-partial:
 

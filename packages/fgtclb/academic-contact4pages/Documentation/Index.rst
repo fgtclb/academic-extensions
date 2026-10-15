@@ -55,9 +55,15 @@ for all academic extensions on the `extension points page of academic_base
         Install :guilabel:`academic_contacts4pages` via Composer, the
         Extension Manager or a TER upload.
 
+    ..  card:: :ref:`For integrators <integrator>`
+
+        The contacts content element, what it shows, and the options an editor
+        sets on it.
+
     ..  card:: :ref:`Configuration <configuration>`
 
-        Configure the extension and its plugin for your installation.
+        The site sets and the TypoScript of the extension, and the contacts of
+        a page in a page template.
 
     ..  card:: :ref:`Styling <styling>`
 
@@ -83,6 +89,7 @@ for all academic extensions on the `extension points page of academic_base
 
     Introduction/Index
     Installation/Index
+    Integrator/Index
     Configuration/Index
     Styling/Index
     Developers/Index
