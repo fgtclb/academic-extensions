@@ -202,6 +202,18 @@ run. They therefore only run on v14 — see
 [Core version aware code](../architecture/core-version-aware-code.md) for the
 group mechanism.
 
+One unit test reads the compiled modules as well.
+[`JavaScriptModulesTest`](../../packages/fgtclb/academic-persons-edit/Tests/Unit/Configuration/JavaScriptModulesTest.php)
+follows their `@ckeditor/*` imports through the CKEditor bundles of the
+installed core and fails when the import map does not answer one of them, see
+[Unit tests](unit-tests.md#the-ckeditor-bundles-of-the-profile-editor). It is
+not the source text assertion warned against above. It reads the import graph
+the browser builds, which changes only when a module starts or stops loading
+something. What it notices is a CKEditor bundle that the bundles of the
+installed core import and the import map of this extension does not answer,
+the defect that kept the editor from starting on TYPO3 13.4.36 and 14.3.8
+(ACE-911).
+
 ## See also
 
 - [JavaScript tests](javascript-tests.md) — the harness, the stubs, and what

@@ -5,7 +5,7 @@ database, no site, no request. Everything the subject needs is passed to it or
 stubbed. That makes the suite fast enough to run on every save, and it makes a
 failure point at one class instead of at a stack.
 
-There are 158 unit test classes: 137 across the twelve extensions, five in
+There are 166 unit test classes: 145 across the twelve extensions, five in
 `packages-dev/dev-site`, eleven in `packages-dev/monorepo-shared` and five in
 `packages-dev/testing-helper`. Twelve of them are the one-line version
 compatibility test every extension carries (see
@@ -307,6 +307,41 @@ Every check asserts that it actually looked at something — that a FlexForm was
 found at all, and, for the value picker shape, that at least one item was
 examined. A structural check that silently has nothing to scan is worse than no
 check, because it reports green.
+
+## The CKEditor bundles of the profile editor
+
+[`JavaScriptModulesTest`](../../packages/fgtclb/academic-persons-edit/Tests/Unit/Configuration/JavaScriptModulesTest.php)
+of `academic_persons_edit` checks the import map of the profile editor against
+the CKEditor 5 build of the installed core. The map lists the bundles of
+`EXT:rte_ckeditor` one by one, see
+[Frontend assets](../development/frontend-assets.md#libraries-come-from-the-core),
+and which bundles that has to be is decided by the core, not by this
+repository. TYPO3 13.4.36 and 14.3.8 updated the build, `ckeditor5-link` started
+to import `ckeditor5-image` and that one `ckeditor5-upload`. Neither was
+mapped, the browser refused the module graph and the editor never started, with
+every gate green (ACE-911).
+
+The test starts from the `@ckeditor/*` specifiers the compiled modules below
+`Resources/Public/JavaScript/frontend/` import, follows the imports through the
+bundles of the installed `typo3/cms-rte-ckeditor`, and fails with the list of
+specifiers the map does not answer. It reads the compiled modules rather than
+the TypeScript sources because they are what the browser loads, and
+`checkJsBuildClean` keeps the two in step.
+
+It deliberately asserts no equality. The map is the union over the supported
+patch levels, so on 13.4.35 or 14.3.7 it carries two bundles nothing imports,
+which costs one line of the map each. What it asserts instead is that every
+mapped bundle is a file the installed core ships, and that the prefix of the
+editor translations names a directory of it. A run therefore only proves the
+closure of the core that is installed: the composer update for the newest patch
+level of each core version is what makes it catch the next CKEditor update.
+
+The imports are read with a pattern that covers static imports and exports,
+side effect imports and dynamic imports with a quoted specifier, and only
+specifier characters, so a user interface string ending in "from" cannot run on
+into the next string. A dynamic import with a template literal is not followed:
+no CKEditor bundle uses one, and the one of the rich text module loads a
+translation through its own prefix entry.
 
 ## The `ext_emconf.php` dependency keys
 
