@@ -50,6 +50,11 @@ modules, and categorization features.
         Install :guilabel:`academic_study_plan` via Composer, the Extension
         Manager or a TER upload.
 
+    ..  card:: :ref:`For integrators <integrator>`
+
+        The study plan content element: what it shows, and the semesters,
+        modules and footer note an editor fills in.
+
     ..  card:: :ref:`Configuration <configuration>`
 
         Learn how to include the site set `fgtclb/academic-study-plan` and how
@@ -89,6 +94,7 @@ modules, and categorization features.
 
     Introduction/Index
     Installation/Index
+    Integrator/Index
     Configuration/Index
     Templates/Index
     Styling/Index
