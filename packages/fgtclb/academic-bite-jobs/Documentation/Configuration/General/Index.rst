@@ -5,23 +5,11 @@
 General configuration
 =====================
 
-..  _configuration-general-view:
-
 The view of the job list
 ========================
 
-The plugin settings of a :guilabel:`Job List b-ite` content element select one of
-three views: :guilabel:`List`, :guilabel:`Card` or :guilabel:`Table`. The stored
-values are `List`, `Card` and `Table`.
-
-Content elements saved with version 2.0 store `ListView`, `CardView` or
-`TableView`. They render the corresponding view, and a content element with an
-empty or unknown value renders the list view. Templates always receive the
-normalised value in `{settings.jobs.view}`.
-
-The upgrade wizard `academicBiteJobs_listViewFlexFormUpgradeWizard` rewrites the
-stored values of existing content elements, so their backend form shows the view
-the frontend renders.
+The view, :guilabel:`List`, :guilabel:`Card` or :guilabel:`Table`, is an option
+of each content element, see :confval:`Select view <job-list-bite-view>`.
 
 ..  _configuration-general-group-by:
 
@@ -40,8 +28,8 @@ The list then renders one group per value of that field, headed by the value,
 and every job title one heading level below the group heading. The field has to
 be part of the job postings, either as the B-ITE API answers them for the job
 listing key of the content element, or written into them by an event listener,
-see :ref:`developers-example`. It is not offered in the plugin settings. An
-empty value, or `none`, switches the grouping off again.
+see :ref:`developers-example-grouping`. It is not offered in the plugin
+settings. An empty value, or `none`, switches the grouping off again.
 
 A content element saved before version 2.1 may still store a grouping setting of
 its own, which wins over the TypoScript. The upgrade wizard

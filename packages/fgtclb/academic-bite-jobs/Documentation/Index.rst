@@ -36,12 +36,12 @@ advertisements in the browser.
 
 The job offers are displayed as tiles, lists and tables. The detailed display
 of individual job advertisements is automatically linked to the b-ite platform.
-The b-ite key can be entered in the extension plugin. Custom assignment allows
-groupings such as appointment procedures, academic staff, non-scientific staff
-or training positions to be selected.
+The b-ite key is entered in the content element. A filter by a custom field of
+b-ite, such as appointment procedures, academic staff, non-scientific staff or
+training positions, is added with an event listener.
 
-Further settings for grouping, sorting, display mode and limiting the job
-advertisements are also available in the plugin.
+The content element also sets the display mode, the sorting and the maximum
+number of job advertisements. The grouping is set in TypoScript.
 
 ----
 
@@ -61,9 +61,14 @@ advertisements are also available in the plugin.
         Install :guilabel:`academic_bite_jobs` via Composer, the Extension
         Manager or a TER upload.
 
+    ..  card:: :ref:`For integrators <integrator>`
+
+        The B-ITE job list and every option of its content element.
+
     ..  card:: :ref:`Configuration <configuration>`
 
-        Configure the extension and its plugins for your installation.
+        The sets, the static templates and the TypoScript of the extension,
+        the grouping of the jobs among it.
 
     ..  card:: :ref:`Templates <templates>`
 
@@ -75,8 +80,8 @@ advertisements are also available in the plugin.
 
     ..  card:: :ref:`For developers <developers>`
 
-        Change the request to B-ITE and the postings it returns with event
-        listeners.
+        Change the request to B-ITE, the postings it returns and the
+        variables of the view with event listeners.
 
     ..  card:: :ref:`Known problems <known-problems>`
 
@@ -94,6 +99,7 @@ advertisements are also available in the plugin.
 
     Introduction/Index
     Installation/Index
+    Integrator/Index
     Configuration/Index
     Templates/Index
     Styling/Index
