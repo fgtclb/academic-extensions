@@ -87,6 +87,20 @@ followed with ACE-740. Why, and what else decides the path:
 The settings decide what the form **offers**, not what the list **accepts**. A
 submitted filter of a type the form does not offer still filters the list.
 
+The content element is the exception. Where it hides a part of the form, with
+`settings.hideFilter`, `settings.hideSorting` or, for projects,
+`settings.hideActiveState`, the demand factory of the extension takes that part
+from the content element for every request, whatever a post or a URL carries
+for it (ACE-916): the default sorting of a hidden sorting and the active state
+of a hidden state select. The default categories of a hidden category filter
+always apply, and categories a request carries are added to them. The
+repositories require every category of the filter, so a link can narrow such a
+list but never widen it. A hidden part submits nothing, which is why the first
+use of the visible part used to drop its preset. The factory reads the
+settings the templates read, so an override of the form partial changes
+nothing. A part the form shows keeps the selection of the visitor, which
+replaces the default categories as before.
+
 ## Tests
 
 | What                                          | Test                                                                                                |
@@ -94,6 +108,7 @@ submitted filter of a type the form does not offer still filters the list.
 | The resolution rules, the split, the settings | `typo3-category-types/Tests/Unit/Filter/FilterTypeResolverTest.php`                                 |
 | Order, count, disclosure, labels, options     | `academic-<partners\|projects\|programs>/Tests/Functional/Plugins/Academic*ListFilterTest.php`      |
 | The fallback, unoffered filters               | `academic-programs/Tests/Functional/Plugins/AcademicProgramsListFilterTest.php`                     |
+| The presets of a hidden part of the form      | `academic-<partners\|projects\|programs>/Tests/Functional/Plugins/Academic*HiddenFormPartsTest.php` |
 | Reading the filters of a form                 | [`CategoryFilterFormAssertionTrait`](../testing/testing-helper.md#categoryfilterformassertiontrait) |
 
 ## See also
