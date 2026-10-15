@@ -15,7 +15,7 @@ a dependency, but it can also be required explicitly.
         ..  code-block:: bash
             :caption: Install the stable release
 
-            composer require 'fgtclb/academic-base':'^2'
+            composer require 'fgtclb/academic-base':'^3'
 
         ..  tip::
 
@@ -32,7 +32,7 @@ a dependency, but it can also be required explicitly.
 
             ..  code-block:: bash
 
-                composer require 'fgtclb/academic-base':'~2.3.1@dev'
+                composer require 'fgtclb/academic-base':'~3.0.0@dev'
 
     ..  group-tab:: Extension Manager
 
