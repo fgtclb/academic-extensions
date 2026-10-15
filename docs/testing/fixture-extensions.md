@@ -201,7 +201,7 @@ protected array $testExtensionsToLoad = [
     'tests/language-files',
 ];
 ```
-— [`ProfileTitleProviderTest.php:27`](../../packages/fgtclb/academic-persons/Tests/Functional/PageTitle/ProfileTitleProviderTest.php#L27)
+— [`ProfileTitleProviderTest.php:28`](../../packages/fgtclb/academic-persons/Tests/Functional/PageTitle/ProfileTitleProviderTest.php#L28)
 
 **The package name is not derivable from the extension key.** All of them use
 the `tests/` vendor, but the second segment follows no rule: `test_plugin_templates`
