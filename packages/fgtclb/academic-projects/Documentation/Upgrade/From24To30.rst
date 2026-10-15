@@ -416,3 +416,6 @@ Check the result
     its categories, the department among them.
 *   The project lists look as the site intends, with the speaking classes, and
     their department filter offers the departments of projects only.
+*   A list keeps its preset categories of the category types its filter does
+    not offer, see
+    :ref:`important-project-list-keeps-default-categories-of-other-types`.

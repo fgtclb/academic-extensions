@@ -93,13 +93,37 @@ link; the demand keys are the ones below.
   gives one selection one URL, and a later route enhancer one variable instead
   of one per category type.
 - **The sorting is always carried**, even when it equals the default. A factory
-  applies the content element's preset categories only when no demand argument
-  arrives at all, and its sorting then and when a demand carries no sorting of
-  its own (in `academic_programs`: a list with a hidden sorting select, the
-  program finder). A visitor who clears a preset category gets a URL without a
+  applies the content element's preset categories of a filter the form shows
+  only when no demand argument arrives at all, and its sorting then and when a
+  demand carries no sorting of its own (in `academic_programs`: the program
+  finder). A visitor who clears a preset category gets a URL without a
   filter — but with the sorting, so it is not the bare page, and the preset
-  stays cleared. The bare page URL is the one place the preset categories
-  apply.
+  stays cleared. The bare page URL is the one place the preset categories of a
+  shown filter apply.
+- **A part of the form the content element hides keeps its preset** on every
+  request (ACE-916). The factories read `settings.hideFilter`,
+  `settings.hideSorting` and, for projects, `settings.hideActiveState`, the
+  settings the templates read, so a template override keeps working and a
+  field a visitor could edit carries nothing. The demand holds the preset, and
+  the redirect target, the pagination links and the tags carry it from there.
+  A hidden sorting or state ignores what a request carries. A hidden category
+  filter keeps every preset category and adds the submitted or linked ones, so
+  a request narrows the list and never leaves the presets, which is what lets
+  the program finder open a list that hides its filter.
+- **A filter keyed by category type keeps the presets of the types it does not
+  name.** The form of a list and the program finder submit
+  `filterCollection[<type>]`, the list's own form with an empty value for "All",
+  so a type the submission names replaces its presets and a type it leaves out,
+  one the filter types of the site or the element do not offer, keeps them.
+  The URL shape `filterCollection[categories]` has no type and is the whole
+  selection, so a cleared preset stays cleared after the redirect.
+  `CategoryFilterNormalizer::keepsPresets()` and `toUidListKeepingPresets()`
+  in `category_types` hold the rule for all three factories.
+- **Two lists of the same plugin on one page share the URL arguments.** The
+  first list on the page answers a submission and builds the redirect from its
+  own settings, so its hidden presets reach the URL and override the selection
+  for another list of that plugin whose form shows that part. The manual of each
+  list element names the limitation.
 
 The keys arriving in alphabetical order is not a choice of this code: the page
 router sorts the query arguments recursively by key (`PageArguments`).
