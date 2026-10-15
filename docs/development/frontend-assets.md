@@ -565,7 +565,11 @@ What follows from taking a library from the core:
   `core`, which is what makes `cropperjs` resolvable on the page.
   `EXT:rte_ckeditor` is the exception the same file explains: its own dependency
   chain would expand several hundred backend entries into the inline import map,
-  so its six bundles and their closure are mapped one by one.
+  so its six bundles and their closure are mapped one by one. That closure moves
+  with the CKEditor build of the core, from nineteen to twenty-one bundles in
+  13.4.36 and 14.3.8, so the map holds the union over the supported patch levels
+  and a unit test follows the imports of the installed bundles, see
+  [Unit tests](../testing/unit-tests.md#the-ckeditor-bundles-of-the-profile-editor).
 - **The specifier is declared, not inferred.** The core's builds carry no type
   declarations, so `Resources/Private/TypeScript/frontend/_dependencies.d.ts`
   declares each module with the surface this repository actually calls, and no
