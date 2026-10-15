@@ -287,6 +287,16 @@ through the page TSconfig of its set instead. A condition in the data structure
 hides the field wherever the element exists, also below a page that does not
 include that page TSconfig.
 
+A number an element may leave empty uses the same list and needs one step more.
+An entry of the list is a dotted path below `settings`, so
+`pagination.resultsPerPage` and `pagination.numberOfLinks` of `academic-persons`
+are listed as they are, and an empty or `0` field takes the site value. The site
+value can still be empty, `0` or negative, and so can a field Extbase does not
+drop, such as `-3`. The reader of the setting therefore casts with `?? 0` and
+replaces a value below 1 with its own default: `ProfileController::listAction()`
+falls back to 10 results and 5 links, the values of the partner and job lists
+(ACE-913).
+
 ## Hide by default, enable per component
 
 An extension registers its content elements in TCA for the whole installation —
