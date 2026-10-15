@@ -29,7 +29,7 @@ They sit next to the tests that use them, under
 | `test_category_types_summary_override` | `tests/category-types-summary-override` | `typo3-category-types` | A page TSconfig override of the page module category summary template.   |
 | `test_frontend_readonly`               | `tests/test-frontend-readonly`          | `academic-persons`     | A `validations` map locking four fields for the frontend editor only.    |
 | `test_hidden_content_types`            | `tests/hidden-content-types`            | `academic-base`        | Page TSconfig and TCA hiding content types, for the wizard tests.        |
-| `test_job_after_save_listener`         | `tests/test-job-after-save-listener`    | `academic-jobs`        | A listener setting the redirect page after a save, a response recorder.  |
+| `test_job_after_save_listener`         | `tests/test-job-after-save-listener`    | `academic-jobs`        | Listeners setting the redirect page and changing the job after a save.   |
 | `test_jobcontact_schema`               | `tests/test-jobcontact-schema`          | `academic-jobs`        | `ext_tables.sql` only, for a removed table an upgrade wizard reads.      |
 | `test_language_files`                  | `tests/language-files`                  | `academic-persons`     | An XLF pair with awkward label keys (dots, dashes).                      |
 | `test_messy_profile_factory`           | `tests/test-messy-profile-factory`      | `academic-persons`     | A deliberately misbehaving profile factory and two event listeners.      |
@@ -235,9 +235,11 @@ The existing ones show the cases that justify one:
   events in a static property, so a test reads what a listener was handed
   during a frontend request too. `test_job_after_save_listener` hands in the
   redirect page a test sets in TypoScript from a listener of the after-save
-  event of the new job form, and records the response of the form plugin from
-  the Extbase dispatch event the same way, because TYPO3 v12 and v13 pass a
-  redirect to `header()`, where a test cannot read it.
+  event of the new job form, and a second listener changes the title of the
+  saved job and hands it to the repository without persisting it, as a project
+  listener may. It recorded the response of the form plugin as well, while
+  TYPO3 v12 and v13 passed the returned redirect to `header()`. The form throws
+  its redirect now, so the test reads the answer itself (ACE-912).
 - **Resources resolved through `EXT:` paths.** `test_plugin_templates` and
   `test_language_files` exist because TypoScript and `LLL:` references need a
   real extension path.

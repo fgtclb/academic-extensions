@@ -174,4 +174,37 @@ trait FrontendPluginRenderingTrait
 
         return (string)$response->getBody();
     }
+
+    /**
+     * The frontend session the response started, the value of its `fe_typo_user` cookie,
+     * or null when it set none. A frontend session starts with the first value stored in
+     * it, a flash message queued for the next page for example.
+     */
+    protected function frontendSessionCookie(ResponseInterface $response): ?string
+    {
+        if (preg_match('@(?:^|,\s*)fe_typo_user=([^;]+)@', $response->getHeaderLine('Set-Cookie'), $cookie) !== 1) {
+            return null;
+        }
+
+        return $cookie[1];
+    }
+
+    /**
+     * Follows a `303 See Other` as a browser does and returns the page it leads to, after
+     * asserting that it answered `200`. The request carries the frontend session cookie
+     * the response set, or `$sessionCookie` when it set none, so the page shows what the
+     * submission stored in the session, its flash messages for example. Without either
+     * the page is requested without a session.
+     */
+    protected function followSeeOther(ResponseInterface $response, ?string $sessionCookie = null): string
+    {
+        $this->assertSame(303, $response->getStatusCode(), (string)$response->getBody());
+        $location = $response->getHeaderLine('Location');
+        $this->assertStringStartsWith($this->frontendPluginTestBase(), $location);
+        $sessionCookie = $this->frontendSessionCookie($response) ?? $sessionCookie;
+
+        return $this->renderFrontendPage(
+            (new InternalRequest($location))->withCookieParams($sessionCookie !== null ? ['fe_typo_user' => $sessionCookie] : []),
+        );
+    }
 }

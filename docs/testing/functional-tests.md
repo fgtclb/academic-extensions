@@ -241,6 +241,25 @@ back with `assertCSVDataSet()` (63 call sites). Fixtures of a plugin test live
 in a `Fixtures/<TestClassName>/` folder beside it, one file per scenario, which
 keeps a fixture from being quietly reused by a test it was not written for.
 
+## A form that redirects
+
+A form that stores something in the session, a flash message for the next page
+above all, is followed with `followSeeOther()`. It requests the `Location` with
+the `fe_typo_user` cookie the answer set, as a browser does, and returns the
+page. `frontendSessionCookie()` reads that cookie for a later request of the
+same visitor. `postJob()` of the job form tests takes it as its third argument,
+so a second submission continues the session of the first one:
+
+```php
+$answer = $this->postJob('https://www.acme.com/new-job', 'Research assistant');
+$this->assertSame('https://www.acme.com/new-job', $answer->getHeaderLine('Location'));
+$page = $this->followSeeOther($answer);
+```
+
+[`AcademicJobsNewJobFormRedirectPageTest`](../../packages/fgtclb/academic-jobs/Tests/Functional/Plugins/AcademicJobsNewJobFormRedirectPageTest.php)
+is the worked example: it asserts that the confirmation is shown once, on the
+redirect and not on a reload in the same session or for another visitor.
+
 ## A mail that cannot be sent
 
 The mail configuration and the log writers are part of the configuration of
@@ -261,13 +280,20 @@ sends: one test class per configuration.
   rather than deleting it.
 - **The form is posted** with its hidden fields. The testing helper of this
   branch has no helper for a post, so the test sets the encoded body and the
-  parsed body of the `InternalRequest` itself. TYPO3 v12 and v13 send the
-  redirect a plugin action returns with `header()` and answer 200.
+  parsed body of the `InternalRequest` itself. The form throws its redirect
+  after a saved job, so the answer is a `303` with an empty body on TYPO3 v12
+  and v13 alike (ACE-912). A test that only cares about the mail asserts the
+  created record.
 - **The messages of the form** are queued in the session of the visitor. The
-  test takes the `fe_typo_user` cookie from the answer to the post, sends it
-  with `withCookieParams()` on the next request, and renders the queue with
-  `f:flashMessages` in a `COA_INT` on the page it requests. The queue is named
-  `extbase.flashmessages.<plugin namespace>`.
+  test takes the `fe_typo_user` cookie from the answer to the post with
+  `frontendSessionCookie()`, or follows the redirect with `followSeeOther()`,
+  which sends it, see
+  [Testing helper](testing-helper.md#frontendpluginrenderingtrait). Without a
+  redirect page the form renders its own queue,
+  `academic_jobs.new_job_form.confirmation`, above itself. For a redirect page
+  the test renders the queue of the plugin,
+  `extbase.flashmessages.<plugin namespace>`, with `f:flashMessages` in a
+  `COA_INT` on the page it requests.
 - **A post that fails** ends the test with the exception that left the
   plugin. A test that expects an error catches it around the post only and
   rethrows any other exception, because a failed assertion of PHPUnit is a
@@ -275,8 +301,8 @@ sends: one test class per configuration.
 
 [`AbstractAcademicJobsFailingNotificationMailTestCase`](../../packages/fgtclb/academic-jobs/Tests/Functional/Plugins/AbstractAcademicJobsFailingNotificationMailTestCase.php)
 is the example, and its test classes cover a failing transport, an empty
-recipient and sender, a recipient that cannot be parsed, and the warning the
-visitor sees.
+recipient and sender, a recipient that cannot be parsed, the warning the
+visitor sees on the form and on a redirect page, and the redirect.
 
 ## A file upload
 

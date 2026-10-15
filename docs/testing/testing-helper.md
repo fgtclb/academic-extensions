@@ -186,6 +186,8 @@ assertion — roughly sixty lines per test class before this trait existed
 | `removeWrittenSiteConfiguration()`  | Removes it again in `tearDown()`.                                       |
 | `requestFrontendPage()`             | Fires the sub request, returns the `ResponseInterface`.                 |
 | `renderFrontendPage()`              | The same, asserts `200`, returns the body as a string.                  |
+| `frontendSessionCookie()`           | The `fe_typo_user` cookie a response set, or `null`.                    |
+| `followSeeOther()`                  | Follows a `303` in the session the answer set, returns the page.        |
 
 **When to use it.** In every test that renders a plugin. The class must also
 `use SBUERK\TYPO3\Testing\SiteHandling\SiteBasedTestTrait` and declare its own
@@ -213,7 +215,7 @@ and constants in traits arrived in PHP 8.2. A trait constant is a fatal
 it takes the whole suite down rather than one test. The `main` branch, which
 starts at PHP 8.2, declares it as a constant.
 
-**The traps it exists for.** Four, three of them silent:
+**The traps it exists for.** Five, three of them silent:
 
 - `subrequestPageErrors` is switched on in the configuration. Without it the
   frontend swallows the exception of a sub request and answers a **rendered
@@ -232,6 +234,11 @@ starts at PHP 8.2, declares it as a constant.
 - The two `add…ToLoad()` helpers exist because assigning `$testExtensionsToLoad`
   in a subclass drops everything the abstract test case declared, and the loss
   is not reported.
+- `followSeeOther()` sends the session cookie of the answer, or the one it is
+  handed when the answer set none, because a session that already exists is
+  not announced again. A redirect followed without it shows a page without the
+  messages the submission stored, which looks like a missing message rather
+  than a lost session.
 
 ---
 
