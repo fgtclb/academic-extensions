@@ -12,16 +12,19 @@ Description
 dispatched by both project list plugins.
 
 The demand event fires after the demand has been built from the content element
-settings and the request and before the projects are queried; the demand a
+settings and the request and before the projects are queried. The demand a
 listener hands back is the one that is queried and assigned to the view. The
-list event fires after the query and before the view variables are assigned; a
+list event fires after the query and before the view variables are assigned. A
 listener replaces the projects, replaces the applicable categories, or assigns
 further view variables.
 
 Both carry
 :php:`\FGTCLB\AcademicBase\Domain\Model\Dto\PluginControllerActionContextInterface`,
 so a listener knows the request, the site, the content element, its settings and
-which of the two list plugins is rendering.
+which of the two list plugins is rendering. Both events, their rules and an
+example listener for each are described in
+:ref:`developers-event-modify-project-demand-event` and
+:ref:`developers-event-modify-project-list-event`.
 
 ..  code-block:: php
     :caption: EXT:my_extension/Classes/EventListener/ShowRunningProjectsOnly.php
@@ -56,7 +59,7 @@ re-registration that goes with it. The controller is final in 3.0, so the
 subclass no longer loads, see :ref:`breaking-1791043407`.
 
 One detail is worth knowing: the applicable categories are computed once, before
-the list event, and not recomputed afterwards - a listener that replaces the
+the list event, and not recomputed afterwards. A listener that replaces the
 projects and wants the filter to match them sets the categories as well.
 
 ..  warning::
