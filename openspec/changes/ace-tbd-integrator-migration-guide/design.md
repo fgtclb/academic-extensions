@@ -1,5 +1,15 @@
 ## Context
 
+**Status after ACE-910.** Every manual now has an `Upgrade/` chapter with the
+pages 2.3 to 2.4, 2.4 to 3.0 and 2.3 to 3.0, one chapter per extension, which
+the maintainer chose over one entry point in `academic_base`. That supersedes
+the decision on the entry point below and the one against pages per starting
+version, and every change this design lists as pending has landed since. What
+this change still adds goes beyond those pages: the profile editor chapter from
+template overrides to configuration, the chapters of programs, study plan and
+category types, and the upgrade guides per project. Revise this design against
+the upgrade chapters before it is applied.
+
 See `proposal.md` for the motivation. On main:
 
 - `academic-persons/Documentation/Upgrade/Index.rst` orders six steps for
