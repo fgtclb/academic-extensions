@@ -60,6 +60,9 @@ final readonly class AfterSaveResolver
      * page, for the redirect and for the mode alike. Only a listener can hand in such a
      * page id, {@see self::redirectPageId()} never returns one. It is normalised here and
      * not in the event, so a later listener still reads what an earlier one set.
+     *
+     * Without a redirect page, and with the current page as the redirect page, the
+     * visitor returns to the form.
      */
     public function decide(
         int $currentPageId,
@@ -72,6 +75,7 @@ final readonly class AfterSaveResolver
         return new AfterSaveDecision(
             redirectPageId: $redirectPageId,
             createFlashMessage: $flashMessageCreationMode->shouldBeCreated($currentPageId, $redirectPageId),
+            returnsToForm: $redirectPageId === null || $redirectPageId === $currentPageId,
         );
     }
 

@@ -89,28 +89,32 @@ final class AfterSaveResolverTest extends UnitTestCase
         ?int $redirectPageId,
         ?int $expectedRedirectPageId,
         bool $expectedFlashMessage,
+        bool $expectedReturnToForm,
     ): void {
         $decision = (new AfterSaveResolver())->decide(10, $redirectPageId, $mode);
 
         $this->assertSame($expectedRedirectPageId, $decision->redirectPageId);
         $this->assertSame($expectedFlashMessage, $decision->createFlashMessage);
+        $this->assertSame($expectedReturnToForm, $decision->returnsToForm);
     }
 
     /**
-     * @return \Generator<string, array{0: FlashMessageCreationMode, 1: int|null, 2: int|null, 3: bool}>
+     * @return \Generator<string, array{0: FlashMessageCreationMode, 1: int|null, 2: int|null, 3: bool, 4: bool}>
      */
     public static function decisions(): \Generator
     {
         foreach (FlashMessageCreationMode::cases() as $mode) {
             $stays = $mode !== FlashMessageCreationMode::NEVER;
-            yield $mode->name . ', no redirect page' => [$mode, null, null, $stays];
-            yield $mode->name . ', redirect to the current page' => [$mode, 10, 10, $stays];
-            yield $mode->name . ', redirect to another page' => [$mode, 11, 11, $mode === FlashMessageCreationMode::ALWAYS];
+            yield $mode->name . ', no redirect page' => [$mode, null, null, $stays, true];
+            // The form page as the redirect page returns to the form like no redirect page,
+            // the decision keeps the page all the same (ACE-912).
+            yield $mode->name . ', redirect to the current page' => [$mode, 10, 10, $stays, true];
+            yield $mode->name . ', redirect to another page' => [$mode, 11, 11, $mode === FlashMessageCreationMode::ALWAYS, false];
             // A listener may hand in a page id of 0 or below. It is no page, so the plugin
             // does not redirect to it, and the message follows the mode as for no redirect
             // page (ACE-435).
-            yield $mode->name . ', redirect page zero' => [$mode, 0, null, $stays];
-            yield $mode->name . ', negative redirect page' => [$mode, -1, null, $stays];
+            yield $mode->name . ', redirect page zero' => [$mode, 0, null, $stays, true];
+            yield $mode->name . ', negative redirect page' => [$mode, -1, null, $stays, true];
         }
     }
 }

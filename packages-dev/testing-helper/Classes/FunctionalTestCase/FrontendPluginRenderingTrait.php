@@ -152,7 +152,7 @@ trait FrontendPluginRenderingTrait
 
     /**
      * Requests a page, submits one of its POST forms and returns the response of the
-     * submission. A redirect is returned, not followed.
+     * submission. A redirect is returned, not followed, see `followSeeOther()`.
      *
      * The fields are collected as a browser collects them for the controls these forms
      * use: hidden and text-like inputs, checked checkboxes and radios, selects with their
@@ -168,15 +168,20 @@ trait FrontendPluginRenderingTrait
      * way, a field it does not have cannot, so a test fails when the form's field names
      * change. A request with fields of its own goes through `frontendPostRequest()`.
      *
+     * `$cookieParams` are sent with both requests, the frontend session cookie of an
+     * earlier answer for example, so a second submission continues the session of the
+     * first one: `['fe_typo_user' => $this->frontendSessionCookie($answer)]`.
+     *
      * @param string $formQuery An XPath expression selecting the `<form>` element; it has
      *        to select exactly one form of the page.
      * @param array<string, mixed> $values
+     * @param array<string, string> $cookieParams
      */
-    protected function submitFrontendForm(string $pageUrl, string $formQuery, array $values = []): ResponseInterface
+    protected function submitFrontendForm(string $pageUrl, string $formQuery, array $values = [], array $cookieParams = []): ResponseInterface
     {
         $document = new \DOMDocument();
         $document->loadHTML(
-            '<?xml encoding="UTF-8">' . $this->renderFrontendPage($pageUrl),
+            '<?xml encoding="UTF-8">' . $this->renderFrontendPage((new InternalRequest($pageUrl))->withCookieParams($cookieParams)),
             LIBXML_NOERROR | LIBXML_NOWARNING,
         );
         $xpath = new \DOMXPath($document);
@@ -202,7 +207,7 @@ trait FrontendPluginRenderingTrait
         return $this->requestFrontendPage($this->frontendPostRequest(
             str_starts_with($action, '/') ? rtrim(self::FRONTEND_PLUGIN_TEST_BASE, '/') . $action : $action,
             array_replace_recursive($parsedBody, $values),
-        ));
+        )->withCookieParams($cookieParams));
     }
 
     /**
@@ -295,5 +300,38 @@ trait FrontendPluginRenderingTrait
         $this->assertNotSame('', $query['cHash']);
 
         return $location;
+    }
+
+    /**
+     * The frontend session the response started, the value of its `fe_typo_user` cookie,
+     * or null when it set none. A frontend session starts with the first value stored in
+     * it, a flash message queued for the next page for example.
+     */
+    protected function frontendSessionCookie(ResponseInterface $response): ?string
+    {
+        if (preg_match('@(?:^|,\s*)fe_typo_user=([^;]+)@', $response->getHeaderLine('Set-Cookie'), $cookie) !== 1) {
+            return null;
+        }
+
+        return $cookie[1];
+    }
+
+    /**
+     * Follows a `303 See Other` as a browser does and returns the page it leads to, after
+     * asserting that it answered `200`. The request carries the frontend session cookie
+     * the response set, or `$sessionCookie` when it set none, so the page shows what the
+     * submission stored in the session, its flash messages for example. Without either
+     * the page is requested without a session.
+     */
+    protected function followSeeOther(ResponseInterface $response, ?string $sessionCookie = null): string
+    {
+        $this->assertSame(303, $response->getStatusCode(), (string)$response->getBody());
+        $location = $response->getHeaderLine('Location');
+        $this->assertStringStartsWith(self::FRONTEND_PLUGIN_TEST_BASE, $location);
+        $sessionCookie = $this->frontendSessionCookie($response) ?? $sessionCookie;
+
+        return $this->renderFrontendPage(
+            (new InternalRequest($location))->withCookieParams($sessionCookie !== null ? ['fe_typo_user' => $sessionCookie] : []),
+        );
     }
 }

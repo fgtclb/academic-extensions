@@ -240,8 +240,9 @@ site packages build on, or through TYPO3 itself. A project with such a theme
 gets layout, buttons and accessible hiding without a line of its own. The
 markup uses no other class of Bootstrap: no cards, no spacing or display
 utilities, no form classes. The one exception is the flash message of the job
-list and the job detail of :guilabel:`EXT:academic_jobs`, the confirmation
-after a submitted job. It is rendered by TYPO3 itself, as a
+list, the job detail and the job form of :guilabel:`EXT:academic_jobs`, the
+confirmation after a submitted job among them. It is rendered by TYPO3
+itself, as a
 :html:`<ul class="typo3-messages">` of :html:`<li class="alert alert-<severity>">`
 entries, with the alert classes of Bootstrap.
 
