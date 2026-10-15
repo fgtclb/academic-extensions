@@ -37,9 +37,10 @@ A contact record consists of:
     An optional role, for example :guilabel:`Dean's office` or
     :guilabel:`Student advisors`. Contacts sharing a role are rendered as a
     group below the name of that role, contacts without a role are rendered
-    below the grouped ones — unless :guilabel:`Group by role` is switched off
-    in the content element, see :ref:`configuration-group-by-role`. Roles are
-    records of their own and are usually kept in a storage folder.
+    below the grouped ones. With :guilabel:`Group by role` switched off in the
+    content element, all contacts form one list, see
+    :confval:`Group by role <contacts-list-group-by-role>`. Roles are records
+    of their own and are usually kept in a storage folder.
 
 ..  _introduction-frontend:
 
@@ -103,3 +104,9 @@ notice :file:`Resources/Public/Icons/LICENSE-font-awesome.txt` lists every file
 with its Font Awesome name and the changes made to it. The role record icon
 draws a shared icon of :guilabel:`academic_base`, which lists it in its own
 notice.
+
+This manual shows the icon of the content element from
+:file:`Documentation/Images/Icons/contacts.svg`, a copy of
+:file:`Resources/Public/Icons/plugin/contacts.svg`, the Font Awesome icon
+`address-card`, drawn in a fixed grey instead of the colour of the surrounding
+text, so that it reads on a light and a dark page alike.

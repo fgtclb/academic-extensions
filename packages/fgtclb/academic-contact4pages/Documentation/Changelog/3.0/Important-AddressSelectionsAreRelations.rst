@@ -71,7 +71,7 @@ next save, or at once with:
 
 A listener of :php:`\FGTCLB\AcademicBase\Event\ModifyTcaSelectFieldItemsEvent`
 still receives the final item list, after the extension replaced the record
-items TYPO3 added.
+items TYPO3 added, see :ref:`developers-event-modify-tca-select-field-items-event`.
 
 Affected Installations
 ======================
