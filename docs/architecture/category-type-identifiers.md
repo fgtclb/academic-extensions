@@ -60,9 +60,13 @@ fallback reads `department` as `project_department`.
 ## A console command, not an upgrade wizard
 
 `academic:projects:department:migrate` (`MigrateProjectDepartmentsCommand`)
-moves the stored categories. No new upgrade wizard is added while `main`
-supports TYPO3 v13, because every wizard is another call site of
-`Install\Updates`, which v15 removes and v13 has no replacement for (ACE-294).
+moves the stored categories. It was written as a command because every upgrade
+wizard is another call site of `Install\Updates`, which v15 removes and v13 has
+no replacement for (ACE-294). 3.0 has added three wizards since
+(`academicPersons_fillFilterSlugs`, `academicPersons_migrateContractPublishToHidden`
+and `academicPersonsEdit_repairLocalizedProfileImages`), so that is no rule for
+the whole release. The upgrade wizard module does not offer the command, the
+upgrade chapter of academic_projects names it.
 
 It classifies the categories of type `department` that are neither a
 translation nor a workspace version, by the doktypes of the non-deleted

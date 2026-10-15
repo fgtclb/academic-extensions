@@ -57,10 +57,10 @@ Two things the contract makes possible without a fork:
 Impact
 ======
 
-**The default output is unchanged.** An installation that configures nothing
-and overrides nothing renders the same text, the same elements and the same
-classes as before, with the data attributes added - and behaves the same by
-mouse and by keyboard.
+**The default behaviour is unchanged.** An installation that configures
+nothing and overrides nothing renders the same text and behaves the same by
+mouse and by keyboard. The classes of the markup changed in the same version,
+see :ref:`breaking-study-plan-speaking-frontend-classes`.
 
 Affected Installations
 ======================
@@ -70,8 +70,8 @@ has anything to do on update.
 
 An installation that forked :file:`AcademicStudyPlan.html` or the script can
 move onto the partials and the attributes instead, and stop carrying the copy.
-Markup that identifies its parts only by the class names of 3.0 keeps working
-for the whole 3.x line - see
+Markup that identifies its parts only by the class names of 2.x keeps working
+for the whole 3.x line, see
 :ref:`Deprecation: The study plan class selectors
 <deprecation-study-plan-class-selectors>`.
 

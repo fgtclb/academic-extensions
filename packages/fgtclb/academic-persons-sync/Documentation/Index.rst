@@ -51,6 +51,11 @@ for all academic extensions on the `extension points page of academic_base
         Install :guilabel:`academic_persons_sync` via Composer, the
         Extension Manager or a TER upload.
 
+    ..  card:: :ref:`Upgrade <upgrade>`
+
+        The steps to upgrade :guilabel:`academic_persons_sync` to a newer
+        version, in the order to take them.
+
     ..  card:: :ref:`Known problems <known-problems>`
 
         Known issues and information about them.
@@ -66,6 +71,7 @@ for all academic extensions on the `extension points page of academic_base
     :hidden:
 
     Installation/Index
+    Upgrade/Index
     KnownProblems/Index
     Changelog/Changelog-3
     Changelog/Changelog-2

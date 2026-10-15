@@ -50,6 +50,11 @@ extensions.
         Install :guilabel:`academic_base` via Composer, the Extension
         Manager or a TER upload.
 
+    ..  card:: :ref:`Upgrade <upgrade>`
+
+        The steps to upgrade :guilabel:`academic_base` to a newer
+        version, in the order to take them.
+
     ..  card:: :ref:`Configuration <configuration>`
 
         Configure the extension and its site sets for your installation.
@@ -101,6 +106,7 @@ extensions.
 
     Introduction/Index
     Installation/Index
+    Upgrade/Index
     Configuration/Index
     Icons/Index
     Templates/Index

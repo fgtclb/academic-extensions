@@ -61,6 +61,11 @@ number of job advertisements. The grouping is set in TypoScript.
         Install :guilabel:`academic_bite_jobs` via Composer, the Extension
         Manager or a TER upload.
 
+    ..  card:: :ref:`Upgrade <upgrade>`
+
+        The steps to upgrade :guilabel:`academic_bite_jobs` to a newer
+        version, in the order to take them.
+
     ..  card:: :ref:`For integrators <integrator>`
 
         The B-ITE job list and every option of its content element.
@@ -99,6 +104,7 @@ number of job advertisements. The grouping is set in TypoScript.
 
     Introduction/Index
     Installation/Index
+    Upgrade/Index
     Integrator/Index
     Configuration/Index
     Templates/Index

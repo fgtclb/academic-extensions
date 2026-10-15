@@ -16,7 +16,7 @@ nowhere in that plan:
     :header-rows: 1
 
     *   -   Attribute
-        -   Class selector of 3.0, deprecated
+        -   Class selector of 2.x, deprecated
     *   -   :html:`data-study-plan`
         -   :html:`.academic-study-plan`
     *   -   :html:`data-study-plan-filter`
@@ -39,15 +39,15 @@ and the classes on others works as well.
 
 The container is the one exception: :html:`.academic-study-plan` is read **next
 to** :html:`data-study-plan`, not instead of it. Two plans of one page can come
-from different templates, and a 3.0 one must not disappear because the other
-carries the attribute. It is deprecated on the same terms.
+from different templates, and one whose template lacks the attribute must not
+disappear because the other one carries it. It is deprecated on the same terms.
 
 Impact
 ======
 
 Nothing is logged and nothing changes for a visitor. The fallback is removed in
-version 4.0; from then on markup without the attributes has no interaction at
-all - no filter, no accordion, no dialogs.
+version 4.0. From then on markup without the attributes has no interaction at
+all: no filter, no accordion, no dialogs.
 
 Affected Installations
 ======================
@@ -59,12 +59,12 @@ Migration
 =========
 
 Add the attributes to your markup, on the elements
-:ref:`Templates <templates-attributes>` names. The classes may stay: they are
-what the stylesheet selects, and nothing reads them once the attributes are
+:ref:`Templates <templates-attributes>` names. The classes may stay where a site
+stylesheet selects them. The script does not read them once the attributes are
 there.
 
 An override that only renamed a few elements is often better replaced by an
-override of the one partial it is really about - the other three then keep
+override of the one partial it is really about. The other three then keep
 coming from the extension, with everything they gain.
 
 .. index:: Frontend, Fluid, JavaScript, ext:academic_study_plan

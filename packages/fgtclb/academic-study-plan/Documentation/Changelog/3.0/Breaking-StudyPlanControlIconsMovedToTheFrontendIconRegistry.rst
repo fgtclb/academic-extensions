@@ -7,12 +7,13 @@ Breaking: The study plan icons are renamed and the controls are frontend icons
 Description
 ===========
 
-In 2.x the study plan registered seven icons in :file:`Configuration/Icons.php`,
-for the icon registry of the TYPO3 backend: the icon of the content element,
-the record icons of categories, semesters and modules, and the three control
-icons of the frontend, the plus and the minus glyph of a semester header and
-the close glyph of a module dialog. The partials rendered the controls with
-``core:icon``.
+In 2.4 the study plan registered seven icons in
+:file:`Configuration/Icons.php`, for the icon registry of the TYPO3 backend:
+the icon of the content element, the record icons of categories, semesters and
+modules, and the three control icons of the frontend, the plus and the minus
+glyph of a semester header and the close glyph of a module dialog. Version 2.3
+registered only the first four and asked for control icons nobody registered.
+The template rendered the controls with ``core:icon``.
 
 The academic extensions now draw every icon from one set, Font Awesome Free
 (solid), drawn in :css:`currentColor` so each icon takes the colour of the
@@ -31,8 +32,7 @@ decides the registry:
     :file:`Frontend/Default/Partials/StudyPlan/ModuleDialog.html` render the
     shared action icons of :guilabel:`academic_base` from its frontend icon
     registry, with the ``ab:icon`` ViewHelper of :guilabel:`academic_base` and
-    the arguments they had (ACE-813). The extension ships no
-    :file:`Configuration/FrontendIcons.php` any more.
+    the arguments they had (ACE-813).
 
 The previous identifiers are removed without an alias:
 
@@ -73,13 +73,14 @@ stays, as the extension icon only. The origin and licence of the Font Awesome
 files (CC BY 4.0) are listed in
 :file:`Resources/Public/Icons/LICENSE-font-awesome.txt`.
 
-The controls are still inlined SVG. Their files used to carry a
-:html:`viewBox` but no :html:`width` and :html:`height`, and an inline SVG
-without a size collapses to 0 pixels inside the flex header of a semester and
-inside the close button of a dialog, so none of the three was visible. The new
-files carry :html:`width="1em" height="1em"`, and the shipped stylesheet sizes
-every icon of the element on top of that, see
-:ref:`important-study-plan-controls-are-visible`.
+The controls are still inlined SVG. The files of 2.x carry a :html:`viewBox`
+but no :html:`width` and :html:`height`, and an inline SVG without a size
+collapses to 0 pixels inside the flex header of a semester and inside the close
+button of a dialog. Only the stylesheet 2.4 shipped made them visible, see
+:ref:`important-study-plan-controls-are-visible`. The new files carry
+:html:`width="1em" height="1em"` and keep that size without a stylesheet, which
+this version no longer ships, see
+:ref:`breaking-study-plan-ships-no-stylesheet`.
 
 Impact
 ======
@@ -95,11 +96,11 @@ Impact
     the icon registry of the backend does not know the identifiers of the
     frontend icon registry.
 *   The class the icon markup derives from the identifier changes with it. The
-    shipped stylesheet switches the glyphs of a semester header through
-    :css:`icon-tx-academicbase-action-expand` and
-    :css:`icon-tx-academicbase-action-collapse` now, and still hides
-    :css:`.icon` in the header on a wide viewport. A stylesheet or an override
-    that still uses :css:`icon-academic-study-plan-plus` or
+    stylesheet example of :ref:`styling` switches the glyphs of a semester
+    header through :css:`icon-tx-academicbase-action-expand` and
+    :css:`icon-tx-academicbase-action-collapse`, and hides :css:`.icon` in the
+    header on a wide viewport. A site stylesheet or an override that still uses
+    :css:`icon-academic-study-plan-plus` or
     :css:`icon-academic-study-plan-minus` shows both glyphs, or neither.
 *   A replacement of a control is no longer limited to the study plan. Its
     identifier belongs to :guilabel:`academic_base`, so a site package that
@@ -147,8 +148,9 @@ Migration
     partial:
     ``xmlns:ab="http://typo3.org/ns/FGTCLB/AcademicBase/ViewHelpers"``. An
     override of :file:`Semester.html` keeps rendering
-    ``tx-academicbase-action-expand`` and ``tx-academicbase-action-collapse``,
-    because the shipped stylesheet selects their classes, see
+    ``tx-academicbase-action-expand`` and ``tx-academicbase-action-collapse``
+    when the site stylesheet selects their classes, as the example of the
+    manual does, see
     :ref:`The glyphs of a semester header <templates-glyphs>`.
 #.  Replace :css:`.icon-<2.x identifier>` selectors with
     :css:`.icon-<3.0 identifier>`.

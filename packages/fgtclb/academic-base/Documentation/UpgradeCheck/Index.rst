@@ -444,4 +444,4 @@ What it does not check
     has no record of the version a copy was taken from, so :bash:`identical` is
     the only statement it can make about a copy that still exists upstream.
 *   The settings file of :php:`EXT:academic_persons`. Its own command
-    :bash:`academic:persons:migrate-settings` reports and migrates that.
+    :bash:`academic:persons:settings:migrate` reports and migrates that.

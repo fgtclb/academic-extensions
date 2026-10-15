@@ -11,8 +11,8 @@ The four category type icons of this extension, which
 :php:`EXT:category_types` registers as :php:`category_types.projects.*`, were
 registered with the core provider
 :php:`\TYPO3\CMS\Core\Imaging\IconProvider\SvgIconProvider`. It renders the
-default markup - the markup a :php:`sys_category` type icon reaches - as an
-:html:`<img>` tag. An image is opaque to CSS, so the icon kept the ink of its
+default markup, which is the markup a :php:`sys_category` type icon reaches, as
+an :html:`<img>` tag. An image is opaque to CSS, so the icon kept the ink of its
 file whatever the backend colour scheme said.
 
 The four category types now ask for inlining with `inlineIcon: true` in
@@ -23,7 +23,7 @@ which inlines the file in both markups. A category type without that flag
 keeps the core provider.
 
 The academic project page type (doktype `30`) and the two content elements
-"Projects" and "Projects (selected)" used the core icon
+:guilabel:`Projects` and :guilabel:`Selected Projects` used the core icon
 :php:`actions-code-merge`, a merge glyph that says nothing about a project and
 that the extension does not ship. They now have icons of their own, registered
 in the new :file:`Configuration/Icons.php` of this extension.

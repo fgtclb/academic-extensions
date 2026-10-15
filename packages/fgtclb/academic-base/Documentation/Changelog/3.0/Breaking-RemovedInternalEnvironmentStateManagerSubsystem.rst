@@ -48,12 +48,13 @@ Migration
 
 Require `fgtclb/environment-state-manager` and replace the namespace prefix
 :php:`\FGTCLB\AcademicBase\Environment` with
-:php:`\FGTCLB\EnvironmentStateManager` (respectively
-:php:`\FGTCLB\AcademicBase\Core12\Environment` /
+:php:`\FGTCLB\EnvironmentStateManager`, and
 :php:`\FGTCLB\AcademicBase\Core13\Environment` with
-:php:`\FGTCLB\EnvironmentStateManager\Core12` /
-:php:`\FGTCLB\EnvironmentStateManager\Core13`). Class names, method
-signatures and behaviour are compatible.
+:php:`\FGTCLB\EnvironmentStateManager\Core13`. Class names, method
+signatures and behaviour are compatible. Version 2 of that extension, which
+3.0 requires, has no :php:`Core12` namespace, so code that used
+:php:`\FGTCLB\AcademicBase\Core12\Environment` names the class of the
+running TYPO3 version instead, see :ref:`important-environment-state-manager-2`.
 
 ..  code-block:: php
 

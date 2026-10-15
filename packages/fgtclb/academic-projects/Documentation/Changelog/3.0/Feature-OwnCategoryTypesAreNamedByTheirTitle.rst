@@ -35,7 +35,7 @@ It applies to
 *   the categories of the project page,
     :file:`Partials/Project/Page/Categories.html`;
 *   the categories of each card of the :guilabel:`Projects` and the
-    :guilabel:`Projects (selected)` content elements,
+    :guilabel:`Selected Projects` content elements,
     :file:`Partials/Project/Item.html`;
 *   the filter selects of the :guilabel:`Projects` content element,
     :file:`Partials/Project/DemandCategories.html`.

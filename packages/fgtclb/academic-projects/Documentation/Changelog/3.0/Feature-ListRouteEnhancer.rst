@@ -8,7 +8,7 @@ Description
 ===========
 
 The extension ships route enhancers for the :guilabel:`Projects` and the
-:guilabel:`Projects (selected)` content elements in
+:guilabel:`Selected Projects` content elements in
 :file:`Configuration/Routes/List.yaml`. A site that imports the file gets
 readable list URLs in the language of the site:
 

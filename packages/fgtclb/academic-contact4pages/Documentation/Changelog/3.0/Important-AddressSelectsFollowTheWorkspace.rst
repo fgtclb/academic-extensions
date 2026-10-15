@@ -8,10 +8,13 @@ Description
 ===========
 
 Version 2.4 made the e-mail address, phone number and postal address selects
-of a page contact relations to the address tables of :php:`academic_persons`,
-see :ref:`important-ace-481-academic-contacts4pages`. Version 3.0 of
-:php:`academic_persons` makes these tables workspace aware, see
-*Breaking: Person records are workspace aware* in its changelog.
+of a page contact relations to the address tables of
+:guilabel:`academic_persons`, see
+:ref:`important-ace-481-academic-contacts4pages`. Version 3.0 of
+:guilabel:`academic_persons` makes these tables workspace aware, see
+`Breaking: Person records are workspace aware
+<https://docs.typo3.org/p/fgtclb/academic-persons/main/en-us/Changelog/3.0/Breaking-PersonRecordsAreWorkspaceAware.html>`__
+in its changelog.
 
 The selects offer each address of the contract once, as the workspace of the
 editor shows it, with the uid of its live record as the value. Publishing

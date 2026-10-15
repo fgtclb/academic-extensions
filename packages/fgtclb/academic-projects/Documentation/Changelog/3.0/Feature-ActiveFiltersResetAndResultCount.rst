@@ -8,7 +8,7 @@ Description
 ===========
 
 A visitor who filtered the :guilabel:`Projects` or the
-:guilabel:`Projects (selected)` content element saw the selects and nothing else. Three
+:guilabel:`Selected Projects` content element saw the selects and nothing else. Three
 settings add what was missing, each off by default:
 
 *   :typoscript:`plugin.tx_academicprojects.filter.showActiveFilters` shows one tag per
