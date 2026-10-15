@@ -313,6 +313,10 @@ Check the result
     the categories of the page.
 *   A project list of 1.x shows or hides completed projects as it did before,
     and its filter and sorting forms are shown or hidden as configured.
+*   A list that hides a part of its form keeps the preset of that part when a
+    visitor uses the rest of the form, a list of running projects with a
+    hidden state select shows running projects only, see
+    :ref:`important-hidden-project-form-parts-keep-their-presets`.
 *   A list filtered by :guilabel:`Active` lists projects without an end date
     now, so a paginated list can grow by some entries. See
     :ref:`important-projects-without-end-date-are-active`.
