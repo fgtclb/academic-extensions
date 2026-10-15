@@ -42,6 +42,12 @@
   confirmation, the base test cases of the notification mail assert the `303`
   on both cores, the unused response recorder of the fixture extension is
   removed.
+- [x] 2.6 Review follow-up: the redirect persists before it clears the caches,
+  so a change an after-save listener does not persist itself is stored, and a
+  request without a job returns to the form. Both tests went red on v14 without
+  the change, logs `.agent/tmp/ace-912/red-core14-persist.log` and
+  `red-core14-nojob.log`. The label of item `-1` reads "Use the site or
+  TypoScript setting".
 
 ## 3. Documentation
 
