@@ -210,5 +210,5 @@ Introduced in
 *   :ref:`feature-modify-plugin-view-event`
 *   :ref:`important-1790607225`
 *   :ref:`important-plugin-controller-action-context-content-object` and
-    :ref:`important-plugin-controller-action-context-site-and-language`, which
-    made the getters of the context return :php:`null` rather than fail
+    :ref:`important-ace-748-academic-base` (2.4), which made the getters of
+    the context return :php:`null` rather than fail

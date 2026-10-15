@@ -139,8 +139,8 @@ address of that kind in the frontend.
 Introduced in
 =============
 
-*   :ref:`important-address-selections-are-relations` made the selects
-    relations to the address tables and states that a listener receives the
-    final item list.
 *   :ref:`feature-dedicated-address-record-selection` added the three selects
     in version 2.4, and with them the dispatch.
+*   :ref:`important-ace-481-academic-contacts4pages` made the selects
+    relations to the address tables in version 2.4, and states that a
+    listener receives the final item list.

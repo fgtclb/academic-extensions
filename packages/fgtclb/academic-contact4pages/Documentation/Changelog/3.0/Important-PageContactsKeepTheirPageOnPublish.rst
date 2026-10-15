@@ -31,7 +31,7 @@ Both pointers now name their table in :php:`dontRemapTablesOnCopy`. A page
 contact keeps its live page and role through a publish from either place, and
 a copied page or role still gets copies of its page contacts that point at the
 copy. The address selects of a page contact work the same way, see
-:ref:`important-address-selections-are-relations`.
+:ref:`important-ace-481-academic-contacts4pages-workspaces`.
 
 Impact
 ======
