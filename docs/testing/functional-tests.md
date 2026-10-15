@@ -371,6 +371,23 @@ tests of `academic_partners`, `academic_projects` and `academic_programs` are
 the worked examples, see
 [List filter URLs](../architecture/list-filter-urls.md).
 
+A form that stores something in the session, a flash message for the next page
+above all, is followed with `followSeeOther()`. It requests the `Location` with
+the `fe_typo_user` cookie the answer set, as a browser does, and returns the
+page. `frontendSessionCookie()` reads that cookie for a later request of the
+same visitor, and `submitFrontendForm()` takes it as its fourth argument, so a
+second submission continues the session of the first one:
+
+```php
+$answer = $this->submitFrontendForm('https://www.acme.com/new-job', $jobForm, $values);
+$this->assertSame('https://www.acme.com/new-job', $answer->getHeaderLine('Location'));
+$page = $this->followSeeOther($answer);
+```
+
+[`AcademicJobsNewJobFormRedirectPageTest`](../../packages/fgtclb/academic-jobs/Tests/Functional/Plugins/AcademicJobsNewJobFormRedirectPageTest.php)
+is the worked example: it asserts that the confirmation is shown once, on the
+redirect and not on a reload in the same session or for another visitor.
+
 The testing framework replaces the `pages` cache with a `NullBackend`, so no
 test is ever served a page from the page cache. A test about what the page
 cache shares restores the database backend for its class:
@@ -424,10 +441,10 @@ Three things about it are not obvious:
   quoted-printable parts, so the test splits the parts at the boundary and
   decodes each by its `Content-Transfer-Encoding` before it asserts text.
 
-The form that sends the mail is posted with its hidden fields. TYPO3 v13 sends
-the redirect a plugin action returns with `header()` and answers 200, TYPO3
-v14 answers the redirect, so a test that runs on both asserts the created
-record rather than the status.
+The form that sends the mail is posted with its hidden fields. The form
+throws its redirect after a saved job, so the answer is a `303` with an empty
+body on TYPO3 v13 and v14 alike (ACE-912). A test that only cares about the
+mail asserts the created record.
 
 [`AbstractAcademicJobsNotificationMailTestCase`](../../packages/fgtclb/academic-jobs/Tests/Functional/Plugins/AbstractAcademicJobsNotificationMailTestCase.php)
 is the worked example, with a test class for the shipped template and one that
@@ -455,11 +472,15 @@ configuration:
   file open across the requests of a class, so `setUp()` truncates the file
   rather than deleting it.
 - **The messages of the form** are queued in the session of the visitor. The
-  test takes the `fe_typo_user` cookie from the answer to the post, sends it
-  with `withCookieParams()` on the next request, and renders the queue with
-  `f:flashMessages` in a `COA_INT` on the page it requests. The queue is named
-  `extbase.flashmessages.<plugin namespace>`. Only TYPO3 v14 answers the post
-  with the redirect, so only a `not-core-13` test follows it.
+  test takes the `fe_typo_user` cookie from the answer to the post with
+  `frontendSessionCookie()`, or follows the redirect with `followSeeOther()`,
+  which sends it, see
+  [Testing helper](testing-helper.md#frontendpluginrenderingtrait). Without a
+  redirect page the form renders its own queue,
+  `academic_jobs.new_job_form.confirmation`, above itself. For a redirect page
+  the test renders the queue of the plugin,
+  `extbase.flashmessages.<plugin namespace>`, with `f:flashMessages` in a
+  `COA_INT` on the page it requests.
 - **A post that fails** ends the test with the exception that left the
   plugin. A test that gets a response therefore knows that nothing did, and
   one that expects an error catches it around the post only and rethrows any
@@ -469,7 +490,8 @@ configuration:
 [`AbstractAcademicJobsFailingNotificationMailTestCase`](../../packages/fgtclb/academic-jobs/Tests/Functional/Plugins/AbstractAcademicJobsFailingNotificationMailTestCase.php)
 is the example, and its test classes cover a failing transport, an empty
 recipient and sender, a recipient that cannot be parsed, a missing template,
-the warning the visitor sees, and the redirect on TYPO3 v14.
+the warning the visitor sees on the form and on a redirect page, and the
+redirect.
 
 ## Version-gated tests
 

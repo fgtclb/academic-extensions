@@ -13,7 +13,7 @@ moved. The controller, the validator and the settings of the form stay in
 |---------------------------------------------|-----------------------|-----------------------------------------------------------|
 | `Classes/Form/FlashMessageCreationMode.php` | backed enum, `@api`   | Whether a save queues its confirmation as a flash message |
 | `Classes/Form/AfterSaveResolver.php`        | service, internal     | Reads redirect page and mode, decides after the save      |
-| `Classes/Form/AfterSaveDecision.php`        | data object, internal | The page to redirect to, and whether to queue the message |
+| `Classes/Form/AfterSaveDecision.php`        | data object, internal | Back to the form or to a page, and whether to queue       |
 | `Resources/Private/Partials/Academic/Form/` | Fluid partials        | Six field partials, the field wrapper and the error alert |
 
 The service and the data object are internal to the academic extensions. The
@@ -52,6 +52,61 @@ redirect to that page id while the mode queued the message for the form page
 event, so a later listener still reads what an earlier one set, and in the jobs
 controller after the `listPid` fallback, which therefore never takes over a
 `0`.
+
+## Back to the form, or to a page
+
+`decide()` sets `returnsToForm` without a redirect page and for a redirect page
+that is the current page. `redirectPageId` keeps the page all the same, so a
+controller reads it only when the flag is false. Setting it to `null` for the
+current page would have made the flag redundant, but lost the information that
+a page was configured. The jobs controller maps the decision to two things
+(ACE-912, ACE-919):
+
+| `returnsToForm` | Redirect                                | Queue of the confirmation                          |
+|-----------------|-----------------------------------------|----------------------------------------------------|
+| `true`          | The form page, without any plugin query | `academic_jobs.new_job_form.confirmation`          |
+| `false`         | `redirectPageId`                        | `extbase.flashmessages.tx_academicjobs_newjobform` |
+
+The first queue is a constant of the controller,
+`JobController::CONFIRMATION_QUEUE_IDENTIFIER`, and `Templates/Job/New.html`
+renders it with `f:flashMessages` inside the content element. The literal is
+repeated in the template, Fluid cannot read the constant, and the functional
+tests hold both together. The form is a `USER_INT`, so the rendered queue never
+reaches the page cache. The second queue is the default queue of the plugin,
+which no shipped template renders. A redirect page renders it in an uncached
+part, which the manual shows. The form does not render it, so a confirmation
+left in the session by a redirect page never turns up on the form. Rendering
+the default queue in `New.html` was rejected for that reason, and because
+Extbase queued its own error message there.
+
+That error message, "An error occurred while trying to call ...", is switched
+off: `getErrorFlashMessage()` of the controller returns `false`. TYPO3 v13
+stored it in the session, v14 does not, so on v13 it turned up next to the
+confirmation of the next saved job.
+
+Both redirects are thrown as `PropagateResponseException`, as the list filters
+do, see [List filter URLs](list-filter-urls.md#thrown-not-returned). The
+answer is a `303` without a page on v13 and v14. Before, the controller
+returned `redirect('list')` without a redirect page. Extbase built that link
+for the `List` plugin, the only plugin offering `list`, so the form page got
+`tx_academicjobs_list` arguments, no plugin on it took them, and the form
+rendered empty. It did not throw `InvalidActionNameException` 1313855175.
+
+The exception skips what `Extbase\Core\Bootstrap` does after an action. The
+controller therefore does both steps itself before it throws, in the same
+order. It calls `persistAll()` first, so a listener of `AfterSaveJobEvent`
+that changes the job or another record through a repository without
+persisting it keeps its change. Then it calls
+`CacheService::clearCachesOfRegisteredPageIds()`: the persistence registered
+the saved records, and the call flushes the page caches tagged with them and
+the pages the storage folder names in `TCEMAIN.clearCacheCmd`. The
+`AfterRequestDispatchedEvent` is skipped as well, nothing in the extensions
+listens to it.
+
+A job that has no uid after `persistAll()` queues "Job not created" for the
+form and leaves through the same exit, before the event and the mail. A
+request for the create action without a job returns to the form through it
+too, without a message.
 
 ## The field partials
 
@@ -126,8 +181,17 @@ its wrapper.
 - `academic-jobs/Tests/Unit/ClassAliasMapTest.php` resolves the old enum name
   and changes the mode of an `AfterSaveJobEvent` through it.
 - `academic-jobs/Tests/Functional/Plugins/AcademicJobsNewJobFormRedirectPageTest.php`
-  sends a job while a listener hands in a redirect page of `0` or `-1`, and
-  asserts the redirect to the form page and the message, on v13 and v14.
+  sends a job without a redirect page, with a listener that hands in `0` or
+  `-1`, and with the form page as the redirect page, and asserts the `303` to
+  the plain form URL and the confirmation in the form, once. It covers the
+  redirect page of the element, the site setting, a listener and `listPid`
+  with its deprecation, the modes "never" and the conditional one, a
+  confirmation left on an unrendered redirect page, a change a listener does
+  not persist itself, a request without a job, and the cache clearing, on
+  v13 and v14.
+- `academic-jobs/Tests/Functional/Plugins/AcademicJobsNewJobFormRejectedSubmissionTest.php`
+  asserts that a rejected submission queues no error message of Extbase, also
+  not into the session for the confirmation that follows.
 - `academic-jobs/Tests/Functional/Plugins/AcademicJobsNewJobFormPartialOverrideTest.php`
   renders the form with a project copy of `Job/Forms/Textfield.html` and with
   one of `Job/Forms/FieldWrapper.html`, made from the files as they were before

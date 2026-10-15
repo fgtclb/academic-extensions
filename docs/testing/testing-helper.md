@@ -248,6 +248,8 @@ assertion — roughly sixty lines per test class before this trait existed
 | `submitFrontendForm()`              | Renders a page and submits one of its POST forms with its fields.       |
 | `frontendPostRequest()`             | A form encoded POST request, for a body no rendered form produces.      |
 | `assertSeeOtherWithCacheHash()`     | Asserts a `303` to a URL of the site with a `cHash`, returns the URL.   |
+| `frontendSessionCookie()`           | The `fe_typo_user` cookie a response set, or `null`.                    |
+| `followSeeOther()`                  | Follows a `303` in the session the answer set, returns the page.        |
 
 **When to use it.** In every test that renders a plugin. The class must also
 `use SBUERK\TYPO3\Testing\SiteHandling\SiteBasedTestTrait` and declare its own
@@ -269,7 +271,7 @@ protected function tearDown(): void
 }
 ```
 
-**The traps it exists for.** Four, the first three of them silent:
+**The traps it exists for.** Five, the first three of them silent:
 
 - `subrequestPageErrors` is switched on in the configuration. Without it the
   frontend swallows the exception of a sub request and answers a **rendered
@@ -282,6 +284,11 @@ protected function tearDown(): void
 - The two `add…ToLoad()` helpers exist because assigning `$testExtensionsToLoad`
   in a subclass drops everything the abstract test case declared, and the loss
   is not reported.
+- `followSeeOther()` sends the session cookie of the answer, or the one it is
+  handed when the answer set none, because a session that already exists is
+  not announced again. A redirect followed without it shows a page without the
+  messages the submission stored, which looks like a missing message rather
+  than a lost session.
 - `frontendPostRequest()` writes the body itself. The testing framework
   otherwise serialises the parsed body with `GuzzleHttp\Psr7\Query::build()`,
   which cannot handle nested plugin arguments and emits an "Array to string

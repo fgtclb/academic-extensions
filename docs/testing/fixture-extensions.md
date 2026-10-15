@@ -51,7 +51,7 @@ They sit next to the tests that use them, under
 | `test_frontend_user_sync_relations_by_name` | `tests/test-frontend-user-sync-relations-by-name` | `academic-persons`       | A synchronisation map matching units by name and creating function types.     |
 | `test_hidden_content_types`                 | `tests/hidden-content-types`                      | `academic-base`          | Two content types hidden by page TSconfig, one in the academic group.         |
 | `test_icon_rules`                           | `tests/icon-rules`                                | `academic-base`          | Icons following every icon rule, in both registries and category types.       |
-| `test_job_after_save_listener`              | `tests/test-job-after-save-listener`              | `academic-jobs`          | A listener setting the redirect page after a save, and a response recorder.   |
+| `test_job_after_save_listener`              | `tests/test-job-after-save-listener`              | `academic-jobs`          | Listeners setting the redirect page and changing the job after a save.        |
 | `test_job_icons`                            | `tests/job-icons`                                 | `academic-jobs`          | Job icons replaced in `FrontendIcons.php`, and without effect in `Icons.php`. |
 | `test_job_validation_override`              | `tests/job-validation-override`                   | `academic-jobs`          | A jobs `Settings.yaml` naming nine fields, a TCA override, two TCA listeners. |
 | `test_jobcontact_schema`                    | `tests/test-jobcontact-schema`                    | `academic-jobs`          | `ext_tables.sql` without TCA for a removed table an upgrade wizard reads.     |
@@ -338,9 +338,11 @@ The existing ones show the cases that justify one:
   a listener was handed during a frontend request too.
   `test_job_after_save_listener` hands in the redirect page a test sets in
   TypoScript from a listener of the after-save event of the new job form, and
-  records the response of the form plugin from the Extbase dispatch event the
-  same way, because TYPO3 v13 passes a redirect to `header()`, where a test
-  cannot read it.
+  a second listener changes the title of the saved job through the repository
+  without persisting it, as a project listener may. The fixture recorded the
+  response of the form plugin as well, while TYPO3 v13 passed the returned
+  redirect to `header()`. The form throws its redirect now, so the test reads
+  the answer itself (ACE-912).
   `test_frontend_user_sync_events` needs a package for two reasons: its
   listeners of the synchronisation events register through
   the container, and its `frontendUserSync` map, which reads a value one of
