@@ -48,7 +48,8 @@ documents the SQLite defect that affects the command line path.
     version rows of every workspace, the editor's own included, and the
     records new in other workspaces. Apart from that, a copy kept the
     addresses of the original and the reference index knew no selection. All
-    of it is fixed, see :ref:`important-address-selections-are-relations`.
+    of it is fixed, see :ref:`important-ace-481-academic-contacts4pages` and
+    :ref:`important-ace-481-academic-contacts4pages-workspaces`.
 
 Affected Installations
 ======================

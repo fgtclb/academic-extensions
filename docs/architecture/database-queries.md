@@ -847,7 +847,7 @@ other asserting that the empty result still has the shape a template expects.
 - `packages/fgtclb/academic-jobs/Documentation/Changelog/2.4/Important-JobContactWizardFindsRenamedTable.rst`:
   the ACE-895 changelog entry, for installations that let the analyzer rename
   the old contact table first.
-- `packages/fgtclb/academic-projects/Documentation/Changelog/3.0/Important-ProjectsWithoutEndDateAreActive.rst`:
+- `packages/fgtclb/academic-projects/Documentation/Changelog/2.4/Important-ProjectsWithoutEndDateAreActive.rst`:
   the ACE-433 changelog entry, for project pages without a stored end date.
 - `.Build/vendor/typo3/cms-core/Classes/Database/Query/QueryBuilder.php` and
   `.../Query/Expression/ExpressionBuilder.php` — the authoritative source for

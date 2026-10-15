@@ -1,4 +1,4 @@
-..  _important-1791841973:
+.. _important-projects-without-end-date-are-active:
 
 ======================================================
 Important: Projects without an end date are now active
@@ -16,8 +16,7 @@ entering an end date does not change that.
 
 The :guilabel:`Active` filter of the project lists left these projects out,
 and so did the :guilabel:`Completed` filter, so a list filtered either way
-never showed them. They are the open ended projects, and a template already
-reads their state as active, see :ref:`configuration-active-state`.
+never showed them, although they are the open ended projects.
 
 A project without a stored end date is now listed by the :guilabel:`Active`
 filter, exactly like a project whose end date was saved empty. The
@@ -33,4 +32,4 @@ list, entries can move to a later page.
 
 No stored value changes, and there is no upgrade wizard to run.
 
-..  index:: Frontend, ext:academic_projects
+.. index:: Frontend, ext:academic_projects
