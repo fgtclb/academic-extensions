@@ -1,170 +1,113 @@
 // The lists of academic_persons: the list, the card, the selected profiles and
 // the selected contracts (`Templates/Profile/List.html`, `Card.html`,
-// `SelectedProfiles.html`, `SelectedContracts.html` and `Partials/Profile/Item.html`).
+// `SelectedProfiles.html`, `SelectedContracts.html`, `Partials/Profile/Item.html`
+// and the partials below `Partials/Profile/List/` and `Partials/Profile/ViewMode/`),
+// and the contacts of academic_contacts4pages (`Templates/Contacts/List.html` and
+// `Partials/Contacts/Item.html`), which render the same item.
+//
+// The colours and sizes, the structural lists, the filter fields, the item
+// with its image and title, the letter navigation and the pagination are
+// shared with the other extensions and come from `_academic-base.scss`. What
+// follows is the portrait and the fields of a profile, the grouped list, the
+// view mode switch, the table and the role groups of the contacts.
 
 .academic-persons-list,
 .academic-persons-card,
 .academic-persons-profiles,
-.academic-persons-contracts {
-    --ace-border-color: var(--bs-border-color, #dee2e6);
-    --ace-secondary-bg: var(--bs-tertiary-bg, #f6f8fd);
-    --ace-secondary-color: var(--bs-secondary-color, #6c757d);
-
-    .ace-form,
+.academic-persons-contracts,
+.academic-contacts4pages-list {
     .ace-navigation,
     .ace-itemlist,
     .ace-table-wrap {
         margin-bottom: 1.5rem;
     }
 
-    .ace-filter {
-        display: grid;
-        gap: 0.5rem;
-    }
+    // The filters share the line, each as wide as its longest option allows,
+    // and take a line of their own on a phone. The submit button keeps its
+    // width at the end.
+    .ace-filters > .row > .col-auto:not(:has(> .ace-actions)) {
+        flex: 1 1 14rem;
+        max-width: 22rem;
 
-    // The filter submit carries "ace-control" as well, and it is a button, not
-    // a field: the theme styles it through "btn btn-primary". Only the fields
-    // a visitor types into or chooses from get the field look.
-    :is(select, textarea, input:not([type="button"], [type="reset"], [type="submit"])).ace-control {
-        background-color: var(--bs-body-bg, #fff);
-        border: 1px solid var(--ace-border-color);
-        border-radius: var(--bs-border-radius, 0.375rem);
-        color: var(--bs-body-color, #212529);
-        display: block;
-        line-height: 1.5;
-        padding: 0.375rem 0.75rem;
-        width: 100%;
-
-        // Room on the right for the arrow of the select, which a text field
-        // has no use for. Nested, because the field rule weighs as much as its
-        // heaviest argument, and a plain "select.ace-control" would lose to its
-        // padding.
-        &:is(select) {
-            padding-right: 2.25rem;
+        @media (max-width: 575.98px) {
+            flex-basis: 100%;
+            max-width: none;
         }
     }
 
-    .ace-list {
-        list-style: none;
-        margin: 0;
-        padding: 0;
-    }
-
-    .ace-alphabet-navigation > .ace-list,
-    .ace-view-mode-switch > .ace-list,
-    .f3-widget-paginator {
+    .ace-view-mode-switch > .ace-list {
         display: flex;
         flex-wrap: wrap;
         gap: 0.25rem;
     }
 
-    // One track per entry, all of the same width, filling the line. The 26
-    // letters and "A-Z" fit in one line of a container at the large
-    // breakpoint, and a narrower one wraps them into rows of equal boxes
-    // rather than leaving the last letter alone on a line of its own.
-    .ace-alphabet-navigation > .ace-list {
-        display: grid;
-        font-size: 0.875rem;
-        grid-template-columns: repeat(auto-fit, minmax(2rem, 1fr));
-    }
-
-    .ace-alphabet-navigation .ace-link,
-    .ace-pagination .ace-link,
     .ace-view-mode-switch .ace-link {
-        border: 1px solid var(--ace-border-color);
-        color: inherit;
+        border: 1px solid var(--ace-accent);
+        border-radius: var(--ace-radius);
+        color: var(--ace-accent);
         display: block;
-        padding: 0.375rem 0.75rem;
+        font-size: 0.875rem;
+        line-height: 1.5;
+        padding: 0.25rem 0.75rem;
         text-decoration: none;
+
+        &:hover,
+        &:focus-visible {
+            background: var(--ace-accent-tint);
+        }
     }
 
-    // "A-Z" is the widest entry and has to stay on one line in a box as narrow
-    // as the one of a single letter.
-    .ace-alphabet-navigation .ace-link {
-        padding-inline: 0;
-        text-align: center;
-        white-space: nowrap;
-    }
-
-    // The letters without profiles say so in a text for screen readers only.
-    // A page without Bootstrap has no rule for "visually-hidden", and that
-    // text would widen the box of its letter over its neighbours.
-    .ace-alphabet-navigation .visually-hidden {
-        clip-path: inset(50%);
-        height: 1px;
-        overflow: hidden;
-        position: absolute;
-        white-space: nowrap;
-        width: 1px;
-    }
-
-    .ace-alphabet-navigation .active .ace-link,
-    .ace-pagination .active .ace-link,
     .ace-view-mode-switch .ace-link.active {
-        background: var(--bs-primary, #0d6efd);
-        border-color: var(--bs-primary, #0d6efd);
-        color: var(--bs-white, #fff);
+        background: var(--ace-accent);
+        color: var(--ace-accent-contrast);
     }
 
-    .ace-alphabet-navigation .disabled .ace-link,
-    .ace-pagination .disabled .ace-link {
-        color: var(--ace-secondary-color);
-        pointer-events: none;
+    // A portrait keeps the frame of three by four on a phone as well, where
+    // the item of the shared partial turns square, because a square crop of
+    // a portrait cuts off the head or the shoulders.
+    .ace-itemlist .ace-item .ace-image {
+        aspect-ratio: 3 / 4;
     }
 
-    // The image comes after the content in the markup and is shown above it.
-    // It is moved by "order" rather than by reversing the column, which would
-    // pack a short item at the bottom of a card stretched to the height of its
-    // row and leave an empty band above the image.
-    .ace-itemlist .ace-item {
-        border: 1px solid var(--ace-border-color);
-        display: flex;
-        flex-direction: column;
-        height: 100%;
-    }
-
-    .ace-itemlist .ace-item > :is(figure, picture, img) {
-        order: -1;
-    }
-
-    .ace-item-content {
-        padding: 1rem;
-    }
-
-    .ace-item-content .ace-title {
-        font-size: 1.25rem;
-        margin: 0 0 1rem;
-    }
-
-    .ace-item-content .ace-link {
-        color: inherit;
-    }
-
+    // The fields of a contract: a small label above its value.
     .ace-item-content .ace-attributes {
-        display: grid;
-        gap: 0.5rem;
+        font-size: 0.9375rem;
+        gap: 0.375rem;
     }
 
     .ace-item-content .ace-attribute {
         display: grid;
-        gap: 0.15rem;
+        gap: 0;
     }
 
-    .ace-item-content .ace-value {
-        min-width: 0;
+    .ace-item-content .ace-attribute > .ace-label {
+        color: var(--ace-muted);
+        font-size: 0.8125rem;
+        font-weight: 600;
+    }
+
+    .ace-item-content .ace-value > .ace-list-item {
+        display: block;
+    }
+
+    .ace-item-content .ace-link {
+        color: inherit;
         overflow-wrap: anywhere;
     }
 
-    .ace-itemlist .ace-item > :is(figure, picture, img),
-    .ace-itemlist .ace-item > :is(figure, picture) img {
-        display: block;
-        height: auto;
-        margin: 0;
-        width: 100%;
+    // A profile with several contracts renders one list of fields per contract.
+    .ace-item-content .ace-attributes + .ace-attributes {
+        border-top: 1px solid var(--ace-border);
+        margin-top: 0.75rem;
+        padding-top: 0.75rem;
     }
 
     .ace-group-header {
-        margin-top: 2rem;
+        color: var(--ace-accent);
+        font-size: 1.75rem;
+        font-weight: 300;
+        line-height: 1.2;
+        margin: 0 0 1rem;
     }
 
     .ace-table-wrap {
@@ -173,32 +116,114 @@
 
     .ace-table {
         border-collapse: collapse;
-        vertical-align: top;
+        font-size: 0.9375rem;
         width: 100%;
     }
 
     .ace-table :is(th, td) {
-        border-bottom: 1px solid var(--ace-border-color);
-        padding: 0.75rem;
+        border-bottom: 1px solid var(--ace-border);
+        padding: 0.625rem 0.75rem;
         text-align: left;
+        vertical-align: top;
+    }
+
+    .ace-table-header .ace-label {
+        border-bottom: 2px solid currentcolor;
+        white-space: nowrap;
     }
 
     .ace-table .ace-list-item {
         display: block;
     }
 
+    .ace-table .ace-link {
+        color: inherit;
+        overflow-wrap: anywhere;
+    }
+
     .ace-table-body .ace-item:nth-child(odd) {
-        background: var(--ace-secondary-bg);
+        background: var(--ace-surface);
     }
 
-    .ace-pagination .f3-widget-paginator {
-        justify-content: center;
-        list-style: none;
-        margin: 1.5rem 0 0;
-        padding: 0;
+    // A grouped table renders one table per group. Columns of equal width make
+    // their columns line up from one group to the next, which columns sized by
+    // their content never do, and a phone scrolls them sideways instead of
+    // squeezing them.
+    .ace-header:has(> .ace-group-header) + .ace-table-wrap > .ace-table {
+        min-width: 40rem;
+        table-layout: fixed;
+    }
+}
+
+// A grouped list renders a heading and a row of items per group. With a few
+// profiles a letter, a grid row per group would put one lone item in a line of
+// four. The groups flow through columns instead, heading and items one after
+// the other, the way a printed directory reads. Everything else of the list,
+// the filter, the navigation and the pagination, spans all columns.
+.academic-persons-list:has(> .ace-header > .ace-group-header):has(> .ace-itemlist) {
+    column-gap: var(--ace-gutter-x);
+
+    @media (min-width: 768px) {
+        columns: 2;
     }
 
-    .ace-empty {
-        color: var(--ace-secondary-color);
+    @media (min-width: 992px) {
+        columns: 3;
     }
+
+    @media (min-width: 1200px) {
+        columns: 4;
+    }
+
+    > :not(.ace-itemlist, :has(> .ace-group-header)) {
+        column-span: all;
+    }
+
+    > .ace-header {
+        break-after: avoid;
+    }
+
+    > .ace-itemlist {
+        margin-bottom: 0;
+    }
+
+    > .ace-itemlist > .row {
+        display: block;
+        margin: 0;
+    }
+
+    > .ace-itemlist > .row > * {
+        break-inside: avoid;
+        margin: 0;
+        padding: 0 0 var(--ace-gutter-y);
+        width: auto;
+    }
+}
+
+// The contacts of a page: the role a contact has for the page, and the heading
+// of a role when the element groups by it.
+.academic-contacts4pages-list {
+    .ace-role {
+        color: var(--ace-muted);
+        font-size: 0.875rem;
+        margin: 0 0 0.5rem;
+    }
+
+    // The gap of the row below it is the gap to the contacts, as below the
+    // role headings of the partnerships.
+    .ace-itemlist > .row > .ace-header .ace-title {
+        font-size: 1.25rem;
+        font-weight: 500;
+        margin: 0;
+    }
+}
+
+// Grouped by role, the element renders one item list per role with the
+// heading of the role inside its row, and the contacts without a role in a
+// last list without a heading. Each list starts a row of its own below a
+// line, so a contact without a role never reads as one more contact of the
+// role above it.
+.academic-contacts4pages-list .ace-itemlist + .ace-itemlist {
+    border-top: 1px solid var(--ace-border);
+    padding-top: 1.5rem;
 }

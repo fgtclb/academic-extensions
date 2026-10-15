@@ -39,6 +39,13 @@ page {
     }
 
     meta.viewport = width=device-width, initial-scale=1
+
+    # The hook the stylesheet of the development instances lays this tree out
+    # by. No theme styles a page of this page object, so the stylesheet gives
+    # it a grid, buttons and fields below this attribute, and none of that
+    # reaches a page a theme renders. An attribute rather than a class, because
+    # it names the page object, not something an extension renders.
+    bodyTag = <body data-academics-dev-site-page-object>
 }
 
 config {

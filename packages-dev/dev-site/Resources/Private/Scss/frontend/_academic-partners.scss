@@ -1,9 +1,18 @@
-// Layout of the partner map of academic_partners.
+// The plugins of academic_partners: the map, the partner list, the
+// partnerships list and teaser, and the page of a partner
+// (`Templates/Partner/Map.html`, `List.html`, `PartnershipsList.html`,
+// `PartnershipsTeaser.html`, `Pages/AcademicPartner.html` and the partials
+// below `Partials/Partner/` and `Partials/Partnerships/`).
 //
-// The stylesheets of Leaflet and of the marker cluster plugin are the ones of
+// The filter bar, the active filters, the count, the attribute rows, the
+// item of the lists with its row of categories, the pagination and the hero
+// are shared with the other extensions and come from `_academic-base.scss`.
+//
+// The first part sizes the map and selects the classes Leaflet writes. The
+// stylesheets of Leaflet and of the marker cluster plugin are the ones of
 // their npm packages, written next to the modules below
 // "Resources/Public/JavaScript/vendor/" of the extension by the asset build, and
-// the map loads them together with its script. This file sizes the
+// the map loads them together with its script. This part sizes the
 // map, puts its panes behind the site chrome, and keeps a site's image rules
 // off the map images.
 
@@ -34,4 +43,71 @@
 .leaflet-container img.leaflet-image-layer,
 .leaflet-container .leaflet-tile {
     width: auto !important;
+}
+
+// The second part selects the classes of the templates.
+
+// Logos come in every format, so the image of a partner differs from the
+// item of the shared partial: each logo is centred in an area of the same
+// height and scaled to fit it, never cropped, so the names of a row line up
+// whatever the logo. A partner without a logo gets an empty area of that
+// height.
+:is(.academic-partners-list, .academic-partnerships-list, .academic-partnerships-teaser) {
+    .ace-itemlist .ace-item .ace-image {
+        aspect-ratio: auto;
+        height: 8rem;
+        object-fit: contain;
+    }
+
+    .ace-itemlist .ace-item:not(:has(> .ace-figure, > .ace-picture, > .ace-image))::before {
+        aspect-ratio: auto;
+        height: 8rem;
+    }
+}
+
+// The partnerships render one item list per role, the heading of the role
+// inside its row, where it takes a line of its own.
+:is(.academic-partnerships-list, .academic-partnerships-teaser) {
+    .ace-itemlist + .ace-itemlist {
+        margin-top: 3rem;
+    }
+
+    .ace-itemlist > .row > .ace-header .ace-title {
+        color: var(--ace-accent);
+        font-size: 1.75rem;
+        font-weight: 300;
+        line-height: 1.2;
+        margin: 0;
+    }
+}
+
+// The page of a partner: the categories and the address below the hero, as
+// attribute rows.
+.academic-partners-page {
+    > .ace-attributes {
+        margin-bottom: 2.5rem;
+    }
+
+    > .ace-attributes:has(+ .ace-address) {
+        margin-bottom: 0.5rem;
+    }
+
+    // The address reads as one more attribute row, below the categories.
+    > .ace-address {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.25rem 0.5rem;
+        margin: 0 0 2.5rem;
+    }
+}
+
+// "Full width" lets the map reach from one edge of the window to the other,
+// out of the container of the page, while the filters above it stay in the
+// container. The template builds the class from the layout setting, and the
+// seed has no map set to it. `50vw` counts a classic scrollbar as part of the
+// window, so a browser that shows one scrolls the page sideways by its width,
+// which a site with such a map prevents with `overflow-x: clip` on its own
+// page wrapper.
+.academic-partners-map.layout-fullWidth > #map {
+    margin-inline: calc(50% - 50vw);
 }

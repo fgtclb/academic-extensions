@@ -174,23 +174,63 @@ Those rules live on as the site package part of the development instances, in
 ```
 packages-dev/dev-site/Resources/Private/Scss/frontend/
   academic-extensions.scss       the entry, one @use per partial
-  _academic-partners.scss        the partner map
+  _academic-base.scss            what several extensions share, and the /legacy/ layout
+  _academic-jobs.scss            the jobs of academic_jobs and academic_bite_jobs
+  _academic-partners.scss        the partner views and the partner map
   _academic-persons.scss         the public profile
-  _academic-persons-list.scss    the profile lists and cards
+  _academic-persons-list.scss    the profile lists and cards, the contacts of a page
   _academic-persons-edit.scss    the profile editor
+  _academic-programs.scss        the program views and the program page
+  _academic-projects.scss        the project views and the project page
   _academic-study-plan.scss      the study plan
         ->  Resources/Public/Css/frontend/academic-extensions.css
 ```
 
-One partial per extension, named after its directory, two for
-`academic-persons` whose lists and detail view are styled apart, and one
-compiled file, built by `buildJs` and guarded by `checkJsBuildClean` like every
-other artifact.
+One partial per extension, named after its directory, and one compiled file,
+built by `buildJs` and guarded by `checkJsBuildClean` like every other
+artifact. Three exceptions follow the markup rather than the extension:
+`academic-persons` has two, because its lists and its detail view are styled
+apart, the contacts of `academic_contacts4pages` share the partial of the
+profile lists, because a contact renders the same item markup, and the job
+offers of `academic_bite_jobs` share the one of `academic_jobs`.
 A new extension that needs styling in the instances gets a partial and a `@use`
 line, never a stylesheet of its own.
 
-It is included on every page of both page trees, by two routes with one file
-behind them, `Configuration/TypoScript/Stylesheet.typoscript`:
+`_academic-base.scss` comes first. It declares the look as custom properties
+on `:where(:root)`, the accent, the filter colour, the surface of a job, the
+borders, the radius and the gaps, so a site overrides any of them with one
+`:root` rule whatever the order of its stylesheets, and it holds the patterns
+several extensions render alike: the structural lists without bullets, the
+attribute rows with their icons, the images of an item, the keyboard focus, the
+filter bar with its active filters and count, the letter navigation and the
+pagination, the item of the lists of programs, projects, partners and profiles,
+and the hero and the facts table of the page templates. The partials of the
+extensions build on both and keep only what differs, such as the logos of the
+partners, which are scaled into their area rather than cropped.
+
+The `/legacy/` tree has no theme, so `row`, `col-*`, `btn` and
+`visually-hidden` of the templates do nothing there. The second half of the
+shared partial lays the plugins out in that tree with the same classes: a
+Bootstrap 5 row and column emulation for the columns the templates name,
+buttons, form controls and the body. All of it sits below the attribute
+`data-academics-dev-site-page-object` that the page object of the package
+writes into the `body` tag, so none of it reaches the `/` tree, where the
+Bootstrap Package lays the plugins out. It is an attribute rather than a class
+because the page object is no markup of an extension, and the class test below
+only knows the classes of the extensions.
+
+The page templates of programs, projects and partners render in `/` only. Each
+extension refines `page.10` of the theme inside a condition on its page type,
+with the template name, the paths and the variables a `FLUIDTEMPLATE` or a
+`PAGEVIEW` reads. The page object of the package, in
+`Configuration/TypoScript/PageObject.typoscript`, makes `page.10` a `COA` of
+the page title and the content elements, and a `COA` reads none of those keys.
+A page of those types in `/legacy/` therefore shows its title and its content
+elements, never the page template, and the rules for the page templates only
+ever apply in `/`.
+
+The stylesheet is included on every page of both page trees, by two routes
+with one file behind them, `Configuration/TypoScript/Stylesheet.typoscript`:
 
 | Tree       | Delivered by                                                                                   |
 |------------|------------------------------------------------------------------------------------------------|
@@ -210,19 +250,30 @@ carries, and the manual of each extension links its partial for an integrator
 to copy from. It is never released, see
 [Monorepo layout](monorepo-layout.md). Tests of the extensions do not read it:
 their packages are split out without `packages-dev/`. The package checks it
-against the extensions instead. `StylesheetClassesTest` covers the partials of
-the study plan, the public profile and the profile lists: it fails for a class
-a partial selects that the extension neither renders in the seed, nor names in
-a `class` attribute of its templates, nor writes from its module. It checks the
-map partial against the stylesheets of Leaflet, because every class it selects
-is one Leaflet writes. A template of those extensions that renames a class
-therefore cannot leave its rule behind unnoticed. The partial of the profile
-editor is **not** covered: the editor needs a logged in owner, its partial also corrects classes of the
+against the extensions instead. `StylesheetClassesTest` covers every partial
+except the one of the profile editor: it fails for a class a partial selects
+that the extensions it styles neither render in the seed, nor name in a `class`
+attribute of their templates, nor write from their modules. The shared partial
+is checked against all of them together. The partner partial is checked
+against the partner views and the stylesheets of Leaflet, because every class
+its map rules select is one Leaflet writes, and the one class the map template
+builds from its layout setting, `layout-fullWidth`, counts while the template
+builds it and the setting offers it, since the seed has no map set to full
+width. The job offers of `academic_bite_jobs` render only their empty state in
+the seed, so their card, list and table views count through their templates.
+The test renders its pages with the page object in place of the theme, as
+`LegacyDeliveryTest` does, so the page templates of programs, projects and
+partners render no page there either, and their classes count through their
+templates in the same way. A page of those types is rendered only for a
+content element on it, such as the details of a program. A template of those
+extensions that renames a class therefore cannot leave its rule behind
+unnoticed. The partial of the profile editor is **not** covered:
+the editor needs a logged in owner, its partial also corrects classes of the
 theme, and it styles the widget CropperJS builds and the transition classes
-the editor derives from a prefix, none of which a template or a module names
-as written. A rule of it that outlives its class
-is found by reading only. `StudyPlanControlIconRulesTest` pins the icon rules
-of the study plan in the compiled file.
+the editor derives from a prefix, none of which a template or a module names as
+written. A rule of it that outlives its class is found by reading only.
+`StudyPlanControlIconRulesTest` pins the icon rules of the study plan in the
+compiled file.
 
 Verified present on TYPO3 13.4.34 and 14.3.6: the `f:asset.module` ViewHelper,
 `AssetCollector::addJavaScriptModule()`, and `ImportMap` reading

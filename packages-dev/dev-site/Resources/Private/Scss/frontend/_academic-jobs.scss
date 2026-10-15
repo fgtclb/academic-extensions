@@ -1,0 +1,447 @@
+// The job plugins of academic_jobs: the list, the detail view and the form
+// for a new job (`Templates/Job/List.html`, `Show.html`, `New.html` and the
+// partials below `Partials/Job/`, whose form fields are rendered by the
+// partials below `Partials/Academic/Form/` of academic_base), and the list of
+// academic_bite_jobs in its card, list and table views
+// (`Templates/BiteJobs/List.html` and the partials below `Partials/BiteJobs/`).
+//
+// The colours and sizes, the structural lists, the fields with their focus
+// and invalid state, the attribute rows, the images, the title links and the
+// pagination are shared with the other extensions and come from
+// `_academic-base.scss`. What follows is the card of a job with its row of
+// facts, the facts band and the contact box of the detail view, the layout of
+// the form fields, and the three views of the external job list.
+
+// A job stands on a light surface of its own, unlike the items of the other
+// lists. The list template renders no grid, so the jobs follow each other in a
+// single column in both page trees.
+.academic-jobs-list {
+    .ace-itemlist {
+        display: grid;
+        gap: 2rem;
+    }
+
+    // The content wrapper takes no box of its own, so its title and its facts
+    // are placed in the grid of the card next to the image. On a phone the
+    // image comes first, the title below it and the facts at the end.
+    .ace-item {
+        background: var(--ace-surface);
+        border-radius: var(--ace-surface-radius);
+        display: grid;
+        gap: 1.5rem;
+        grid-template-columns: minmax(0, 1fr);
+        padding: 1.5rem;
+    }
+
+    .ace-item > .ace-item-content {
+        display: contents;
+    }
+
+    .ace-item > :is(.ace-figure, .ace-picture, .ace-image) {
+        grid-row: 1;
+        justify-self: center;
+    }
+
+    // The image of a job is a logo more often than a photo, so it keeps its
+    // ratio and is never cropped, only scaled down into a box of 15rem by
+    // 12rem.
+    .ace-item .ace-image {
+        max-height: 12rem;
+        max-width: min(100%, 15rem);
+        width: auto;
+    }
+
+    .ace-header .ace-title {
+        font-size: clamp(1.375rem, 3vw, 2rem);
+        font-weight: 700;
+        line-height: 1.2;
+        margin: 0;
+        overflow-wrap: break-word;
+    }
+
+    // The facts below a line across the card: the icon above its bold label
+    // and the value, two in a row on a phone, six on a wide screen.
+    .ace-item-content > .ace-attributes {
+        border-top: 1px solid var(--ace-border);
+        gap: 1.5rem 1rem;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        padding-top: 1.5rem;
+
+        @media (min-width: 768px) {
+            grid-column: 1 / -1;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+
+        @media (min-width: 992px) {
+            grid-template-columns: repeat(6, minmax(0, 1fr));
+        }
+    }
+
+    .ace-item-content > .ace-attributes > .ace-attribute {
+        align-items: center;
+        flex-direction: column;
+        flex-wrap: nowrap;
+        gap: 0.125rem;
+        text-align: center;
+    }
+
+    .ace-item-content > .ace-attributes .ace-icon {
+        align-self: center;
+        font-size: 1.75rem;
+        margin-bottom: 0.25rem;
+    }
+
+    .ace-item-content > .ace-attributes .ace-label {
+        font-size: 0.875rem;
+        hyphens: auto;
+    }
+
+    // From the medium breakpoint on the image sits left of the title, the
+    // title at the top of the card, and the facts take the whole width below
+    // both. The column of the image is as wide as the image. A job without an
+    // image keeps its title in the first column.
+    @media (min-width: 768px) {
+        .ace-item:has(> :is(.ace-figure, .ace-picture, .ace-image)) {
+            grid-template-columns: auto minmax(0, 1fr);
+        }
+
+        .ace-item > :is(.ace-figure, .ace-picture, .ace-image) {
+            grid-column: 1;
+            justify-self: start;
+        }
+
+        .ace-item:has(> :is(.ace-figure, .ace-picture, .ace-image)) .ace-header {
+            grid-column: 2;
+            grid-row: 1;
+        }
+    }
+}
+
+// The detail view: the link back to the list on a line of its own above the
+// title, the facts on a band of the surface colour, the description and the
+// contact box beside it.
+.academic-jobs-detail {
+    > .ace-link {
+        display: inline-block;
+        font-size: 0.875rem;
+        margin-bottom: 1.5rem;
+
+        &::before {
+            content: "\2039";
+            display: inline-block;
+            margin-right: 0.375rem;
+        }
+    }
+
+    > .ace-header .ace-title {
+        font-weight: 700;
+        margin: 0 0 1.5rem;
+        overflow-wrap: break-word;
+    }
+
+    // Every fact a grid of its own: the icon left, the bold label above the
+    // value. A flag has no value, its label is the statement.
+    > .ace-attributes {
+        background: var(--ace-surface);
+        border-radius: var(--ace-surface-radius);
+        gap: 1.25rem 1.5rem;
+        grid-template-columns: repeat(auto-fill, minmax(min(100%, 14rem), 1fr));
+        margin-bottom: 2rem;
+        padding: 1.5rem;
+    }
+
+    > .ace-attributes > .ace-attribute {
+        align-items: start;
+        display: grid;
+        gap: 0 0.75rem;
+        grid-template-columns: 2rem minmax(0, 1fr);
+    }
+
+    > .ace-attributes .ace-icon {
+        font-size: 1.75rem;
+        grid-row: span 2;
+        justify-content: center;
+    }
+
+    > .ace-attributes .ace-label {
+        font-size: 0.875rem;
+        grid-column: 2;
+    }
+
+    > .ace-attributes .ace-value {
+        grid-column: 2;
+    }
+
+    // The description and the contact box share a row from the large
+    // breakpoint on and stack below it.
+    > .row {
+        --bs-gutter-y: 2rem;
+    }
+
+    .ace-contact {
+        background: var(--ace-surface);
+        border-radius: var(--ace-surface-radius);
+        padding: 1.25rem 1.5rem;
+    }
+
+    .ace-contact > .ace-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        margin: 0 0 0.75rem;
+    }
+
+    .ace-contact > .ace-name {
+        display: block;
+        margin-bottom: 0.75rem;
+    }
+
+    .ace-contact > .ace-list {
+        display: grid;
+        gap: 0.5rem;
+    }
+
+    .ace-contact .ace-list-item {
+        align-items: center;
+        display: flex;
+        gap: 0.625rem;
+    }
+
+    .ace-contact .ace-icon {
+        display: inline-flex;
+        flex: 0 0 auto;
+        font-size: 1.25rem;
+    }
+
+    .ace-contact .ace-link {
+        min-width: 0;
+        overflow-wrap: anywhere;
+    }
+
+    .ace-contact > .ce-bodytext {
+        border-top: 1px solid var(--ace-border);
+        font-size: 0.9375rem;
+        margin-top: 1rem;
+        padding-top: 1rem;
+    }
+
+    .ace-contact > .ce-bodytext > :last-child {
+        margin-bottom: 0;
+    }
+}
+
+// The form for a new job: a label above each field, the fields of a row
+// aligned and apart from the next row. The text fields, selects and text
+// areas look as the filters of the other lists, from the shared partial.
+.academic-jobs-new {
+    .ace-form > .row {
+        --bs-gutter-y: 1.25rem;
+    }
+
+    .ace-field {
+        display: grid;
+        gap: 0.375rem;
+    }
+
+    .ace-field > .ace-label {
+        font-weight: 600;
+    }
+
+    .ace-required {
+        color: var(--ace-accent);
+        cursor: help;
+        text-decoration: none;
+    }
+
+    .ace-textarea {
+        min-height: 8rem;
+        resize: vertical;
+    }
+
+    // The file field as a box of the same height and frame as the text
+    // fields, its button on the surface colour inside the frame.
+    .ace-upload {
+        background: var(--ace-background);
+        border: 1px solid var(--ace-border);
+        border-radius: var(--ace-radius);
+        box-sizing: border-box;
+        color: var(--ace-text);
+        font: inherit;
+        line-height: 1.5;
+        min-height: 2.5rem;
+        padding: 0;
+        width: 100%;
+
+        &::file-selector-button {
+            background: var(--ace-surface);
+            border: 0;
+            border-right: 1px solid var(--ace-border);
+            color: inherit;
+            cursor: pointer;
+            font: inherit;
+            margin-right: 0.75rem;
+            min-height: calc(2.5rem - 2px);
+            padding: 0.375rem 0.75rem;
+        }
+
+        // The shared rule of the fields leaves the file field out, so its
+        // focus and its invalid state are set here, the same as there.
+        &:focus-visible {
+            border-color: var(--ace-focus);
+            outline: 2px solid var(--ace-focus);
+            outline-offset: 2px;
+        }
+
+        &[aria-invalid="true"],
+        &[aria-invalid="true"]:focus-visible {
+            border-color: var(--bs-form-invalid-border-color, #dc3545);
+        }
+    }
+
+    // A checkbox stands before its label, although the label comes first in
+    // the markup. The messages and the help text below take the whole line.
+    .ace-checkbox-wrap {
+        align-items: center;
+        column-gap: 0.5rem;
+        grid-template-columns: auto minmax(0, 1fr);
+    }
+
+    .ace-checkbox-wrap > .ace-label {
+        font-weight: 400;
+        grid-column: 2;
+        grid-row: 1;
+    }
+
+    .ace-checkbox-wrap > .ace-checkbox {
+        accent-color: var(--ace-accent);
+        grid-column: 1;
+        grid-row: 1;
+        height: 1.125rem;
+        margin: 0;
+        width: 1.125rem;
+    }
+
+    .ace-checkbox-wrap > :is(.ace-field-errors, .ace-help) {
+        grid-column: 1 / -1;
+    }
+
+    .ace-help {
+        color: var(--ace-muted);
+        font-size: 0.875rem;
+    }
+
+    // The messages of a field that failed validation, which follow the field,
+    // and the summary above the form. The border of the field comes from the
+    // shared partial. The colours are those of Bootstrap's invalid fields,
+    // with its values as the fallback.
+    .ace-field-errors {
+        color: var(--bs-form-invalid-color, #dc3545);
+        font-size: 0.875rem;
+    }
+
+    .ace-errors {
+        background: color-mix(in srgb, var(--bs-form-invalid-color, #dc3545) 8%, transparent);
+        border: 1px solid var(--bs-form-invalid-border-color, #dc3545);
+        border-radius: var(--ace-radius);
+        color: var(--bs-form-invalid-color, #dc3545);
+        margin-bottom: 1.5rem;
+        padding: 0.75rem 1rem;
+    }
+
+    .ace-form > .btn {
+        margin-top: 1.75rem;
+    }
+}
+
+// The external job list. A group of jobs starts with a heading of its own,
+// rendered right inside the root element before the jobs of the group.
+.academic-bite-jobs-list {
+    > .ace-title {
+        margin: 2rem 0 1rem;
+    }
+
+    > .ace-title:first-child {
+        margin-top: 0;
+    }
+
+    .ace-itemlist {
+        display: grid;
+        gap: var(--ace-gutter-x);
+        margin-bottom: 1.5rem;
+    }
+
+    // The cards fill the line in columns of at least 16rem, one on a phone.
+    .ace-card-view {
+        grid-template-columns: repeat(auto-fill, minmax(min(100%, 16rem), 1fr));
+    }
+
+    .ace-list-view {
+        gap: 1rem;
+    }
+
+    .ace-itemlist .ace-item {
+        background: var(--ace-surface);
+        border-radius: var(--ace-surface-radius);
+        padding: 1.5rem;
+    }
+
+    .ace-item-content {
+        display: grid;
+        gap: 0.75rem;
+    }
+
+    // A job of the list view is one line on a wide screen: the title, and its
+    // facts at the end of the line.
+    @media (min-width: 768px) {
+        .ace-list-view .ace-item-content {
+            align-items: baseline;
+            gap: 0.5rem 1.5rem;
+            grid-template-columns: minmax(0, 1fr) auto;
+        }
+    }
+
+    .ace-item-content .ace-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        line-height: 1.3;
+        margin: 0;
+        overflow-wrap: break-word;
+    }
+
+    .ace-list-view .ace-item-content .ace-title {
+        font-size: clamp(1.25rem, 2.5vw, 1.75rem);
+    }
+
+    .ace-item-content .ace-list-item {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0 0.375rem;
+    }
+
+    // The table view: a striped table, the header row underlined.
+    .ace-table {
+        border-collapse: collapse;
+        margin-bottom: 1.5rem;
+        width: 100%;
+    }
+
+    .ace-table :is(.ace-label, .ace-value) {
+        border-bottom: 1px solid var(--ace-border);
+        padding: 0.625rem 0.75rem;
+        text-align: left;
+        vertical-align: top;
+    }
+
+    .ace-head .ace-label {
+        border-bottom: 2px solid currentcolor;
+        white-space: nowrap;
+    }
+
+    .ace-body .ace-item:nth-child(odd) {
+        background: var(--ace-surface);
+    }
+
+    .ace-body .ace-link {
+        color: inherit;
+        overflow-wrap: anywhere;
+    }
+}
