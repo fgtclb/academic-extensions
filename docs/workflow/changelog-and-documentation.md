@@ -35,6 +35,7 @@ Every package under `packages/fgtclb/` ships the same skeleton
 | `guides.xml`                                       | Renderer configuration: theme, project title and release, edit links |
 | `Changelog/`                                       | The per-version changelog tree, see below                            |
 | `Introduction/`, `Installation/`, `KnownProblems/` | The narrative sections                                               |
+| `Upgrade/`                                         | The upgrade steps per path, see below                                |
 | `Sitemap.rst`                                      | Generated sitemap page                                               |
 
 `guides.xml` carries the version too, as `<project title="…" release="2.4.0"/>`
