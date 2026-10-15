@@ -34,8 +34,8 @@ partnerships with a role. The partnerships without a role SHALL follow the
 role groups in one list without a heading, in the order arranged on the page.
 A partnership whose role is hidden or deleted SHALL render as a partnership
 without a role. A page template that receives the partnerships of the page
-SHALL receive the partnerships without a role as a list of their own as well. This applies to
-TYPO3 v13 and v14 alike.
+SHALL receive the partnerships without a role as a list of their own as well.
+This applies to TYPO3 v13 and v14 alike.
 
 #### Scenario: A page mixes partnerships with and without a role
 
