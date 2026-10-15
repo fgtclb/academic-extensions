@@ -61,6 +61,59 @@ The extension key is not always the directory name: `academic-contact4pages`
 ships `academic_contacts4pages`. The manual's `Index.rst` states the key, the
 directory does not.
 
+### Plugins and events
+
+Two chapters have a fixed shape in every manual that has something to put in
+them (ACE-909):
+
+| Folder                               | Holds                                                                                                                        |
+|--------------------------------------|------------------------------------------------------------------------------------------------------------------------------|
+| `Integrator/Index.rst`               | "For integrators": how plugin settings meet TypoScript and site settings, and a table of the plugins with icon, title, CType |
+| `Integrator/<Plugin>.rst`            | One page per plugin: what it shows and when to use it, then every FlexForm option as a `confval`, grouped by the backend tab |
+| `Developers/Index.rst`               | "For developers": a table of every PSR-14 event the extension dispatches or owns, its own and those of another extension     |
+| `Developers/Events/<EventClass>.rst` | One page per event dispatched or owned: when it is dispatched, what a listener reads and changes, an example, its changelog  |
+
+An event dispatched by several extensions has a page in each of them, with an
+example that fits that extension's plugin, and the manual of the extension that
+owns it describes it in general. A new plugin, a new FlexForm field or a new
+event therefore changes one of these pages in the same change. A `confval`
+needs a `:name:` unique within its manual, so it is prefixed with the plugin.
+
+Option text belongs on the plugin page, not in `Configuration/`, which keeps
+the site settings, the TypoScript and the table of what each set adds. The
+table of events on the Extension points page of academic_base stays where it
+is, `ExtensionPointTest` reads it.
+
+Every manual writes these pages the same way:
+
+- A plugin page starts with the field list `:CType:` (a double backtick
+  literal), `:Plugin:` for an Extbase plugin (extension name, plugin name,
+  controller action), `:Set:`, and `:Templates:` where the manual has a
+  Templates chapter.
+- The section with the options of a plugin is titled `Settings` and carries a
+  label. A `confval` writes `:Default: empty` for an empty default and a
+  literal value such as ``` ``10`` ``` in double backticks. Its `:type:` is
+  what the editor sees: `text` for an input, `number` only for an input with
+  integer evaluation.
+- A `:confval:` reference in running prose carries the backend label as its
+  link text, ``:confval:`Startingpoint <partner-list-pages>` ``.
+- Icons and figures are referenced as `/Images/...`, absolute from
+  `Documentation/`.
+- The events table of `Developers/Index.rst` has the columns `Event`,
+  `Dispatched`, `What a listener can change` and `Owner`, an event page closes
+  with `Rules and pitfalls` and `Introduced in`, and every hidden toctree of
+  the two index pages uses `:titlesonly:`.
+
+Images live in `Documentation/Images/`, because a manual is rendered from its
+own folder and split out with its package. `Images/Icons/` holds copies of the
+plugin icons with `currentColor` replaced by the grey `#737373`, which reads on
+the light and the dark theme of docs.typo3.org, and `Images/Screenshots/`
+holds screenshots of the styled development instances, cropped to the plugin
+and taken only where an option visibly changes the output. They are PNG, apart
+from a map, whose tiles compress far better as JPEG. Both are
+shipped with the package, so a screenshot earns its place. The icons are Font
+Awesome Free, which the Third-party icons section of the Introduction credits.
+
 ## Rendering the manual
 
 Rendering goes through the harness like every other check, so it uses the same
