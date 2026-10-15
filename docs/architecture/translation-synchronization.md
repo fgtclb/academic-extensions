@@ -435,8 +435,12 @@ which are not translated, so the visitor sees the same partnership. A
 partnership that renders as its translation and an untranslated one carry their
 role as two objects of different languages, so the partnerships list and teaser
 group by the uid of the role, and `PartnershipRoles` of `academic_partners`
-keeps the role in the visitor's language for the heading. One limit is left to
-the core: on TYPO3 v13 the data mapper resolves a relation from its identity map
+keeps the role in the visitor's language for the heading. The same service
+collects the partnerships without a role, those with a hidden or deleted role
+included, and the actions and the page data processor hand them to the
+templates as a list of their own, rendered after the role groups (ACE-917), as
+`academic_contacts4pages` does for its contacts. One limit is left to the core:
+on TYPO3 v13 the data mapper resolves a relation from its identity map
 by the plain uid (v13.4.36, `DataMapper.php:742`), so once an untranslated
 partnership has loaded its role in the default language, every later partnership
 of the page with that role names it in the default language too. v14 keys the
