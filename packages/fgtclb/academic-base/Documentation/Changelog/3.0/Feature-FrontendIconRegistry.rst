@@ -18,7 +18,8 @@ well.
     :file:`Configuration/Icons.php`. The files are read in the loading order of
     the packages, and a package loaded later replaces an identifier.
 *   An extension contributes icons from code through the new event
-    :php:`\FGTCLB\AcademicBase\Event\CollectFrontendIconsEvent`. An entry of a
+    :php:`\FGTCLB\AcademicBase\Event\CollectFrontendIconsEvent`, see
+    :ref:`developers-event-collect-frontend-icons-event`. An entry of a
     :file:`Configuration/FrontendIcons.php` with the same identifier wins over
     a contributed icon.
 *   The new view helper ``icon``, in the namespace
