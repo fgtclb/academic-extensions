@@ -35,3 +35,9 @@ icons by Fonticons, Inc., licensed under the `Creative Commons Attribution 4.0
 International license <https://creativecommons.org/licenses/by/4.0/>`__. The
 notice :file:`Resources/Public/Icons/LICENSE-font-awesome.txt` lists every file
 with its Font Awesome name and the changes made to it.
+
+This manual shows the icon of the content element from
+:file:`Documentation/Images/Icons/bite-jobs.svg`, a copy of
+:file:`Resources/Public/Icons/plugin/bite-jobs.svg`, the Font Awesome icon
+`suitcase`, drawn in a fixed grey instead of the colour of the surrounding
+text, so that it reads on a light and a dark page alike.

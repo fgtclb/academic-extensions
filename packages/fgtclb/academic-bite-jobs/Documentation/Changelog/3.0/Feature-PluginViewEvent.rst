@@ -16,8 +16,9 @@ controller.
 The context of the event names the extension :php:`AcademicBiteJobs` and the
 plugin name :php:`List`, which a listener checks for the plugin it means.
 
-The event, with an example listener, is described in the `changelog of
-academic_base
+What the job list hands to the event, with an example listener, is described
+in :ref:`developers-event-modify-plugin-view-event`. The event itself is
+described in the `changelog of academic_base
 <https://docs.typo3.org/p/fgtclb/academic-base/main/en-us/Changelog/3.0/Feature-ModifyPluginViewEvent.html>`__.
 
 Impact

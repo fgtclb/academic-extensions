@@ -47,11 +47,14 @@ again. Move each override to its replacement, see :ref:`feature-1790774401`:
 
 *   Changing the request to B-ITE, its filter, channel, locale, sorting or
     paging: a listener of
-    :php:`\FGTCLB\AcademicBiteJobs\Event\ModifyBiteJobPostingsRequestEvent`.
+    :php:`\FGTCLB\AcademicBiteJobs\Event\ModifyBiteJobPostingsRequestEvent`,
+    see :ref:`developers-event-modify-bite-job-postings-request-event`.
 *   Removing, enriching or grouping the postings: a listener of
-    :php:`\FGTCLB\AcademicBiteJobs\Event\ModifyBiteJobPostingsEvent`.
+    :php:`\FGTCLB\AcademicBiteJobs\Event\ModifyBiteJobPostingsEvent`, see
+    :ref:`developers-event-modify-bite-job-postings-event`.
 *   Additional view variables: a listener of the plugin view event of
-    :guilabel:`academic_base`, see :ref:`feature-plugin-view-event`.
+    :guilabel:`academic_base`, see :ref:`feature-plugin-view-event` and
+    :ref:`developers-event-modify-plugin-view-event`.
 
 A subclass that drops postings:
 
