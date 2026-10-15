@@ -427,7 +427,7 @@ A complete stylesheet as a reference
 The mono repository the academic extensions are developed in carries a
 development site package, `academics_dev_site`, and its stylesheet is a
 working example of the approach above. It is never shipped with an extension.
-Its sources are one SCSS partial per extension below
+Its sources are a shared SCSS partial and one partial per extension below
 :file:`packages-dev/dev-site/Resources/Private/Scss/frontend/`, collected by
 :file:`academic-extensions.scss` and compiled into
 :file:`packages-dev/dev-site/Resources/Public/Css/frontend/academic-extensions.css`,
@@ -440,21 +440,38 @@ which the development instances include on every page with
 
     *   -   Partial
         -   Styles
+    *   -   `_academic-base.scss <https://github.com/fgtclb/academic-extensions/blob/main/packages-dev/dev-site/Resources/Private/Scss/frontend/_academic-base.scss>`__
+        -   What several extensions share: the colours and sizes as custom
+            properties, item lists and their items, attribute rows, the
+            keyboard focus, filters, the letter navigation and the
+            pagination, the hero and the facts of the page templates, and the
+            layout of the page tree without a theme.
+    *   -   `_academic-jobs.scss <https://github.com/fgtclb/academic-extensions/blob/main/packages-dev/dev-site/Resources/Private/Scss/frontend/_academic-jobs.scss>`__
+        -   The jobs of `academic_jobs` and `academic_bite_jobs`, and the
+            form for a new job.
     *   -   `_academic-partners.scss <https://github.com/fgtclb/academic-extensions/blob/main/packages-dev/dev-site/Resources/Private/Scss/frontend/_academic-partners.scss>`__
-        -   The partner map.
+        -   The partner views and the partner map.
     *   -   `_academic-persons.scss <https://github.com/fgtclb/academic-extensions/blob/main/packages-dev/dev-site/Resources/Private/Scss/frontend/_academic-persons.scss>`__
         -   The profile detail.
     *   -   `_academic-persons-list.scss <https://github.com/fgtclb/academic-extensions/blob/main/packages-dev/dev-site/Resources/Private/Scss/frontend/_academic-persons-list.scss>`__
-        -   The profile lists and cards.
+        -   The profile lists and cards, and the contacts of a page.
     *   -   `_academic-persons-edit.scss <https://github.com/fgtclb/academic-extensions/blob/main/packages-dev/dev-site/Resources/Private/Scss/frontend/_academic-persons-edit.scss>`__
         -   The profile editor.
+    *   -   `_academic-programs.scss <https://github.com/fgtclb/academic-extensions/blob/main/packages-dev/dev-site/Resources/Private/Scss/frontend/_academic-programs.scss>`__
+        -   The program views and the program page.
+    *   -   `_academic-projects.scss <https://github.com/fgtclb/academic-extensions/blob/main/packages-dev/dev-site/Resources/Private/Scss/frontend/_academic-projects.scss>`__
+        -   The project views and the project page.
     *   -   `_academic-study-plan.scss <https://github.com/fgtclb/academic-extensions/blob/main/packages-dev/dev-site/Resources/Private/Scss/frontend/_academic-study-plan.scss>`__
         -   The study plan.
 
 The stylesheet is written against the markup and the Bootstrap 5 classes it
 carries, on top of the Bootstrap Package, the theme of the main page tree of
-the instances. The plugins of the other extensions have no partial: there, the
-theme alone styles them, through the grid and button classes they keep.
+the instances. The second page tree of the instances has no theme, so the
+shared partial also lays the plugins out there, below an attribute of the page
+body, which shows what a site without Bootstrap has to provide. The colours,
+the radius and the gaps are custom properties declared once in
+:file:`_academic-base.scss`, so a site changes the look in one place. The
+profile editor is the one exception: its partial declares colours of its own.
 
 ..  _styling-project-override:
 

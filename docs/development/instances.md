@@ -344,20 +344,25 @@ at together. See
 
 The academic extensions ship no stylesheet, and the instances bring one of
 their own, as a site package would: `academic-extensions.css` of
-`packages-dev/dev-site`, compiled from one SCSS partial per extension, two for
-the persons. It is linked on every page of both trees, in both instances:
+`packages-dev/dev-site`, compiled from a shared SCSS partial and one partial per
+extension, two for the persons. It is linked on every page of both trees, in
+both instances:
 
 - the `/` tree gets it from the set `fgtclb/academics-dev-site-stylesheet`,
   which `core-*/config/sites/academics/config.yaml` names last, after the theme;
 - the `/legacy/` tree gets it from the static template of `academics_dev_site`,
   which its root `sys_template` record already includes.
 
-It is what makes the study plan, the partner map, the profiles and the profile
-editor of the instances look and work as intended: without it the map has no
-height, the semester and fold-out headers show both of their glyphs, regions
-the profile editor hides stay on screen and its image cropper cannot be
-dragged. A change to it is a
-change to the SCSS, followed by `buildJs` and a commit of the compiled file.
+It styles every plugin and page template of the academic extensions, on top of
+the theme in `/`, and in `/legacy/`, which has no theme, it also lays them out:
+the grid of the item lists, the buttons and the fields. Some of it is needed for
+the plugins to work at all: without it the map has no height, the semester and
+fold-out headers of the study plan show both of their glyphs, regions the
+profile editor hides stay on screen and its image cropper cannot be dragged.
+The page templates of programs, projects and partners render in `/` only: a
+page of those types in `/legacy/` shows its title and its content elements. A
+change to the stylesheet is a change to the SCSS, followed by `buildJs` and a
+commit of the compiled file.
 
 To check that it reaches a page, look for it in the source, and fetch it:
 

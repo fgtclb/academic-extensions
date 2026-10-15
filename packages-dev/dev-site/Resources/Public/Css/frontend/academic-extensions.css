@@ -1,5 +1,848 @@
 /* Generated from Resources/Private/Scss — do not edit. */
+@charset "UTF-8";
+
 /* packages-dev/dev-site/Resources/Private/Scss/frontend/academic-extensions.scss */
+:where(:root) {
+  --ace-accent: #c43d0c;
+  --ace-accent-contrast: #fff;
+  --ace-accent-tint: color-mix(in srgb, var(--ace-accent) 10%, transparent);
+  --ace-background: var(--bs-body-bg, #fff);
+  --ace-border: var(--bs-border-color, #dee2e6);
+  --ace-filter: #005694;
+  --ace-filter-tint: color-mix(in srgb, var(--ace-filter) 8%, transparent);
+  --ace-focus: var(--ace-filter);
+  --ace-gutter-x: 1.5rem;
+  --ace-gutter-y: 2.5rem;
+  --ace-muted: var(--bs-secondary-color, #6c757d);
+  --ace-radius: 0.3125rem;
+  --ace-state-active: #2a9d3f;
+  --ace-state-completed: #e0306f;
+  --ace-surface: #f6f8fd;
+  --ace-surface-radius: 0.375rem;
+  --ace-text: var(--bs-body-color, #212529);
+}
+:is(.academic-bite-jobs-list, .academic-contacts4pages-list, .academic-jobs-detail, .academic-jobs-list, .academic-jobs-new, .academic-partners-list, .academic-partners-map, .academic-partners-page, .academic-partnerships-list, .academic-partnerships-teaser, .academic-persons-card, .academic-persons-contracts, .academic-persons-list, .academic-persons-profiles, .academic-programs-detail, .academic-programs-finder, .academic-programs-list, .academic-programs-page, .academic-projects-list, .academic-projects-page) .ace-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+:is(.academic-bite-jobs-list, .academic-contacts4pages-list, .academic-jobs-detail, .academic-jobs-list, .academic-jobs-new, .academic-partners-list, .academic-partners-map, .academic-partners-page, .academic-partnerships-list, .academic-partnerships-teaser, .academic-persons-card, .academic-persons-contracts, .academic-persons-list, .academic-persons-profiles, .academic-programs-detail, .academic-programs-finder, .academic-programs-list, .academic-programs-page, .academic-projects-list, .academic-projects-page) .ace-figure,
+:is(.academic-bite-jobs-list, .academic-contacts4pages-list, .academic-jobs-detail, .academic-jobs-list, .academic-jobs-new, .academic-partners-list, .academic-partners-map, .academic-partners-page, .academic-partnerships-list, .academic-partnerships-teaser, .academic-persons-card, .academic-persons-contracts, .academic-persons-list, .academic-persons-profiles, .academic-programs-detail, .academic-programs-finder, .academic-programs-list, .academic-programs-page, .academic-projects-list, .academic-projects-page) .ace-picture {
+  display: block;
+  margin: 0;
+}
+:is(.academic-bite-jobs-list, .academic-contacts4pages-list, .academic-jobs-detail, .academic-jobs-list, .academic-jobs-new, .academic-partners-list, .academic-partners-map, .academic-partners-page, .academic-partnerships-list, .academic-partnerships-teaser, .academic-persons-card, .academic-persons-contracts, .academic-persons-list, .academic-persons-profiles, .academic-programs-detail, .academic-programs-finder, .academic-programs-list, .academic-programs-page, .academic-projects-list, .academic-projects-page) .ace-image {
+  display: block;
+  height: auto;
+  max-width: 100%;
+}
+:is(.academic-bite-jobs-list, .academic-contacts4pages-list, .academic-jobs-detail, .academic-jobs-list, .academic-jobs-new, .academic-partners-list, .academic-partners-map, .academic-partners-page, .academic-partnerships-list, .academic-partnerships-teaser, .academic-persons-card, .academic-persons-contracts, .academic-persons-list, .academic-persons-profiles, .academic-programs-detail, .academic-programs-finder, .academic-programs-list, .academic-programs-page, .academic-projects-list, .academic-projects-page) .ace-caption {
+  color: var(--ace-muted);
+  font-size: 0.875rem;
+  margin-top: 0.5rem;
+}
+:is(.academic-bite-jobs-list, .academic-contacts4pages-list, .academic-jobs-detail, .academic-jobs-list, .academic-jobs-new, .academic-partners-list, .academic-partners-map, .academic-partners-page, .academic-partnerships-list, .academic-partnerships-teaser, .academic-persons-card, .academic-persons-contracts, .academic-persons-list, .academic-persons-profiles, .academic-programs-detail, .academic-programs-finder, .academic-programs-list, .academic-programs-page, .academic-projects-list, .academic-projects-page) :is(a, button, input, select, summary, textarea):focus-visible {
+  outline: 2px solid var(--ace-focus);
+  outline-offset: 2px;
+}
+:is(.academic-bite-jobs-list, .academic-contacts4pages-list, .academic-jobs-detail, .academic-jobs-list, .academic-jobs-new, .academic-partners-list, .academic-partners-map, .academic-partners-page, .academic-partnerships-list, .academic-partnerships-teaser, .academic-persons-card, .academic-persons-contracts, .academic-persons-list, .academic-persons-profiles, .academic-programs-detail, .academic-programs-finder, .academic-programs-list, .academic-programs-page, .academic-projects-list, .academic-projects-page) .ace-item-content .ace-title > a {
+  color: inherit;
+  text-decoration: none;
+}
+:is(.academic-bite-jobs-list, .academic-contacts4pages-list, .academic-jobs-detail, .academic-jobs-list, .academic-jobs-new, .academic-partners-list, .academic-partners-map, .academic-partners-page, .academic-partnerships-list, .academic-partnerships-teaser, .academic-persons-card, .academic-persons-contracts, .academic-persons-list, .academic-persons-profiles, .academic-programs-detail, .academic-programs-finder, .academic-programs-list, .academic-programs-page, .academic-projects-list, .academic-projects-page) .ace-item-content .ace-title > a:hover,
+:is(.academic-bite-jobs-list, .academic-contacts4pages-list, .academic-jobs-detail, .academic-jobs-list, .academic-jobs-new, .academic-partners-list, .academic-partners-map, .academic-partners-page, .academic-partnerships-list, .academic-partnerships-teaser, .academic-persons-card, .academic-persons-contracts, .academic-persons-list, .academic-persons-profiles, .academic-programs-detail, .academic-programs-finder, .academic-programs-list, .academic-programs-page, .academic-projects-list, .academic-projects-page) .ace-item-content .ace-title > a:focus-visible {
+  text-decoration: underline;
+}
+:is(.academic-bite-jobs-list, .academic-contacts4pages-list, .academic-jobs-detail, .academic-jobs-list, .academic-jobs-new, .academic-partners-list, .academic-partners-map, .academic-partners-page, .academic-partnerships-list, .academic-partnerships-teaser, .academic-persons-card, .academic-persons-contracts, .academic-persons-list, .academic-persons-profiles, .academic-programs-detail, .academic-programs-finder, .academic-programs-list, .academic-programs-page, .academic-projects-list, .academic-projects-page) .ace-itemlist > .row {
+  --bs-gutter-y: var(--ace-gutter-y);
+}
+:is(.academic-bite-jobs-list, .academic-contacts4pages-list, .academic-jobs-detail, .academic-jobs-list, .academic-jobs-new, .academic-partners-list, .academic-partners-map, .academic-partners-page, .academic-partnerships-list, .academic-partnerships-teaser, .academic-persons-card, .academic-persons-contracts, .academic-persons-list, .academic-persons-profiles, .academic-programs-detail, .academic-programs-finder, .academic-programs-list, .academic-programs-page, .academic-projects-list, .academic-projects-page) .ace-attributes {
+  display: grid;
+  gap: 0.5rem;
+}
+:is(.academic-bite-jobs-list, .academic-contacts4pages-list, .academic-jobs-detail, .academic-jobs-list, .academic-jobs-new, .academic-partners-list, .academic-partners-map, .academic-partners-page, .academic-partnerships-list, .academic-partnerships-teaser, .academic-persons-card, .academic-persons-contracts, .academic-persons-list, .academic-persons-profiles, .academic-programs-detail, .academic-programs-finder, .academic-programs-list, .academic-programs-page, .academic-projects-list, .academic-projects-page) .ace-attribute {
+  align-items: baseline;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 0.5rem;
+  margin: 0;
+}
+:is(.academic-bite-jobs-list, .academic-contacts4pages-list, .academic-jobs-detail, .academic-jobs-list, .academic-jobs-new, .academic-partners-list, .academic-partners-map, .academic-partners-page, .academic-partnerships-list, .academic-partnerships-teaser, .academic-persons-card, .academic-persons-contracts, .academic-persons-list, .academic-persons-profiles, .academic-programs-detail, .academic-programs-finder, .academic-programs-list, .academic-programs-page, .academic-projects-list, .academic-projects-page) .ace-attribute > .ace-icon {
+  align-self: center;
+  display: inline-flex;
+  flex: 0 0 auto;
+}
+:is(.academic-bite-jobs-list, .academic-contacts4pages-list, .academic-jobs-detail, .academic-jobs-list, .academic-jobs-new, .academic-partners-list, .academic-partners-map, .academic-partners-page, .academic-partnerships-list, .academic-partnerships-teaser, .academic-persons-card, .academic-persons-contracts, .academic-persons-list, .academic-persons-profiles, .academic-programs-detail, .academic-programs-finder, .academic-programs-list, .academic-programs-page, .academic-projects-list, .academic-projects-page) .ace-attribute > .ace-label {
+  font-weight: 700;
+}
+:is(.academic-bite-jobs-list, .academic-contacts4pages-list, .academic-jobs-detail, .academic-jobs-list, .academic-jobs-new, .academic-partners-list, .academic-partners-map, .academic-partners-page, .academic-partnerships-list, .academic-partnerships-teaser, .academic-persons-card, .academic-persons-contracts, .academic-persons-list, .academic-persons-profiles, .academic-programs-detail, .academic-programs-finder, .academic-programs-list, .academic-programs-page, .academic-projects-list, .academic-projects-page) .ace-attribute > .ace-value {
+  min-width: 0;
+  overflow-wrap: break-word;
+}
+:is(.academic-bite-jobs-list, .academic-contacts4pages-list, .academic-jobs-detail, .academic-jobs-list, .academic-jobs-new, .academic-partners-list, .academic-partners-map, .academic-partners-page, .academic-partnerships-list, .academic-partnerships-teaser, .academic-persons-card, .academic-persons-contracts, .academic-persons-list, .academic-persons-profiles, .academic-programs-detail, .academic-programs-finder, .academic-programs-list, .academic-programs-page, .academic-projects-list, .academic-projects-page) .ace-form {
+  margin-bottom: 1.5rem;
+}
+:is(.academic-bite-jobs-list, .academic-contacts4pages-list, .academic-jobs-detail, .academic-jobs-list, .academic-jobs-new, .academic-partners-list, .academic-partners-map, .academic-partners-page, .academic-partnerships-list, .academic-partnerships-teaser, .academic-persons-card, .academic-persons-contracts, .academic-persons-list, .academic-persons-profiles, .academic-programs-detail, .academic-programs-finder, .academic-programs-list, .academic-programs-page, .academic-projects-list, .academic-projects-page) .ace-filters > .row,
+:is(.academic-bite-jobs-list, .academic-contacts4pages-list, .academic-jobs-detail, .academic-jobs-list, .academic-jobs-new, .academic-partners-list, .academic-partners-map, .academic-partners-page, .academic-partnerships-list, .academic-partnerships-teaser, .academic-persons-card, .academic-persons-contracts, .academic-persons-list, .academic-persons-profiles, .academic-programs-detail, .academic-programs-finder, .academic-programs-list, .academic-programs-page, .academic-projects-list, .academic-projects-page) .ace-more > .row {
+  --bs-gutter-y: 1rem;
+  align-items: flex-end;
+}
+:is(.academic-bite-jobs-list, .academic-contacts4pages-list, .academic-jobs-detail, .academic-jobs-list, .academic-jobs-new, .academic-partners-list, .academic-partners-map, .academic-partners-page, .academic-partnerships-list, .academic-partnerships-teaser, .academic-persons-card, .academic-persons-contracts, .academic-persons-list, .academic-persons-profiles, .academic-programs-detail, .academic-programs-finder, .academic-programs-list, .academic-programs-page, .academic-projects-list, .academic-projects-page) .ace-filter {
+  display: grid;
+  gap: 0.25rem;
+}
+:is(.academic-bite-jobs-list, .academic-contacts4pages-list, .academic-jobs-detail, .academic-jobs-list, .academic-jobs-new, .academic-partners-list, .academic-partners-map, .academic-partners-page, .academic-partnerships-list, .academic-partnerships-teaser, .academic-persons-card, .academic-persons-contracts, .academic-persons-list, .academic-persons-profiles, .academic-programs-detail, .academic-programs-finder, .academic-programs-list, .academic-programs-page, .academic-projects-list, .academic-projects-page) .ace-filter > .ace-label {
+  font-weight: 600;
+}
+:is(.academic-bite-jobs-list, .academic-contacts4pages-list, .academic-jobs-detail, .academic-jobs-list, .academic-jobs-new, .academic-partners-list, .academic-partners-map, .academic-partners-page, .academic-partnerships-list, .academic-partnerships-teaser, .academic-persons-card, .academic-persons-contracts, .academic-persons-list, .academic-persons-profiles, .academic-programs-detail, .academic-programs-finder, .academic-programs-list, .academic-programs-page, .academic-projects-list, .academic-projects-page) :is(select, textarea, input:not([type=button], [type=checkbox], [type=file], [type=hidden], [type=radio], [type=reset], [type=submit])).ace-control {
+  background-color: var(--ace-background);
+  border: 1px solid var(--ace-border);
+  border-radius: var(--ace-radius);
+  box-sizing: border-box;
+  color: var(--ace-text);
+  display: block;
+  font: inherit;
+  line-height: 1.5;
+  min-height: 2.5rem;
+  padding: 0.375rem 0.75rem;
+  width: 100%;
+}
+:is(.academic-bite-jobs-list, .academic-contacts4pages-list, .academic-jobs-detail, .academic-jobs-list, .academic-jobs-new, .academic-partners-list, .academic-partners-map, .academic-partners-page, .academic-partnerships-list, .academic-partnerships-teaser, .academic-persons-card, .academic-persons-contracts, .academic-persons-list, .academic-persons-profiles, .academic-programs-detail, .academic-programs-finder, .academic-programs-list, .academic-programs-page, .academic-projects-list, .academic-projects-page) :is(select, textarea, input:not([type=button], [type=checkbox], [type=file], [type=hidden], [type=radio], [type=reset], [type=submit])).ace-control:focus-visible {
+  border-color: var(--ace-focus);
+  outline: 2px solid var(--ace-focus);
+  outline-offset: 2px;
+}
+:is(.academic-bite-jobs-list, .academic-contacts4pages-list, .academic-jobs-detail, .academic-jobs-list, .academic-jobs-new, .academic-partners-list, .academic-partners-map, .academic-partners-page, .academic-partnerships-list, .academic-partnerships-teaser, .academic-persons-card, .academic-persons-contracts, .academic-persons-list, .academic-persons-profiles, .academic-programs-detail, .academic-programs-finder, .academic-programs-list, .academic-programs-page, .academic-projects-list, .academic-projects-page) :is(select, textarea, input:not([type=button], [type=checkbox], [type=file], [type=hidden], [type=radio], [type=reset], [type=submit])).ace-control[aria-invalid=true],
+:is(.academic-bite-jobs-list, .academic-contacts4pages-list, .academic-jobs-detail, .academic-jobs-list, .academic-jobs-new, .academic-partners-list, .academic-partners-map, .academic-partners-page, .academic-partnerships-list, .academic-partnerships-teaser, .academic-persons-card, .academic-persons-contracts, .academic-persons-list, .academic-persons-profiles, .academic-programs-detail, .academic-programs-finder, .academic-programs-list, .academic-programs-page, .academic-projects-list, .academic-projects-page) :is(select, textarea, input:not([type=button], [type=checkbox], [type=file], [type=hidden], [type=radio], [type=reset], [type=submit])).ace-control[aria-invalid=true]:focus-visible {
+  border-color: var(--bs-form-invalid-border-color, #dc3545);
+}
+:is(.academic-bite-jobs-list, .academic-contacts4pages-list, .academic-jobs-detail, .academic-jobs-list, .academic-jobs-new, .academic-partners-list, .academic-partners-map, .academic-partners-page, .academic-partnerships-list, .academic-partnerships-teaser, .academic-persons-card, .academic-persons-contracts, .academic-persons-list, .academic-persons-profiles, .academic-programs-detail, .academic-programs-finder, .academic-programs-list, .academic-programs-page, .academic-projects-list, .academic-projects-page) :is(select, textarea, input:not([type=button], [type=checkbox], [type=file], [type=hidden], [type=radio], [type=reset], [type=submit])).ace-control:is(select) {
+  padding-right: 2.25rem;
+}
+:is(.academic-bite-jobs-list, .academic-contacts4pages-list, .academic-jobs-detail, .academic-jobs-list, .academic-jobs-new, .academic-partners-list, .academic-partners-map, .academic-partners-page, .academic-partnerships-list, .academic-partnerships-teaser, .academic-persons-card, .academic-persons-contracts, .academic-persons-list, .academic-persons-profiles, .academic-programs-detail, .academic-programs-finder, .academic-programs-list, .academic-programs-page, .academic-projects-list, .academic-projects-page) .ace-more > .ace-toggle {
+  align-items: center;
+  cursor: pointer;
+  display: inline-flex;
+  gap: 0.5rem;
+  list-style: none;
+  margin-block: 0.5rem;
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+:is(.academic-bite-jobs-list, .academic-contacts4pages-list, .academic-jobs-detail, .academic-jobs-list, .academic-jobs-new, .academic-partners-list, .academic-partners-map, .academic-partners-page, .academic-partnerships-list, .academic-partnerships-teaser, .academic-persons-card, .academic-persons-contracts, .academic-persons-list, .academic-persons-profiles, .academic-programs-detail, .academic-programs-finder, .academic-programs-list, .academic-programs-page, .academic-projects-list, .academic-projects-page) .ace-more > .ace-toggle::-webkit-details-marker {
+  display: none;
+}
+:is(.academic-bite-jobs-list, .academic-contacts4pages-list, .academic-jobs-detail, .academic-jobs-list, .academic-jobs-new, .academic-partners-list, .academic-partners-map, .academic-partners-page, .academic-partnerships-list, .academic-partnerships-teaser, .academic-persons-card, .academic-persons-contracts, .academic-persons-list, .academic-persons-profiles, .academic-programs-detail, .academic-programs-finder, .academic-programs-list, .academic-programs-page, .academic-projects-list, .academic-projects-page) .ace-more > .ace-toggle::before {
+  align-items: center;
+  border: 1px solid var(--ace-accent);
+  border-radius: 50%;
+  color: var(--ace-accent);
+  content: "+";
+  display: inline-flex;
+  flex: 0 0 auto;
+  height: 1.25rem;
+  justify-content: center;
+  line-height: 1;
+  text-decoration: none;
+  width: 1.25rem;
+}
+:is(.academic-bite-jobs-list, .academic-contacts4pages-list, .academic-jobs-detail, .academic-jobs-list, .academic-jobs-new, .academic-partners-list, .academic-partners-map, .academic-partners-page, .academic-partnerships-list, .academic-partnerships-teaser, .academic-persons-card, .academic-persons-contracts, .academic-persons-list, .academic-persons-profiles, .academic-programs-detail, .academic-programs-finder, .academic-programs-list, .academic-programs-page, .academic-projects-list, .academic-projects-page) .ace-more[open] > .ace-toggle {
+  margin-bottom: 1rem;
+}
+:is(.academic-bite-jobs-list, .academic-contacts4pages-list, .academic-jobs-detail, .academic-jobs-list, .academic-jobs-new, .academic-partners-list, .academic-partners-map, .academic-partners-page, .academic-partnerships-list, .academic-partnerships-teaser, .academic-persons-card, .academic-persons-contracts, .academic-persons-list, .academic-persons-profiles, .academic-programs-detail, .academic-programs-finder, .academic-programs-list, .academic-programs-page, .academic-projects-list, .academic-projects-page) .ace-more[open] > .ace-toggle::before {
+  content: "\2212";
+}
+:is(.academic-bite-jobs-list, .academic-contacts4pages-list, .academic-jobs-detail, .academic-jobs-list, .academic-jobs-new, .academic-partners-list, .academic-partners-map, .academic-partners-page, .academic-partnerships-list, .academic-partnerships-teaser, .academic-persons-card, .academic-persons-contracts, .academic-persons-list, .academic-persons-profiles, .academic-programs-detail, .academic-programs-finder, .academic-programs-list, .academic-programs-page, .academic-projects-list, .academic-projects-page) .ace-active-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+:is(.academic-bite-jobs-list, .academic-contacts4pages-list, .academic-jobs-detail, .academic-jobs-list, .academic-jobs-new, .academic-partners-list, .academic-partners-map, .academic-partners-page, .academic-partnerships-list, .academic-partnerships-teaser, .academic-persons-card, .academic-persons-contracts, .academic-persons-list, .academic-persons-profiles, .academic-programs-detail, .academic-programs-finder, .academic-programs-list, .academic-programs-page, .academic-projects-list, .academic-projects-page) .ace-active-filter > .ace-link {
+  align-items: center;
+  background: var(--ace-filter-tint);
+  border: 1px solid var(--ace-filter);
+  border-radius: var(--ace-radius);
+  color: var(--ace-filter);
+  display: inline-flex;
+  font-size: 0.875rem;
+  gap: 0.5rem;
+  line-height: 1.5;
+  padding: 0.125rem 0.625rem;
+  text-decoration: none;
+}
+:is(.academic-bite-jobs-list, .academic-contacts4pages-list, .academic-jobs-detail, .academic-jobs-list, .academic-jobs-new, .academic-partners-list, .academic-partners-map, .academic-partners-page, .academic-partnerships-list, .academic-partnerships-teaser, .academic-persons-card, .academic-persons-contracts, .academic-persons-list, .academic-persons-profiles, .academic-programs-detail, .academic-programs-finder, .academic-programs-list, .academic-programs-page, .academic-projects-list, .academic-projects-page) .ace-active-filter > .ace-link:hover,
+:is(.academic-bite-jobs-list, .academic-contacts4pages-list, .academic-jobs-detail, .academic-jobs-list, .academic-jobs-new, .academic-partners-list, .academic-partners-map, .academic-partners-page, .academic-partnerships-list, .academic-partnerships-teaser, .academic-persons-card, .academic-persons-contracts, .academic-persons-list, .academic-persons-profiles, .academic-programs-detail, .academic-programs-finder, .academic-programs-list, .academic-programs-page, .academic-projects-list, .academic-projects-page) .ace-active-filter > .ace-link:focus-visible {
+  background: color-mix(in srgb, var(--ace-filter) 16%, transparent);
+}
+:is(.academic-bite-jobs-list, .academic-contacts4pages-list, .academic-jobs-detail, .academic-jobs-list, .academic-jobs-new, .academic-partners-list, .academic-partners-map, .academic-partners-page, .academic-partnerships-list, .academic-partnerships-teaser, .academic-persons-card, .academic-persons-contracts, .academic-persons-list, .academic-persons-profiles, .academic-programs-detail, .academic-programs-finder, .academic-programs-list, .academic-programs-page, .academic-projects-list, .academic-projects-page) .ace-active-filter .ace-icon {
+  font-size: 1.125em;
+  line-height: 1;
+}
+:is(.academic-bite-jobs-list, .academic-contacts4pages-list, .academic-jobs-detail, .academic-jobs-list, .academic-jobs-new, .academic-partners-list, .academic-partners-map, .academic-partners-page, .academic-partnerships-list, .academic-partnerships-teaser, .academic-persons-card, .academic-persons-contracts, .academic-persons-list, .academic-persons-profiles, .academic-programs-detail, .academic-programs-finder, .academic-programs-list, .academic-programs-page, .academic-projects-list, .academic-projects-page) .ace-active-filters + .ace-link {
+  display: inline-block;
+  font-size: 0.875rem;
+  margin-bottom: 1rem;
+}
+:is(.academic-bite-jobs-list, .academic-contacts4pages-list, .academic-jobs-detail, .academic-jobs-list, .academic-jobs-new, .academic-partners-list, .academic-partners-map, .academic-partners-page, .academic-partnerships-list, .academic-partnerships-teaser, .academic-persons-card, .academic-persons-contracts, .academic-persons-list, .academic-persons-profiles, .academic-programs-detail, .academic-programs-finder, .academic-programs-list, .academic-programs-page, .academic-projects-list, .academic-projects-page) p.ace-count {
+  font-weight: 700;
+  margin: 0 0 1rem;
+}
+:is(.academic-bite-jobs-list, .academic-contacts4pages-list, .academic-jobs-detail, .academic-jobs-list, .academic-jobs-new, .academic-partners-list, .academic-partners-map, .academic-partners-page, .academic-partnerships-list, .academic-partnerships-teaser, .academic-persons-card, .academic-persons-contracts, .academic-persons-list, .academic-persons-profiles, .academic-programs-detail, .academic-programs-finder, .academic-programs-list, .academic-programs-page, .academic-projects-list, .academic-projects-page) .ace-empty {
+  color: var(--ace-muted);
+  display: block;
+  margin-block: 1rem;
+}
+:is(.academic-bite-jobs-list, .academic-contacts4pages-list, .academic-jobs-detail, .academic-jobs-list, .academic-jobs-new, .academic-partners-list, .academic-partners-map, .academic-partners-page, .academic-partnerships-list, .academic-partnerships-teaser, .academic-persons-card, .academic-persons-contracts, .academic-persons-list, .academic-persons-profiles, .academic-programs-detail, .academic-programs-finder, .academic-programs-list, .academic-programs-page, .academic-projects-list, .academic-projects-page) .ace-alphabet-navigation {
+  margin-bottom: 1.5rem;
+}
+:is(.academic-bite-jobs-list, .academic-contacts4pages-list, .academic-jobs-detail, .academic-jobs-list, .academic-jobs-new, .academic-partners-list, .academic-partners-map, .academic-partners-page, .academic-partnerships-list, .academic-partnerships-teaser, .academic-persons-card, .academic-persons-contracts, .academic-persons-list, .academic-persons-profiles, .academic-programs-detail, .academic-programs-finder, .academic-programs-list, .academic-programs-page, .academic-projects-list, .academic-projects-page) .ace-alphabet-navigation > .ace-list {
+  display: grid;
+  gap: 0.25rem;
+  grid-template-columns: repeat(auto-fit, minmax(2rem, 1fr));
+}
+:is(.academic-bite-jobs-list, .academic-contacts4pages-list, .academic-jobs-detail, .academic-jobs-list, .academic-jobs-new, .academic-partners-list, .academic-partners-map, .academic-partners-page, .academic-partnerships-list, .academic-partnerships-teaser, .academic-persons-card, .academic-persons-contracts, .academic-persons-list, .academic-persons-profiles, .academic-programs-detail, .academic-programs-finder, .academic-programs-list, .academic-programs-page, .academic-projects-list, .academic-projects-page) .f3-widget-paginator {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  list-style: none;
+  margin: 2rem 0 0;
+  padding: 0;
+}
+:is(.academic-bite-jobs-list, .academic-contacts4pages-list, .academic-jobs-detail, .academic-jobs-list, .academic-jobs-new, .academic-partners-list, .academic-partners-map, .academic-partners-page, .academic-partnerships-list, .academic-partnerships-teaser, .academic-persons-card, .academic-persons-contracts, .academic-persons-list, .academic-persons-profiles, .academic-programs-detail, .academic-programs-finder, .academic-programs-list, .academic-programs-page, .academic-projects-list, .academic-projects-page) .ace-alphabet-navigation .ace-list-item > .ace-link,
+:is(.academic-bite-jobs-list, .academic-contacts4pages-list, .academic-jobs-detail, .academic-jobs-list, .academic-jobs-new, .academic-partners-list, .academic-partners-map, .academic-partners-page, .academic-partnerships-list, .academic-partnerships-teaser, .academic-persons-card, .academic-persons-contracts, .academic-persons-list, .academic-persons-profiles, .academic-programs-detail, .academic-programs-finder, .academic-programs-list, .academic-programs-page, .academic-projects-list, .academic-projects-page) .f3-widget-paginator > :is(.ace-list-item, .page-item) > :is(.ace-link, .page-link) {
+  background: transparent;
+  border: 1px solid var(--ace-accent);
+  border-radius: var(--ace-radius);
+  color: var(--ace-accent);
+  display: block;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  margin: 0;
+  min-width: 2rem;
+  padding: 0.25rem 0.625rem;
+  text-align: center;
+  text-decoration: none;
+  white-space: nowrap;
+}
+:is(.academic-bite-jobs-list, .academic-contacts4pages-list, .academic-jobs-detail, .academic-jobs-list, .academic-jobs-new, .academic-partners-list, .academic-partners-map, .academic-partners-page, .academic-partnerships-list, .academic-partnerships-teaser, .academic-persons-card, .academic-persons-contracts, .academic-persons-list, .academic-persons-profiles, .academic-programs-detail, .academic-programs-finder, .academic-programs-list, .academic-programs-page, .academic-projects-list, .academic-projects-page) .ace-alphabet-navigation .ace-list-item > .ace-link:hover,
+:is(.academic-bite-jobs-list, .academic-contacts4pages-list, .academic-jobs-detail, .academic-jobs-list, .academic-jobs-new, .academic-partners-list, .academic-partners-map, .academic-partners-page, .academic-partnerships-list, .academic-partnerships-teaser, .academic-persons-card, .academic-persons-contracts, .academic-persons-list, .academic-persons-profiles, .academic-programs-detail, .academic-programs-finder, .academic-programs-list, .academic-programs-page, .academic-projects-list, .academic-projects-page) .f3-widget-paginator > :is(.ace-list-item, .page-item) > :is(.ace-link, .page-link):hover {
+  background: var(--ace-accent-tint);
+}
+:is(.academic-bite-jobs-list, .academic-contacts4pages-list, .academic-jobs-detail, .academic-jobs-list, .academic-jobs-new, .academic-partners-list, .academic-partners-map, .academic-partners-page, .academic-partnerships-list, .academic-partnerships-teaser, .academic-persons-card, .academic-persons-contracts, .academic-persons-list, .academic-persons-profiles, .academic-programs-detail, .academic-programs-finder, .academic-programs-list, .academic-programs-page, .academic-projects-list, .academic-projects-page) .ace-alphabet-navigation .ace-list-item > .ace-link:focus-visible,
+:is(.academic-bite-jobs-list, .academic-contacts4pages-list, .academic-jobs-detail, .academic-jobs-list, .academic-jobs-new, .academic-partners-list, .academic-partners-map, .academic-partners-page, .academic-partnerships-list, .academic-partnerships-teaser, .academic-persons-card, .academic-persons-contracts, .academic-persons-list, .academic-persons-profiles, .academic-programs-detail, .academic-programs-finder, .academic-programs-list, .academic-programs-page, .academic-projects-list, .academic-projects-page) .f3-widget-paginator > :is(.ace-list-item, .page-item) > :is(.ace-link, .page-link):focus-visible {
+  background: var(--ace-accent-tint);
+  box-shadow: none;
+  outline: 2px solid var(--ace-focus);
+  outline-offset: 2px;
+}
+:is(.academic-bite-jobs-list, .academic-contacts4pages-list, .academic-jobs-detail, .academic-jobs-list, .academic-jobs-new, .academic-partners-list, .academic-partners-map, .academic-partners-page, .academic-partnerships-list, .academic-partnerships-teaser, .academic-persons-card, .academic-persons-contracts, .academic-persons-list, .academic-persons-profiles, .academic-programs-detail, .academic-programs-finder, .academic-programs-list, .academic-programs-page, .academic-projects-list, .academic-projects-page) .ace-alphabet-navigation .ace-list-item > .ace-link {
+  padding-inline: 0;
+}
+:is(.academic-bite-jobs-list, .academic-contacts4pages-list, .academic-jobs-detail, .academic-jobs-list, .academic-jobs-new, .academic-partners-list, .academic-partners-map, .academic-partners-page, .academic-partnerships-list, .academic-partnerships-teaser, .academic-persons-card, .academic-persons-contracts, .academic-persons-list, .academic-persons-profiles, .academic-programs-detail, .academic-programs-finder, .academic-programs-list, .academic-programs-page, .academic-projects-list, .academic-projects-page) .ace-alphabet-navigation .active > .ace-link,
+:is(.academic-bite-jobs-list, .academic-contacts4pages-list, .academic-jobs-detail, .academic-jobs-list, .academic-jobs-new, .academic-partners-list, .academic-partners-map, .academic-partners-page, .academic-partnerships-list, .academic-partnerships-teaser, .academic-persons-card, .academic-persons-contracts, .academic-persons-list, .academic-persons-profiles, .academic-programs-detail, .academic-programs-finder, .academic-programs-list, .academic-programs-page, .academic-projects-list, .academic-projects-page) .f3-widget-paginator > .active > :is(.ace-link, .page-link) {
+  background: var(--ace-accent);
+  color: var(--ace-accent-contrast);
+}
+:is(.academic-bite-jobs-list, .academic-contacts4pages-list, .academic-jobs-detail, .academic-jobs-list, .academic-jobs-new, .academic-partners-list, .academic-partners-map, .academic-partners-page, .academic-partnerships-list, .academic-partnerships-teaser, .academic-persons-card, .academic-persons-contracts, .academic-persons-list, .academic-persons-profiles, .academic-programs-detail, .academic-programs-finder, .academic-programs-list, .academic-programs-page, .academic-projects-list, .academic-projects-page) .ace-alphabet-navigation .disabled > .ace-link,
+:is(.academic-bite-jobs-list, .academic-contacts4pages-list, .academic-jobs-detail, .academic-jobs-list, .academic-jobs-new, .academic-partners-list, .academic-partners-map, .academic-partners-page, .academic-partnerships-list, .academic-partnerships-teaser, .academic-persons-card, .academic-persons-contracts, .academic-persons-list, .academic-persons-profiles, .academic-programs-detail, .academic-programs-finder, .academic-programs-list, .academic-programs-page, .academic-projects-list, .academic-projects-page) .f3-widget-paginator > .disabled > :is(.ace-link, .page-link) {
+  background: transparent;
+  border-color: var(--ace-border);
+  color: var(--ace-muted);
+  pointer-events: none;
+}
+:is(.academic-bite-jobs-list, .academic-contacts4pages-list, .academic-jobs-detail, .academic-jobs-list, .academic-jobs-new, .academic-partners-list, .academic-partners-map, .academic-partners-page, .academic-partnerships-list, .academic-partnerships-teaser, .academic-persons-card, .academic-persons-contracts, .academic-persons-list, .academic-persons-profiles, .academic-programs-detail, .academic-programs-finder, .academic-programs-list, .academic-programs-page, .academic-projects-list, .academic-projects-page) .ace-hero {
+  display: grid;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+:is(.academic-bite-jobs-list, .academic-contacts4pages-list, .academic-jobs-detail, .academic-jobs-list, .academic-jobs-new, .academic-partners-list, .academic-partners-map, .academic-partners-page, .academic-partnerships-list, .academic-partnerships-teaser, .academic-persons-card, .academic-persons-contracts, .academic-persons-list, .academic-persons-profiles, .academic-programs-detail, .academic-programs-finder, .academic-programs-list, .academic-programs-page, .academic-projects-list, .academic-projects-page) .ace-hero > :is(.ace-figure, .ace-picture, .ace-image) {
+  order: -1;
+}
+:is(.academic-bite-jobs-list, .academic-contacts4pages-list, .academic-jobs-detail, .academic-jobs-list, .academic-jobs-new, .academic-partners-list, .academic-partners-map, .academic-partners-page, .academic-partnerships-list, .academic-partnerships-teaser, .academic-persons-card, .academic-persons-contracts, .academic-persons-list, .academic-persons-profiles, .academic-programs-detail, .academic-programs-finder, .academic-programs-list, .academic-programs-page, .academic-projects-list, .academic-projects-page) .ace-hero .ace-image {
+  width: 100%;
+}
+@media (min-width: 992px) {
+  :is(.academic-bite-jobs-list, .academic-contacts4pages-list, .academic-jobs-detail, .academic-jobs-list, .academic-jobs-new, .academic-partners-list, .academic-partners-map, .academic-partners-page, .academic-partnerships-list, .academic-partnerships-teaser, .academic-persons-card, .academic-persons-contracts, .academic-persons-list, .academic-persons-profiles, .academic-programs-detail, .academic-programs-finder, .academic-programs-list, .academic-programs-page, .academic-projects-list, .academic-projects-page) .ace-hero:has(> :is(.ace-figure, .ace-picture, .ace-image)) {
+    align-items: center;
+    gap: 2.5rem;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  }
+  :is(.academic-bite-jobs-list, .academic-contacts4pages-list, .academic-jobs-detail, .academic-jobs-list, .academic-jobs-new, .academic-partners-list, .academic-partners-map, .academic-partners-page, .academic-partnerships-list, .academic-partnerships-teaser, .academic-persons-card, .academic-persons-contracts, .academic-persons-list, .academic-persons-profiles, .academic-programs-detail, .academic-programs-finder, .academic-programs-list, .academic-programs-page, .academic-projects-list, .academic-projects-page) .ace-hero > :is(.ace-figure, .ace-picture, .ace-image) {
+    order: 0;
+  }
+}
+:is(.academic-bite-jobs-list, .academic-contacts4pages-list, .academic-jobs-detail, .academic-jobs-list, .academic-jobs-new, .academic-partners-list, .academic-partners-map, .academic-partners-page, .academic-partnerships-list, .academic-partnerships-teaser, .academic-persons-card, .academic-persons-contracts, .academic-persons-list, .academic-persons-profiles, .academic-programs-detail, .academic-programs-finder, .academic-programs-list, .academic-programs-page, .academic-projects-list, .academic-projects-page) .ace-hero .ace-title {
+  font-size: clamp(2rem, 5vw, 3.25rem);
+  font-weight: 300;
+  line-height: 1.1;
+  margin: 0;
+  overflow-wrap: break-word;
+}
+:is(.academic-bite-jobs-list, .academic-contacts4pages-list, .academic-jobs-detail, .academic-jobs-list, .academic-jobs-new, .academic-partners-list, .academic-partners-map, .academic-partners-page, .academic-partnerships-list, .academic-partnerships-teaser, .academic-persons-card, .academic-persons-contracts, .academic-persons-list, .academic-persons-profiles, .academic-programs-detail, .academic-programs-finder, .academic-programs-list, .academic-programs-page, .academic-projects-list, .academic-projects-page) .ace-hero .ace-subtitle {
+  color: var(--ace-muted);
+  font-size: 1.25rem;
+  margin: 0.75rem 0 0;
+}
+:is(.academic-contacts4pages-list, .academic-partners-list, .academic-partnerships-list, .academic-partnerships-teaser, .academic-persons-card, .academic-persons-contracts, .academic-persons-list, .academic-persons-profiles, .academic-programs-list, .academic-projects-list) .ace-itemlist .ace-item {
+  display: flex;
+  flex-direction: column;
+}
+:is(.academic-contacts4pages-list, .academic-partners-list, .academic-partnerships-list, .academic-partnerships-teaser, .academic-persons-card, .academic-persons-contracts, .academic-persons-list, .academic-persons-profiles, .academic-programs-list, .academic-projects-list) .ace-itemlist .ace-item > :is(.ace-figure, .ace-picture, .ace-image) {
+  margin: 0 0 1rem;
+  order: -1;
+}
+:is(.academic-contacts4pages-list, .academic-partners-list, .academic-partnerships-list, .academic-partnerships-teaser, .academic-persons-card, .academic-persons-contracts, .academic-persons-list, .academic-persons-profiles, .academic-programs-list, .academic-projects-list) .ace-itemlist .ace-item .ace-image {
+  aspect-ratio: 1;
+  object-fit: cover;
+  width: 100%;
+}
+@media (min-width: 768px) {
+  :is(.academic-contacts4pages-list, .academic-partners-list, .academic-partnerships-list, .academic-partnerships-teaser, .academic-persons-card, .academic-persons-contracts, .academic-persons-list, .academic-persons-profiles, .academic-programs-list, .academic-projects-list) .ace-itemlist .ace-item .ace-image {
+    aspect-ratio: 3/4;
+  }
+}
+:is(.academic-contacts4pages-list, .academic-partners-list, .academic-partnerships-list, .academic-partnerships-teaser, .academic-persons-card, .academic-persons-contracts, .academic-persons-list, .academic-persons-profiles, .academic-programs-list, .academic-projects-list) .ace-item-content .ace-title {
+  font-size: 1.125rem;
+  font-weight: 700;
+  line-height: 1.3;
+  margin: 0 0 0.5rem;
+}
+:is(.academic-partners-list, .academic-partnerships-list, .academic-partnerships-teaser, .academic-programs-list, .academic-projects-list) .ace-itemlist .ace-item:not(:has(> .ace-figure, > .ace-picture, > .ace-image))::before {
+  aspect-ratio: 1;
+  background: color-mix(in srgb, var(--ace-muted) 15%, transparent);
+  content: "";
+  display: block;
+  margin-bottom: 1rem;
+  order: -1;
+}
+@media (min-width: 768px) {
+  :is(.academic-partners-list, .academic-partnerships-list, .academic-partnerships-teaser, .academic-programs-list, .academic-projects-list) .ace-itemlist .ace-item:not(:has(> .ace-figure, > .ace-picture, > .ace-image))::before {
+    aspect-ratio: 3/4;
+  }
+}
+:is(.academic-partners-list, .academic-partnerships-list, .academic-partnerships-teaser, .academic-programs-list, .academic-projects-list) .ace-item-content .ace-attributes {
+  font-size: 0.9375rem;
+  gap: 0.25rem;
+}
+:is(.academic-partners-list, .academic-partnerships-list, .academic-partnerships-teaser, .academic-programs-list, .academic-projects-list) .ace-item-content .ace-attribute {
+  flex-wrap: nowrap;
+}
+:is(.academic-partners-list, .academic-partnerships-list, .academic-partnerships-teaser, .academic-programs-list, .academic-projects-list) .ace-item-content .ace-attribute > .ace-icon {
+  align-items: center;
+  align-self: flex-start;
+  height: 1.5em;
+}
+:is(.academic-partners-list, .academic-partnerships-list, .academic-partnerships-teaser, .academic-programs-list, .academic-projects-list) .ace-item-content .ace-attribute:has(> .ace-icon) > .ace-label {
+  clip-path: inset(50%);
+  height: 1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+}
+:is(.academic-programs-detail, .academic-programs-page, .academic-projects-page) > .ace-attributes {
+  gap: 0.75rem;
+  margin-bottom: 2rem;
+}
+:is(.academic-programs-detail, .academic-programs-page, .academic-projects-page) > .ace-attributes:has(+ .ace-attributes) {
+  margin-bottom: 0.75rem;
+}
+:is(.academic-programs-detail, .academic-programs-page, .academic-projects-page) > .ace-attributes > .ace-attribute {
+  align-items: start;
+  display: grid;
+  gap: 0.125rem 1rem;
+  grid-template-columns: 1.25rem minmax(0, 1fr);
+}
+@media (min-width: 576px) {
+  :is(.academic-programs-detail, .academic-programs-page, .academic-projects-page) > .ace-attributes > .ace-attribute {
+    grid-template-columns: 1.25rem minmax(8rem, 15rem) minmax(0, 1fr);
+  }
+}
+:is(.academic-programs-detail, .academic-programs-page, .academic-projects-page) > .ace-attributes > .ace-attribute > .ace-icon {
+  align-items: center;
+  grid-column: 1;
+  height: 1.5em;
+}
+:is(.academic-programs-detail, .academic-programs-page, .academic-projects-page) > .ace-attributes > .ace-attribute > .ace-label {
+  grid-column: 2;
+}
+:is(.academic-programs-detail, .academic-programs-page, .academic-projects-page) > .ace-attributes > .ace-attribute > .ace-value {
+  grid-column: 2;
+}
+@media (min-width: 576px) {
+  :is(.academic-programs-detail, .academic-programs-page, .academic-projects-page) > .ace-attributes > .ace-attribute > .ace-value {
+    grid-column: 3;
+  }
+}
+:is(.academic-programs-detail, .academic-programs-page, .academic-projects-page) > .ace-attributes > .ace-attribute > .ace-value > :first-child {
+  margin-top: 0;
+}
+:is(.academic-programs-detail, .academic-programs-page, .academic-projects-page) > .ace-attributes > .ace-attribute > .ace-value > :last-child {
+  margin-bottom: 0;
+}
+@media (min-width: 576px) {
+  :is(.academic-jobs-list, .academic-partners-list, .academic-persons-card, .academic-persons-contracts, .academic-persons-list, .academic-persons-profiles) .f3-widget-paginator {
+    justify-content: flex-end;
+  }
+}
+:is(.academic-partners-page, .academic-programs-page, .academic-projects-page) {
+  padding-block: 2.5rem 3rem;
+}
+[data-academics-dev-site-page-object] {
+  background: var(--ace-background);
+  color: var(--ace-text);
+  font-family:
+    system-ui,
+    -apple-system,
+    "Segoe UI",
+    Roboto,
+    "Helvetica Neue",
+    Arial,
+    sans-serif;
+  line-height: 1.5;
+  margin: 0 auto;
+  max-width: 75rem;
+  padding: 1.5rem 1rem 4rem;
+}
+[data-academics-dev-site-page-object] :where(img) {
+  height: auto;
+  max-width: 100%;
+}
+[data-academics-dev-site-page-object] :is(.academic-bite-jobs-list, .academic-contacts4pages-list, .academic-jobs-detail, .academic-jobs-list, .academic-jobs-new, .academic-partners-list, .academic-partners-map, .academic-partnerships-list, .academic-partnerships-teaser, .academic-persons-card, .academic-persons-contracts, .academic-persons-detail, .academic-persons-list, .academic-persons-profiles, .academic-programs-detail, .academic-programs-finder, .academic-programs-list, .academic-projects-list, .academic-study-plan) {
+  margin-bottom: 3rem;
+}
+[data-academics-dev-site-page-object] :is(.academic-bite-jobs-list, .academic-contacts4pages-list, .academic-jobs-detail, .academic-jobs-list, .academic-jobs-new, .academic-partners-list, .academic-partners-map, .academic-partnerships-list, .academic-partnerships-teaser, .academic-persons-card, .academic-persons-contracts, .academic-persons-detail, .academic-persons-list, .academic-persons-profiles, .academic-programs-detail, .academic-programs-finder, .academic-programs-list, .academic-projects-list, .academic-study-plan) *,
+[data-academics-dev-site-page-object] :is(.academic-bite-jobs-list, .academic-contacts4pages-list, .academic-jobs-detail, .academic-jobs-list, .academic-jobs-new, .academic-partners-list, .academic-partners-map, .academic-partnerships-list, .academic-partnerships-teaser, .academic-persons-card, .academic-persons-contracts, .academic-persons-detail, .academic-persons-list, .academic-persons-profiles, .academic-programs-detail, .academic-programs-finder, .academic-programs-list, .academic-projects-list, .academic-study-plan) *::before,
+[data-academics-dev-site-page-object] :is(.academic-bite-jobs-list, .academic-contacts4pages-list, .academic-jobs-detail, .academic-jobs-list, .academic-jobs-new, .academic-partners-list, .academic-partners-map, .academic-partnerships-list, .academic-partnerships-teaser, .academic-persons-card, .academic-persons-contracts, .academic-persons-detail, .academic-persons-list, .academic-persons-profiles, .academic-programs-detail, .academic-programs-finder, .academic-programs-list, .academic-projects-list, .academic-study-plan) *::after {
+  box-sizing: border-box;
+}
+[data-academics-dev-site-page-object] :is(.academic-bite-jobs-list, .academic-contacts4pages-list, .academic-jobs-detail, .academic-jobs-list, .academic-jobs-new, .academic-partners-list, .academic-partners-map, .academic-partnerships-list, .academic-partnerships-teaser, .academic-persons-card, .academic-persons-contracts, .academic-persons-detail, .academic-persons-list, .academic-persons-profiles, .academic-programs-detail, .academic-programs-finder, .academic-programs-list, .academic-projects-list, .academic-study-plan) :where(a) {
+  color: inherit;
+}
+[data-academics-dev-site-page-object] :is(.academic-bite-jobs-list, .academic-contacts4pages-list, .academic-jobs-detail, .academic-jobs-list, .academic-jobs-new, .academic-partners-list, .academic-partners-map, .academic-partnerships-list, .academic-partnerships-teaser, .academic-persons-card, .academic-persons-contracts, .academic-persons-detail, .academic-persons-list, .academic-persons-profiles, .academic-programs-detail, .academic-programs-finder, .academic-programs-list, .academic-projects-list, .academic-study-plan) :where(h1, h2, h3, h4, h5, h6) {
+  font-weight: 500;
+  line-height: 1.2;
+  margin: 0 0 0.75rem;
+}
+[data-academics-dev-site-page-object] :is(.academic-bite-jobs-list, .academic-contacts4pages-list, .academic-jobs-detail, .academic-jobs-list, .academic-jobs-new, .academic-partners-list, .academic-partners-map, .academic-partnerships-list, .academic-partnerships-teaser, .academic-persons-card, .academic-persons-contracts, .academic-persons-detail, .academic-persons-list, .academic-persons-profiles, .academic-programs-detail, .academic-programs-finder, .academic-programs-list, .academic-projects-list, .academic-study-plan) .row {
+  display: flex;
+  flex-wrap: wrap;
+  margin-inline: calc(var(--bs-gutter-x, 1.5rem) * -0.5);
+  margin-top: calc(var(--bs-gutter-y, 0) * -1);
+}
+[data-academics-dev-site-page-object] :is(.academic-bite-jobs-list, .academic-contacts4pages-list, .academic-jobs-detail, .academic-jobs-list, .academic-jobs-new, .academic-partners-list, .academic-partners-map, .academic-partnerships-list, .academic-partnerships-teaser, .academic-persons-card, .academic-persons-contracts, .academic-persons-detail, .academic-persons-list, .academic-persons-profiles, .academic-programs-detail, .academic-programs-finder, .academic-programs-list, .academic-projects-list, .academic-study-plan) .row > * {
+  flex-shrink: 0;
+  margin-top: var(--bs-gutter-y, 0);
+  max-width: 100%;
+  padding-inline: calc(var(--bs-gutter-x, 1.5rem) * 0.5);
+  width: 100%;
+}
+[data-academics-dev-site-page-object] :is(.academic-bite-jobs-list, .academic-contacts4pages-list, .academic-jobs-detail, .academic-jobs-list, .academic-jobs-new, .academic-partners-list, .academic-partners-map, .academic-partnerships-list, .academic-partnerships-teaser, .academic-persons-card, .academic-persons-contracts, .academic-persons-detail, .academic-persons-list, .academic-persons-profiles, .academic-programs-detail, .academic-programs-finder, .academic-programs-list, .academic-projects-list, .academic-study-plan) .col {
+  flex: 1 0 0%;
+}
+[data-academics-dev-site-page-object] :is(.academic-bite-jobs-list, .academic-contacts4pages-list, .academic-jobs-detail, .academic-jobs-list, .academic-jobs-new, .academic-partners-list, .academic-partners-map, .academic-partnerships-list, .academic-partnerships-teaser, .academic-persons-card, .academic-persons-contracts, .academic-persons-detail, .academic-persons-list, .academic-persons-profiles, .academic-programs-detail, .academic-programs-finder, .academic-programs-list, .academic-projects-list, .academic-study-plan) .col-auto {
+  flex: 0 0 auto;
+  width: auto;
+}
+[data-academics-dev-site-page-object] :is(.academic-bite-jobs-list, .academic-contacts4pages-list, .academic-jobs-detail, .academic-jobs-list, .academic-jobs-new, .academic-partners-list, .academic-partners-map, .academic-partnerships-list, .academic-partnerships-teaser, .academic-persons-card, .academic-persons-contracts, .academic-persons-detail, .academic-persons-list, .academic-persons-profiles, .academic-programs-detail, .academic-programs-finder, .academic-programs-list, .academic-projects-list, .academic-study-plan) .col-12 {
+  flex: 0 0 auto;
+  width: 100%;
+}
+@media (min-width: 768px) {
+  [data-academics-dev-site-page-object] :is(.academic-bite-jobs-list, .academic-contacts4pages-list, .academic-jobs-detail, .academic-jobs-list, .academic-jobs-new, .academic-partners-list, .academic-partners-map, .academic-partnerships-list, .academic-partnerships-teaser, .academic-persons-card, .academic-persons-contracts, .academic-persons-detail, .academic-persons-list, .academic-persons-profiles, .academic-programs-detail, .academic-programs-finder, .academic-programs-list, .academic-projects-list, .academic-study-plan) .col-md {
+    flex: 1 0 0%;
+  }
+  [data-academics-dev-site-page-object] :is(.academic-bite-jobs-list, .academic-contacts4pages-list, .academic-jobs-detail, .academic-jobs-list, .academic-jobs-new, .academic-partners-list, .academic-partners-map, .academic-partnerships-list, .academic-partnerships-teaser, .academic-persons-card, .academic-persons-contracts, .academic-persons-detail, .academic-persons-list, .academic-persons-profiles, .academic-programs-detail, .academic-programs-finder, .academic-programs-list, .academic-projects-list, .academic-study-plan) .col-md-4 {
+    flex: 0 0 auto;
+    width: 33.33333333%;
+  }
+  [data-academics-dev-site-page-object] :is(.academic-bite-jobs-list, .academic-contacts4pages-list, .academic-jobs-detail, .academic-jobs-list, .academic-jobs-new, .academic-partners-list, .academic-partners-map, .academic-partnerships-list, .academic-partnerships-teaser, .academic-persons-card, .academic-persons-contracts, .academic-persons-detail, .academic-persons-list, .academic-persons-profiles, .academic-programs-detail, .academic-programs-finder, .academic-programs-list, .academic-projects-list, .academic-study-plan) .col-md-6 {
+    flex: 0 0 auto;
+    width: 50%;
+  }
+  [data-academics-dev-site-page-object] :is(.academic-bite-jobs-list, .academic-contacts4pages-list, .academic-jobs-detail, .academic-jobs-list, .academic-jobs-new, .academic-partners-list, .academic-partners-map, .academic-partnerships-list, .academic-partnerships-teaser, .academic-persons-card, .academic-persons-contracts, .academic-persons-detail, .academic-persons-list, .academic-persons-profiles, .academic-programs-detail, .academic-programs-finder, .academic-programs-list, .academic-projects-list, .academic-study-plan) .col-md-8 {
+    flex: 0 0 auto;
+    width: 66.66666667%;
+  }
+}
+@media (min-width: 992px) {
+  [data-academics-dev-site-page-object] :is(.academic-bite-jobs-list, .academic-contacts4pages-list, .academic-jobs-detail, .academic-jobs-list, .academic-jobs-new, .academic-partners-list, .academic-partners-map, .academic-partnerships-list, .academic-partnerships-teaser, .academic-persons-card, .academic-persons-contracts, .academic-persons-detail, .academic-persons-list, .academic-persons-profiles, .academic-programs-detail, .academic-programs-finder, .academic-programs-list, .academic-projects-list, .academic-study-plan) .col-lg-4 {
+    flex: 0 0 auto;
+    width: 33.33333333%;
+  }
+  [data-academics-dev-site-page-object] :is(.academic-bite-jobs-list, .academic-contacts4pages-list, .academic-jobs-detail, .academic-jobs-list, .academic-jobs-new, .academic-partners-list, .academic-partners-map, .academic-partnerships-list, .academic-partnerships-teaser, .academic-persons-card, .academic-persons-contracts, .academic-persons-detail, .academic-persons-list, .academic-persons-profiles, .academic-programs-detail, .academic-programs-finder, .academic-programs-list, .academic-projects-list, .academic-study-plan) .col-lg-6 {
+    flex: 0 0 auto;
+    width: 50%;
+  }
+  [data-academics-dev-site-page-object] :is(.academic-bite-jobs-list, .academic-contacts4pages-list, .academic-jobs-detail, .academic-jobs-list, .academic-jobs-new, .academic-partners-list, .academic-partners-map, .academic-partnerships-list, .academic-partnerships-teaser, .academic-persons-card, .academic-persons-contracts, .academic-persons-detail, .academic-persons-list, .academic-persons-profiles, .academic-programs-detail, .academic-programs-finder, .academic-programs-list, .academic-projects-list, .academic-study-plan) .col-lg-8 {
+    flex: 0 0 auto;
+    width: 66.66666667%;
+  }
+}
+@media (min-width: 1200px) {
+  [data-academics-dev-site-page-object] :is(.academic-bite-jobs-list, .academic-contacts4pages-list, .academic-jobs-detail, .academic-jobs-list, .academic-jobs-new, .academic-partners-list, .academic-partners-map, .academic-partnerships-list, .academic-partnerships-teaser, .academic-persons-card, .academic-persons-contracts, .academic-persons-detail, .academic-persons-list, .academic-persons-profiles, .academic-programs-detail, .academic-programs-finder, .academic-programs-list, .academic-projects-list, .academic-study-plan) .col-xl-3 {
+    flex: 0 0 auto;
+    width: 25%;
+  }
+}
+[data-academics-dev-site-page-object] :is(.academic-bite-jobs-list, .academic-contacts4pages-list, .academic-jobs-detail, .academic-jobs-list, .academic-jobs-new, .academic-partners-list, .academic-partners-map, .academic-partnerships-list, .academic-partnerships-teaser, .academic-persons-card, .academic-persons-contracts, .academic-persons-detail, .academic-persons-list, .academic-persons-profiles, .academic-programs-detail, .academic-programs-finder, .academic-programs-list, .academic-projects-list, .academic-study-plan) .btn {
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--ace-radius);
+  color: inherit;
+  cursor: pointer;
+  display: inline-block;
+  font: inherit;
+  line-height: 1.5;
+  padding: 0.375rem 0.875rem;
+  text-align: center;
+  text-decoration: none;
+}
+[data-academics-dev-site-page-object] :is(.academic-bite-jobs-list, .academic-contacts4pages-list, .academic-jobs-detail, .academic-jobs-list, .academic-jobs-new, .academic-partners-list, .academic-partners-map, .academic-partnerships-list, .academic-partnerships-teaser, .academic-persons-card, .academic-persons-contracts, .academic-persons-detail, .academic-persons-list, .academic-persons-profiles, .academic-programs-detail, .academic-programs-finder, .academic-programs-list, .academic-projects-list, .academic-study-plan) .btn-primary {
+  background: var(--ace-accent);
+  border-color: var(--ace-accent);
+  color: var(--ace-accent-contrast);
+}
+[data-academics-dev-site-page-object] :is(.academic-bite-jobs-list, .academic-contacts4pages-list, .academic-jobs-detail, .academic-jobs-list, .academic-jobs-new, .academic-partners-list, .academic-partners-map, .academic-partnerships-list, .academic-partnerships-teaser, .academic-persons-card, .academic-persons-contracts, .academic-persons-detail, .academic-persons-list, .academic-persons-profiles, .academic-programs-detail, .academic-programs-finder, .academic-programs-list, .academic-projects-list, .academic-study-plan) .btn-primary:hover,
+[data-academics-dev-site-page-object] :is(.academic-bite-jobs-list, .academic-contacts4pages-list, .academic-jobs-detail, .academic-jobs-list, .academic-jobs-new, .academic-partners-list, .academic-partners-map, .academic-partnerships-list, .academic-partnerships-teaser, .academic-persons-card, .academic-persons-contracts, .academic-persons-detail, .academic-persons-list, .academic-persons-profiles, .academic-programs-detail, .academic-programs-finder, .academic-programs-list, .academic-projects-list, .academic-study-plan) .btn-primary:focus-visible {
+  background: color-mix(in srgb, var(--ace-accent) 85%, #000);
+}
+[data-academics-dev-site-page-object] :is(.academic-bite-jobs-list, .academic-contacts4pages-list, .academic-jobs-detail, .academic-jobs-list, .academic-jobs-new, .academic-partners-list, .academic-partners-map, .academic-partnerships-list, .academic-partnerships-teaser, .academic-persons-card, .academic-persons-contracts, .academic-persons-detail, .academic-persons-list, .academic-persons-profiles, .academic-programs-detail, .academic-programs-finder, .academic-programs-list, .academic-projects-list, .academic-study-plan) .visually-hidden {
+  border: 0;
+  clip-path: inset(50%);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+}
+.academic-jobs-list .ace-itemlist {
+  display: grid;
+  gap: 2rem;
+}
+.academic-jobs-list .ace-item {
+  background: var(--ace-surface);
+  border-radius: var(--ace-surface-radius);
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: minmax(0, 1fr);
+  padding: 1.5rem;
+}
+.academic-jobs-list .ace-item > .ace-item-content {
+  display: contents;
+}
+.academic-jobs-list .ace-item > :is(.ace-figure, .ace-picture, .ace-image) {
+  grid-row: 1;
+  justify-self: center;
+}
+.academic-jobs-list .ace-item .ace-image {
+  max-height: 12rem;
+  max-width: min(100%, 15rem);
+  width: auto;
+}
+.academic-jobs-list .ace-header .ace-title {
+  font-size: clamp(1.375rem, 3vw, 2rem);
+  font-weight: 700;
+  line-height: 1.2;
+  margin: 0;
+  overflow-wrap: break-word;
+}
+.academic-jobs-list .ace-item-content > .ace-attributes {
+  border-top: 1px solid var(--ace-border);
+  gap: 1.5rem 1rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  padding-top: 1.5rem;
+}
+@media (min-width: 768px) {
+  .academic-jobs-list .ace-item-content > .ace-attributes {
+    grid-column: 1/-1;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+@media (min-width: 992px) {
+  .academic-jobs-list .ace-item-content > .ace-attributes {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+}
+.academic-jobs-list .ace-item-content > .ace-attributes > .ace-attribute {
+  align-items: center;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  gap: 0.125rem;
+  text-align: center;
+}
+.academic-jobs-list .ace-item-content > .ace-attributes .ace-icon {
+  align-self: center;
+  font-size: 1.75rem;
+  margin-bottom: 0.25rem;
+}
+.academic-jobs-list .ace-item-content > .ace-attributes .ace-label {
+  font-size: 0.875rem;
+  -webkit-hyphens: auto;
+  hyphens: auto;
+}
+@media (min-width: 768px) {
+  .academic-jobs-list .ace-item:has(> :is(.ace-figure, .ace-picture, .ace-image)) {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+  .academic-jobs-list .ace-item > :is(.ace-figure, .ace-picture, .ace-image) {
+    grid-column: 1;
+    justify-self: start;
+  }
+  .academic-jobs-list .ace-item:has(> :is(.ace-figure, .ace-picture, .ace-image)) .ace-header {
+    grid-column: 2;
+    grid-row: 1;
+  }
+}
+.academic-jobs-detail > .ace-link {
+  display: inline-block;
+  font-size: 0.875rem;
+  margin-bottom: 1.5rem;
+}
+.academic-jobs-detail > .ace-link::before {
+  content: "\2039";
+  display: inline-block;
+  margin-right: 0.375rem;
+}
+.academic-jobs-detail > .ace-header .ace-title {
+  font-weight: 700;
+  margin: 0 0 1.5rem;
+  overflow-wrap: break-word;
+}
+.academic-jobs-detail > .ace-attributes {
+  background: var(--ace-surface);
+  border-radius: var(--ace-surface-radius);
+  gap: 1.25rem 1.5rem;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 14rem), 1fr));
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+}
+.academic-jobs-detail > .ace-attributes > .ace-attribute {
+  align-items: start;
+  display: grid;
+  gap: 0 0.75rem;
+  grid-template-columns: 2rem minmax(0, 1fr);
+}
+.academic-jobs-detail > .ace-attributes .ace-icon {
+  font-size: 1.75rem;
+  grid-row: span 2;
+  justify-content: center;
+}
+.academic-jobs-detail > .ace-attributes .ace-label {
+  font-size: 0.875rem;
+  grid-column: 2;
+}
+.academic-jobs-detail > .ace-attributes .ace-value {
+  grid-column: 2;
+}
+.academic-jobs-detail > .row {
+  --bs-gutter-y: 2rem;
+}
+.academic-jobs-detail .ace-contact {
+  background: var(--ace-surface);
+  border-radius: var(--ace-surface-radius);
+  padding: 1.25rem 1.5rem;
+}
+.academic-jobs-detail .ace-contact > .ace-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0 0 0.75rem;
+}
+.academic-jobs-detail .ace-contact > .ace-name {
+  display: block;
+  margin-bottom: 0.75rem;
+}
+.academic-jobs-detail .ace-contact > .ace-list {
+  display: grid;
+  gap: 0.5rem;
+}
+.academic-jobs-detail .ace-contact .ace-list-item {
+  align-items: center;
+  display: flex;
+  gap: 0.625rem;
+}
+.academic-jobs-detail .ace-contact .ace-icon {
+  display: inline-flex;
+  flex: 0 0 auto;
+  font-size: 1.25rem;
+}
+.academic-jobs-detail .ace-contact .ace-link {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.academic-jobs-detail .ace-contact > .ce-bodytext {
+  border-top: 1px solid var(--ace-border);
+  font-size: 0.9375rem;
+  margin-top: 1rem;
+  padding-top: 1rem;
+}
+.academic-jobs-detail .ace-contact > .ce-bodytext > :last-child {
+  margin-bottom: 0;
+}
+.academic-jobs-new .ace-form > .row {
+  --bs-gutter-y: 1.25rem;
+}
+.academic-jobs-new .ace-field {
+  display: grid;
+  gap: 0.375rem;
+}
+.academic-jobs-new .ace-field > .ace-label {
+  font-weight: 600;
+}
+.academic-jobs-new .ace-required {
+  color: var(--ace-accent);
+  cursor: help;
+  text-decoration: none;
+}
+.academic-jobs-new .ace-textarea {
+  min-height: 8rem;
+  resize: vertical;
+}
+.academic-jobs-new .ace-upload {
+  background: var(--ace-background);
+  border: 1px solid var(--ace-border);
+  border-radius: var(--ace-radius);
+  box-sizing: border-box;
+  color: var(--ace-text);
+  font: inherit;
+  line-height: 1.5;
+  min-height: 2.5rem;
+  padding: 0;
+  width: 100%;
+}
+.academic-jobs-new .ace-upload::file-selector-button {
+  background: var(--ace-surface);
+  border: 0;
+  border-right: 1px solid var(--ace-border);
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  margin-right: 0.75rem;
+  min-height: calc(2.5rem - 2px);
+  padding: 0.375rem 0.75rem;
+}
+.academic-jobs-new .ace-upload:focus-visible {
+  border-color: var(--ace-focus);
+  outline: 2px solid var(--ace-focus);
+  outline-offset: 2px;
+}
+.academic-jobs-new .ace-upload[aria-invalid=true],
+.academic-jobs-new .ace-upload[aria-invalid=true]:focus-visible {
+  border-color: var(--bs-form-invalid-border-color, #dc3545);
+}
+.academic-jobs-new .ace-checkbox-wrap {
+  align-items: center;
+  column-gap: 0.5rem;
+  grid-template-columns: auto minmax(0, 1fr);
+}
+.academic-jobs-new .ace-checkbox-wrap > .ace-label {
+  font-weight: 400;
+  grid-column: 2;
+  grid-row: 1;
+}
+.academic-jobs-new .ace-checkbox-wrap > .ace-checkbox {
+  accent-color: var(--ace-accent);
+  grid-column: 1;
+  grid-row: 1;
+  height: 1.125rem;
+  margin: 0;
+  width: 1.125rem;
+}
+.academic-jobs-new .ace-checkbox-wrap > :is(.ace-field-errors, .ace-help) {
+  grid-column: 1/-1;
+}
+.academic-jobs-new .ace-help {
+  color: var(--ace-muted);
+  font-size: 0.875rem;
+}
+.academic-jobs-new .ace-field-errors {
+  color: var(--bs-form-invalid-color, #dc3545);
+  font-size: 0.875rem;
+}
+.academic-jobs-new .ace-errors {
+  background: color-mix(in srgb, var(--bs-form-invalid-color, #dc3545) 8%, transparent);
+  border: 1px solid var(--bs-form-invalid-border-color, #dc3545);
+  border-radius: var(--ace-radius);
+  color: var(--bs-form-invalid-color, #dc3545);
+  margin-bottom: 1.5rem;
+  padding: 0.75rem 1rem;
+}
+.academic-jobs-new .ace-form > .btn {
+  margin-top: 1.75rem;
+}
+.academic-bite-jobs-list > .ace-title {
+  margin: 2rem 0 1rem;
+}
+.academic-bite-jobs-list > .ace-title:first-child {
+  margin-top: 0;
+}
+.academic-bite-jobs-list .ace-itemlist {
+  display: grid;
+  gap: var(--ace-gutter-x);
+  margin-bottom: 1.5rem;
+}
+.academic-bite-jobs-list .ace-card-view {
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 16rem), 1fr));
+}
+.academic-bite-jobs-list .ace-list-view {
+  gap: 1rem;
+}
+.academic-bite-jobs-list .ace-itemlist .ace-item {
+  background: var(--ace-surface);
+  border-radius: var(--ace-surface-radius);
+  padding: 1.5rem;
+}
+.academic-bite-jobs-list .ace-item-content {
+  display: grid;
+  gap: 0.75rem;
+}
+@media (min-width: 768px) {
+  .academic-bite-jobs-list .ace-list-view .ace-item-content {
+    align-items: baseline;
+    gap: 0.5rem 1.5rem;
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+}
+.academic-bite-jobs-list .ace-item-content .ace-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1.3;
+  margin: 0;
+  overflow-wrap: break-word;
+}
+.academic-bite-jobs-list .ace-list-view .ace-item-content .ace-title {
+  font-size: clamp(1.25rem, 2.5vw, 1.75rem);
+}
+.academic-bite-jobs-list .ace-item-content .ace-list-item {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 0.375rem;
+}
+.academic-bite-jobs-list .ace-table {
+  border-collapse: collapse;
+  margin-bottom: 1.5rem;
+  width: 100%;
+}
+.academic-bite-jobs-list .ace-table :is(.ace-label, .ace-value) {
+  border-bottom: 1px solid var(--ace-border);
+  padding: 0.625rem 0.75rem;
+  text-align: left;
+  vertical-align: top;
+}
+.academic-bite-jobs-list .ace-head .ace-label {
+  border-bottom: 2px solid currentcolor;
+  white-space: nowrap;
+}
+.academic-bite-jobs-list .ace-body .ace-item:nth-child(odd) {
+  background: var(--ace-surface);
+}
+.academic-bite-jobs-list .ace-body .ace-link {
+  color: inherit;
+  overflow-wrap: anywhere;
+}
 #map {
   height: 500px;
 }
@@ -16,6 +859,40 @@
 .leaflet-container img.leaflet-image-layer,
 .leaflet-container .leaflet-tile {
   width: auto !important;
+}
+:is(.academic-partners-list, .academic-partnerships-list, .academic-partnerships-teaser) .ace-itemlist .ace-item .ace-image {
+  aspect-ratio: auto;
+  height: 8rem;
+  object-fit: contain;
+}
+:is(.academic-partners-list, .academic-partnerships-list, .academic-partnerships-teaser) .ace-itemlist .ace-item:not(:has(> .ace-figure, > .ace-picture, > .ace-image))::before {
+  aspect-ratio: auto;
+  height: 8rem;
+}
+:is(.academic-partnerships-list, .academic-partnerships-teaser) .ace-itemlist + .ace-itemlist {
+  margin-top: 3rem;
+}
+:is(.academic-partnerships-list, .academic-partnerships-teaser) .ace-itemlist > .row > .ace-header .ace-title {
+  color: var(--ace-accent);
+  font-size: 1.75rem;
+  font-weight: 300;
+  line-height: 1.2;
+  margin: 0;
+}
+.academic-partners-page > .ace-attributes {
+  margin-bottom: 2.5rem;
+}
+.academic-partners-page > .ace-attributes:has(+ .ace-address) {
+  margin-bottom: 0.5rem;
+}
+.academic-partners-page > .ace-address {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 0.5rem;
+  margin: 0 0 2.5rem;
+}
+.academic-partners-map.layout-fullWidth > #map {
+  margin-inline: calc(50% - 50vw);
 }
 .academic-persons-detail {
   --academic-persons-detail-accent-start: #ff5820;
@@ -381,276 +1258,265 @@
     padding-inline: 0;
   }
 }
-.academic-persons-list,
-.academic-persons-card,
-.academic-persons-profiles,
-.academic-persons-contracts {
-  --ace-border-color: var(--bs-border-color, #dee2e6);
-  --ace-secondary-bg: var(--bs-tertiary-bg, #f6f8fd);
-  --ace-secondary-color: var(--bs-secondary-color, #6c757d);
-}
-.academic-persons-list .ace-form,
 .academic-persons-list .ace-navigation,
 .academic-persons-list .ace-itemlist,
 .academic-persons-list .ace-table-wrap,
-.academic-persons-card .ace-form,
 .academic-persons-card .ace-navigation,
 .academic-persons-card .ace-itemlist,
 .academic-persons-card .ace-table-wrap,
-.academic-persons-profiles .ace-form,
 .academic-persons-profiles .ace-navigation,
 .academic-persons-profiles .ace-itemlist,
 .academic-persons-profiles .ace-table-wrap,
-.academic-persons-contracts .ace-form,
 .academic-persons-contracts .ace-navigation,
 .academic-persons-contracts .ace-itemlist,
-.academic-persons-contracts .ace-table-wrap {
+.academic-persons-contracts .ace-table-wrap,
+.academic-contacts4pages-list .ace-navigation,
+.academic-contacts4pages-list .ace-itemlist,
+.academic-contacts4pages-list .ace-table-wrap {
   margin-bottom: 1.5rem;
 }
-.academic-persons-list .ace-filter,
-.academic-persons-card .ace-filter,
-.academic-persons-profiles .ace-filter,
-.academic-persons-contracts .ace-filter {
-  display: grid;
-  gap: 0.5rem;
+.academic-persons-list .ace-filters > .row > .col-auto:not(:has(> .ace-actions)),
+.academic-persons-card .ace-filters > .row > .col-auto:not(:has(> .ace-actions)),
+.academic-persons-profiles .ace-filters > .row > .col-auto:not(:has(> .ace-actions)),
+.academic-persons-contracts .ace-filters > .row > .col-auto:not(:has(> .ace-actions)),
+.academic-contacts4pages-list .ace-filters > .row > .col-auto:not(:has(> .ace-actions)) {
+  flex: 1 1 14rem;
+  max-width: 22rem;
 }
-.academic-persons-list :is(select, textarea, input:not([type=button], [type=reset], [type=submit])).ace-control,
-.academic-persons-card :is(select, textarea, input:not([type=button], [type=reset], [type=submit])).ace-control,
-.academic-persons-profiles :is(select, textarea, input:not([type=button], [type=reset], [type=submit])).ace-control,
-.academic-persons-contracts :is(select, textarea, input:not([type=button], [type=reset], [type=submit])).ace-control {
-  background-color: var(--bs-body-bg, #fff);
-  border: 1px solid var(--ace-border-color);
-  border-radius: var(--bs-border-radius, 0.375rem);
-  color: var(--bs-body-color, #212529);
-  display: block;
-  line-height: 1.5;
-  padding: 0.375rem 0.75rem;
-  width: 100%;
+@media (max-width: 575.98px) {
+  .academic-persons-list .ace-filters > .row > .col-auto:not(:has(> .ace-actions)),
+  .academic-persons-card .ace-filters > .row > .col-auto:not(:has(> .ace-actions)),
+  .academic-persons-profiles .ace-filters > .row > .col-auto:not(:has(> .ace-actions)),
+  .academic-persons-contracts .ace-filters > .row > .col-auto:not(:has(> .ace-actions)),
+  .academic-contacts4pages-list .ace-filters > .row > .col-auto:not(:has(> .ace-actions)) {
+    flex-basis: 100%;
+    max-width: none;
+  }
 }
-.academic-persons-list :is(select, textarea, input:not([type=button], [type=reset], [type=submit])).ace-control:is(select),
-.academic-persons-card :is(select, textarea, input:not([type=button], [type=reset], [type=submit])).ace-control:is(select),
-.academic-persons-profiles :is(select, textarea, input:not([type=button], [type=reset], [type=submit])).ace-control:is(select),
-.academic-persons-contracts :is(select, textarea, input:not([type=button], [type=reset], [type=submit])).ace-control:is(select) {
-  padding-right: 2.25rem;
-}
-.academic-persons-list .ace-list,
-.academic-persons-card .ace-list,
-.academic-persons-profiles .ace-list,
-.academic-persons-contracts .ace-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-.academic-persons-list .ace-alphabet-navigation > .ace-list,
 .academic-persons-list .ace-view-mode-switch > .ace-list,
-.academic-persons-list .f3-widget-paginator,
-.academic-persons-card .ace-alphabet-navigation > .ace-list,
 .academic-persons-card .ace-view-mode-switch > .ace-list,
-.academic-persons-card .f3-widget-paginator,
-.academic-persons-profiles .ace-alphabet-navigation > .ace-list,
 .academic-persons-profiles .ace-view-mode-switch > .ace-list,
-.academic-persons-profiles .f3-widget-paginator,
-.academic-persons-contracts .ace-alphabet-navigation > .ace-list,
 .academic-persons-contracts .ace-view-mode-switch > .ace-list,
-.academic-persons-contracts .f3-widget-paginator {
+.academic-contacts4pages-list .ace-view-mode-switch > .ace-list {
   display: flex;
   flex-wrap: wrap;
   gap: 0.25rem;
 }
-.academic-persons-list .ace-alphabet-navigation > .ace-list,
-.academic-persons-card .ace-alphabet-navigation > .ace-list,
-.academic-persons-profiles .ace-alphabet-navigation > .ace-list,
-.academic-persons-contracts .ace-alphabet-navigation > .ace-list {
-  display: grid;
-  font-size: 0.875rem;
-  grid-template-columns: repeat(auto-fit, minmax(2rem, 1fr));
-}
-.academic-persons-list .ace-alphabet-navigation .ace-link,
-.academic-persons-list .ace-pagination .ace-link,
 .academic-persons-list .ace-view-mode-switch .ace-link,
-.academic-persons-card .ace-alphabet-navigation .ace-link,
-.academic-persons-card .ace-pagination .ace-link,
 .academic-persons-card .ace-view-mode-switch .ace-link,
-.academic-persons-profiles .ace-alphabet-navigation .ace-link,
-.academic-persons-profiles .ace-pagination .ace-link,
 .academic-persons-profiles .ace-view-mode-switch .ace-link,
-.academic-persons-contracts .ace-alphabet-navigation .ace-link,
-.academic-persons-contracts .ace-pagination .ace-link,
-.academic-persons-contracts .ace-view-mode-switch .ace-link {
-  border: 1px solid var(--ace-border-color);
-  color: inherit;
+.academic-persons-contracts .ace-view-mode-switch .ace-link,
+.academic-contacts4pages-list .ace-view-mode-switch .ace-link {
+  border: 1px solid var(--ace-accent);
+  border-radius: var(--ace-radius);
+  color: var(--ace-accent);
   display: block;
-  padding: 0.375rem 0.75rem;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  padding: 0.25rem 0.75rem;
   text-decoration: none;
 }
-.academic-persons-list .ace-alphabet-navigation .ace-link,
-.academic-persons-card .ace-alphabet-navigation .ace-link,
-.academic-persons-profiles .ace-alphabet-navigation .ace-link,
-.academic-persons-contracts .ace-alphabet-navigation .ace-link {
-  padding-inline: 0;
-  text-align: center;
-  white-space: nowrap;
+.academic-persons-list .ace-view-mode-switch .ace-link:hover,
+.academic-persons-list .ace-view-mode-switch .ace-link:focus-visible,
+.academic-persons-card .ace-view-mode-switch .ace-link:hover,
+.academic-persons-card .ace-view-mode-switch .ace-link:focus-visible,
+.academic-persons-profiles .ace-view-mode-switch .ace-link:hover,
+.academic-persons-profiles .ace-view-mode-switch .ace-link:focus-visible,
+.academic-persons-contracts .ace-view-mode-switch .ace-link:hover,
+.academic-persons-contracts .ace-view-mode-switch .ace-link:focus-visible,
+.academic-contacts4pages-list .ace-view-mode-switch .ace-link:hover,
+.academic-contacts4pages-list .ace-view-mode-switch .ace-link:focus-visible {
+  background: var(--ace-accent-tint);
 }
-.academic-persons-list .ace-alphabet-navigation .visually-hidden,
-.academic-persons-card .ace-alphabet-navigation .visually-hidden,
-.academic-persons-profiles .ace-alphabet-navigation .visually-hidden,
-.academic-persons-contracts .ace-alphabet-navigation .visually-hidden {
-  clip-path: inset(50%);
-  height: 1px;
-  overflow: hidden;
-  position: absolute;
-  white-space: nowrap;
-  width: 1px;
-}
-.academic-persons-list .ace-alphabet-navigation .active .ace-link,
-.academic-persons-list .ace-pagination .active .ace-link,
 .academic-persons-list .ace-view-mode-switch .ace-link.active,
-.academic-persons-card .ace-alphabet-navigation .active .ace-link,
-.academic-persons-card .ace-pagination .active .ace-link,
 .academic-persons-card .ace-view-mode-switch .ace-link.active,
-.academic-persons-profiles .ace-alphabet-navigation .active .ace-link,
-.academic-persons-profiles .ace-pagination .active .ace-link,
 .academic-persons-profiles .ace-view-mode-switch .ace-link.active,
-.academic-persons-contracts .ace-alphabet-navigation .active .ace-link,
-.academic-persons-contracts .ace-pagination .active .ace-link,
-.academic-persons-contracts .ace-view-mode-switch .ace-link.active {
-  background: var(--bs-primary, #0d6efd);
-  border-color: var(--bs-primary, #0d6efd);
-  color: var(--bs-white, #fff);
+.academic-persons-contracts .ace-view-mode-switch .ace-link.active,
+.academic-contacts4pages-list .ace-view-mode-switch .ace-link.active {
+  background: var(--ace-accent);
+  color: var(--ace-accent-contrast);
 }
-.academic-persons-list .ace-alphabet-navigation .disabled .ace-link,
-.academic-persons-list .ace-pagination .disabled .ace-link,
-.academic-persons-card .ace-alphabet-navigation .disabled .ace-link,
-.academic-persons-card .ace-pagination .disabled .ace-link,
-.academic-persons-profiles .ace-alphabet-navigation .disabled .ace-link,
-.academic-persons-profiles .ace-pagination .disabled .ace-link,
-.academic-persons-contracts .ace-alphabet-navigation .disabled .ace-link,
-.academic-persons-contracts .ace-pagination .disabled .ace-link {
-  color: var(--ace-secondary-color);
-  pointer-events: none;
-}
-.academic-persons-list .ace-itemlist .ace-item,
-.academic-persons-card .ace-itemlist .ace-item,
-.academic-persons-profiles .ace-itemlist .ace-item,
-.academic-persons-contracts .ace-itemlist .ace-item {
-  border: 1px solid var(--ace-border-color);
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-}
-.academic-persons-list .ace-itemlist .ace-item > :is(figure, picture, img),
-.academic-persons-card .ace-itemlist .ace-item > :is(figure, picture, img),
-.academic-persons-profiles .ace-itemlist .ace-item > :is(figure, picture, img),
-.academic-persons-contracts .ace-itemlist .ace-item > :is(figure, picture, img) {
-  order: -1;
-}
-.academic-persons-list .ace-item-content,
-.academic-persons-card .ace-item-content,
-.academic-persons-profiles .ace-item-content,
-.academic-persons-contracts .ace-item-content {
-  padding: 1rem;
-}
-.academic-persons-list .ace-item-content .ace-title,
-.academic-persons-card .ace-item-content .ace-title,
-.academic-persons-profiles .ace-item-content .ace-title,
-.academic-persons-contracts .ace-item-content .ace-title {
-  font-size: 1.25rem;
-  margin: 0 0 1rem;
-}
-.academic-persons-list .ace-item-content .ace-link,
-.academic-persons-card .ace-item-content .ace-link,
-.academic-persons-profiles .ace-item-content .ace-link,
-.academic-persons-contracts .ace-item-content .ace-link {
-  color: inherit;
+.academic-persons-list .ace-itemlist .ace-item .ace-image,
+.academic-persons-card .ace-itemlist .ace-item .ace-image,
+.academic-persons-profiles .ace-itemlist .ace-item .ace-image,
+.academic-persons-contracts .ace-itemlist .ace-item .ace-image,
+.academic-contacts4pages-list .ace-itemlist .ace-item .ace-image {
+  aspect-ratio: 3/4;
 }
 .academic-persons-list .ace-item-content .ace-attributes,
 .academic-persons-card .ace-item-content .ace-attributes,
 .academic-persons-profiles .ace-item-content .ace-attributes,
-.academic-persons-contracts .ace-item-content .ace-attributes {
-  display: grid;
-  gap: 0.5rem;
+.academic-persons-contracts .ace-item-content .ace-attributes,
+.academic-contacts4pages-list .ace-item-content .ace-attributes {
+  font-size: 0.9375rem;
+  gap: 0.375rem;
 }
 .academic-persons-list .ace-item-content .ace-attribute,
 .academic-persons-card .ace-item-content .ace-attribute,
 .academic-persons-profiles .ace-item-content .ace-attribute,
-.academic-persons-contracts .ace-item-content .ace-attribute {
+.academic-persons-contracts .ace-item-content .ace-attribute,
+.academic-contacts4pages-list .ace-item-content .ace-attribute {
   display: grid;
-  gap: 0.15rem;
+  gap: 0;
 }
-.academic-persons-list .ace-item-content .ace-value,
-.academic-persons-card .ace-item-content .ace-value,
-.academic-persons-profiles .ace-item-content .ace-value,
-.academic-persons-contracts .ace-item-content .ace-value {
-  min-width: 0;
+.academic-persons-list .ace-item-content .ace-attribute > .ace-label,
+.academic-persons-card .ace-item-content .ace-attribute > .ace-label,
+.academic-persons-profiles .ace-item-content .ace-attribute > .ace-label,
+.academic-persons-contracts .ace-item-content .ace-attribute > .ace-label,
+.academic-contacts4pages-list .ace-item-content .ace-attribute > .ace-label {
+  color: var(--ace-muted);
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+.academic-persons-list .ace-item-content .ace-value > .ace-list-item,
+.academic-persons-card .ace-item-content .ace-value > .ace-list-item,
+.academic-persons-profiles .ace-item-content .ace-value > .ace-list-item,
+.academic-persons-contracts .ace-item-content .ace-value > .ace-list-item,
+.academic-contacts4pages-list .ace-item-content .ace-value > .ace-list-item {
+  display: block;
+}
+.academic-persons-list .ace-item-content .ace-link,
+.academic-persons-card .ace-item-content .ace-link,
+.academic-persons-profiles .ace-item-content .ace-link,
+.academic-persons-contracts .ace-item-content .ace-link,
+.academic-contacts4pages-list .ace-item-content .ace-link {
+  color: inherit;
   overflow-wrap: anywhere;
 }
-.academic-persons-list .ace-itemlist .ace-item > :is(figure, picture, img),
-.academic-persons-list .ace-itemlist .ace-item > :is(figure, picture) img,
-.academic-persons-card .ace-itemlist .ace-item > :is(figure, picture, img),
-.academic-persons-card .ace-itemlist .ace-item > :is(figure, picture) img,
-.academic-persons-profiles .ace-itemlist .ace-item > :is(figure, picture, img),
-.academic-persons-profiles .ace-itemlist .ace-item > :is(figure, picture) img,
-.academic-persons-contracts .ace-itemlist .ace-item > :is(figure, picture, img),
-.academic-persons-contracts .ace-itemlist .ace-item > :is(figure, picture) img {
-  display: block;
-  height: auto;
-  margin: 0;
-  width: 100%;
+.academic-persons-list .ace-item-content .ace-attributes + .ace-attributes,
+.academic-persons-card .ace-item-content .ace-attributes + .ace-attributes,
+.academic-persons-profiles .ace-item-content .ace-attributes + .ace-attributes,
+.academic-persons-contracts .ace-item-content .ace-attributes + .ace-attributes,
+.academic-contacts4pages-list .ace-item-content .ace-attributes + .ace-attributes {
+  border-top: 1px solid var(--ace-border);
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
 }
 .academic-persons-list .ace-group-header,
 .academic-persons-card .ace-group-header,
 .academic-persons-profiles .ace-group-header,
-.academic-persons-contracts .ace-group-header {
-  margin-top: 2rem;
+.academic-persons-contracts .ace-group-header,
+.academic-contacts4pages-list .ace-group-header {
+  color: var(--ace-accent);
+  font-size: 1.75rem;
+  font-weight: 300;
+  line-height: 1.2;
+  margin: 0 0 1rem;
 }
 .academic-persons-list .ace-table-wrap,
 .academic-persons-card .ace-table-wrap,
 .academic-persons-profiles .ace-table-wrap,
-.academic-persons-contracts .ace-table-wrap {
+.academic-persons-contracts .ace-table-wrap,
+.academic-contacts4pages-list .ace-table-wrap {
   overflow-x: auto;
 }
 .academic-persons-list .ace-table,
 .academic-persons-card .ace-table,
 .academic-persons-profiles .ace-table,
-.academic-persons-contracts .ace-table {
+.academic-persons-contracts .ace-table,
+.academic-contacts4pages-list .ace-table {
   border-collapse: collapse;
-  vertical-align: top;
+  font-size: 0.9375rem;
   width: 100%;
 }
 .academic-persons-list .ace-table :is(th, td),
 .academic-persons-card .ace-table :is(th, td),
 .academic-persons-profiles .ace-table :is(th, td),
-.academic-persons-contracts .ace-table :is(th, td) {
-  border-bottom: 1px solid var(--ace-border-color);
-  padding: 0.75rem;
+.academic-persons-contracts .ace-table :is(th, td),
+.academic-contacts4pages-list .ace-table :is(th, td) {
+  border-bottom: 1px solid var(--ace-border);
+  padding: 0.625rem 0.75rem;
   text-align: left;
+  vertical-align: top;
+}
+.academic-persons-list .ace-table-header .ace-label,
+.academic-persons-card .ace-table-header .ace-label,
+.academic-persons-profiles .ace-table-header .ace-label,
+.academic-persons-contracts .ace-table-header .ace-label,
+.academic-contacts4pages-list .ace-table-header .ace-label {
+  border-bottom: 2px solid currentcolor;
+  white-space: nowrap;
 }
 .academic-persons-list .ace-table .ace-list-item,
 .academic-persons-card .ace-table .ace-list-item,
 .academic-persons-profiles .ace-table .ace-list-item,
-.academic-persons-contracts .ace-table .ace-list-item {
+.academic-persons-contracts .ace-table .ace-list-item,
+.academic-contacts4pages-list .ace-table .ace-list-item {
   display: block;
+}
+.academic-persons-list .ace-table .ace-link,
+.academic-persons-card .ace-table .ace-link,
+.academic-persons-profiles .ace-table .ace-link,
+.academic-persons-contracts .ace-table .ace-link,
+.academic-contacts4pages-list .ace-table .ace-link {
+  color: inherit;
+  overflow-wrap: anywhere;
 }
 .academic-persons-list .ace-table-body .ace-item:nth-child(odd),
 .academic-persons-card .ace-table-body .ace-item:nth-child(odd),
 .academic-persons-profiles .ace-table-body .ace-item:nth-child(odd),
-.academic-persons-contracts .ace-table-body .ace-item:nth-child(odd) {
-  background: var(--ace-secondary-bg);
+.academic-persons-contracts .ace-table-body .ace-item:nth-child(odd),
+.academic-contacts4pages-list .ace-table-body .ace-item:nth-child(odd) {
+  background: var(--ace-surface);
 }
-.academic-persons-list .ace-pagination .f3-widget-paginator,
-.academic-persons-card .ace-pagination .f3-widget-paginator,
-.academic-persons-profiles .ace-pagination .f3-widget-paginator,
-.academic-persons-contracts .ace-pagination .f3-widget-paginator {
-  justify-content: center;
-  list-style: none;
-  margin: 1.5rem 0 0;
-  padding: 0;
+.academic-persons-list .ace-header:has(> .ace-group-header) + .ace-table-wrap > .ace-table,
+.academic-persons-card .ace-header:has(> .ace-group-header) + .ace-table-wrap > .ace-table,
+.academic-persons-profiles .ace-header:has(> .ace-group-header) + .ace-table-wrap > .ace-table,
+.academic-persons-contracts .ace-header:has(> .ace-group-header) + .ace-table-wrap > .ace-table,
+.academic-contacts4pages-list .ace-header:has(> .ace-group-header) + .ace-table-wrap > .ace-table {
+  min-width: 40rem;
+  table-layout: fixed;
 }
-.academic-persons-list .ace-empty,
-.academic-persons-card .ace-empty,
-.academic-persons-profiles .ace-empty,
-.academic-persons-contracts .ace-empty {
-  color: var(--ace-secondary-color);
+.academic-persons-list:has(> .ace-header > .ace-group-header):has(> .ace-itemlist) {
+  column-gap: var(--ace-gutter-x);
+}
+@media (min-width: 768px) {
+  .academic-persons-list:has(> .ace-header > .ace-group-header):has(> .ace-itemlist) {
+    columns: 2;
+  }
+}
+@media (min-width: 992px) {
+  .academic-persons-list:has(> .ace-header > .ace-group-header):has(> .ace-itemlist) {
+    columns: 3;
+  }
+}
+@media (min-width: 1200px) {
+  .academic-persons-list:has(> .ace-header > .ace-group-header):has(> .ace-itemlist) {
+    columns: 4;
+  }
+}
+.academic-persons-list:has(> .ace-header > .ace-group-header):has(> .ace-itemlist) > :not(.ace-itemlist, :has(> .ace-group-header)) {
+  column-span: all;
+}
+.academic-persons-list:has(> .ace-header > .ace-group-header):has(> .ace-itemlist) > .ace-header {
+  break-after: avoid;
+}
+.academic-persons-list:has(> .ace-header > .ace-group-header):has(> .ace-itemlist) > .ace-itemlist {
+  margin-bottom: 0;
+}
+.academic-persons-list:has(> .ace-header > .ace-group-header):has(> .ace-itemlist) > .ace-itemlist > .row {
+  display: block;
+  margin: 0;
+}
+.academic-persons-list:has(> .ace-header > .ace-group-header):has(> .ace-itemlist) > .ace-itemlist > .row > * {
+  break-inside: avoid;
+  margin: 0;
+  padding: 0 0 var(--ace-gutter-y);
+  width: auto;
+}
+.academic-contacts4pages-list .ace-role {
+  color: var(--ace-muted);
+  font-size: 0.875rem;
+  margin: 0 0 0.5rem;
+}
+.academic-contacts4pages-list .ace-itemlist > .row > .ace-header .ace-title {
+  font-size: 1.25rem;
+  font-weight: 500;
+  margin: 0;
+}
+.academic-contacts4pages-list .ace-itemlist + .ace-itemlist {
+  border-top: 1px solid var(--ace-border);
+  padding-top: 1.5rem;
 }
 academic-persons-edit-profile-editing,
 academic-persons-edit-document-editor,
@@ -1378,6 +2244,68 @@ body:has(.academic-persons-profile-editing) .ace-sticky-image {
 }
 .academic-persons-profile-editing .ace-dialog::backdrop {
   background: rgba(0, 0, 0, 0.5);
+}
+.academic-programs-finder {
+  background: var(--ace-surface);
+  border-radius: var(--ace-surface-radius);
+  margin-bottom: 1.5rem;
+  padding: 1.5rem;
+}
+.academic-programs-finder .ace-form {
+  margin-bottom: 0;
+}
+.academic-programs-finder .ace-filters .btn {
+  min-height: 2.5rem;
+  width: 100%;
+}
+.academic-programs-page > .ace-link {
+  display: inline-block;
+  margin: 0 1.5rem 1.5rem 0;
+  vertical-align: middle;
+}
+.academic-programs-page > .ace-link::before {
+  content: "\2039";
+  display: inline-block;
+  margin-right: 0.375rem;
+}
+.academic-programs-page > .ace-apply {
+  margin-bottom: 1.5rem;
+  vertical-align: middle;
+}
+.academic-projects-list .ace-state {
+  align-items: flex-start;
+  display: flex;
+  font-size: 0.9375rem;
+  gap: 0.5rem;
+  margin: 0 0 0.5rem;
+}
+.academic-projects-list .ace-state::before {
+  background: var(--ace-muted);
+  border-radius: 50%;
+  content: "";
+  flex: 0 0 auto;
+  height: 0.75rem;
+  margin-top: 0.35em;
+  width: 0.75rem;
+}
+.academic-projects-list .ace-state.active::before {
+  background: var(--ace-state-active);
+}
+.academic-projects-list .ace-state.completed::before {
+  background: var(--ace-state-completed);
+}
+.academic-projects-list .ace-item-content .ce-bodytext {
+  font-size: 0.9375rem;
+  margin-bottom: 0.75rem;
+}
+.academic-projects-list .ace-item-content .ce-bodytext > :last-child {
+  margin-bottom: 0;
+}
+.academic-projects-page .ace-hero .ce-bodytext {
+  margin-top: 1rem;
+}
+.academic-projects-page .ace-hero .ce-bodytext > :last-child {
+  margin-bottom: 0;
 }
 @media screen and (max-width: 767px) {
   .academic-study-plan.highlighted .ace-semester:not(.highlighted) {

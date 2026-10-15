@@ -188,5 +188,13 @@ Rules in the stylesheet of the site package, scoped by the outermost element:
         padding-left: 0;
     }
 
+The development instances style the project list and the project page with
+the partial `_academic-projects.scss
+<https://github.com/fgtclb/academic-extensions/blob/main/packages-dev/dev-site/Resources/Private/Scss/frontend/_academic-projects.scss>`__,
+together with the shared rules of `_academic-base.scss
+<https://github.com/fgtclb/academic-extensions/blob/main/packages-dev/dev-site/Resources/Private/Scss/frontend/_academic-base.scss>`__,
+both of the site package `academics_dev_site`, a complete example to copy
+from.
+
 To change the markup itself, override the partials as described in
 :ref:`templates`.

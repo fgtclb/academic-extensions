@@ -1,0 +1,50 @@
+// The program plugins of academic_programs: the list, the finder and the
+// details (`Templates/Program/List.html`, `Finder.html`, `Templates/Details/Show.html`
+// and the partials below `Partials/Program/`), and the page of a program
+// (`Pages/AcademicProgram.html`).
+//
+// The colours and sizes, the structural lists, the filter bar with its active
+// filters, the count, the item of the list with its row of facts, the facts
+// table of the details element and of the page, and the hero are shared with
+// the other extensions and come from `_academic-base.scss`. What follows is
+// the finder, and the links below the hero of the page.
+
+// The finder is a form on its own, often the first thing of a page, so it sits
+// on a surface that sets it apart. Its button is as high as the selects it
+// lines up with.
+.academic-programs-finder {
+    background: var(--ace-surface);
+    border-radius: var(--ace-surface-radius);
+    margin-bottom: 1.5rem;
+    padding: 1.5rem;
+
+    .ace-form {
+        margin-bottom: 0;
+    }
+
+    .ace-filters .btn {
+        min-height: 2.5rem;
+        width: 100%;
+    }
+}
+
+// The link back to the list and the application button of the page share a
+// line, the button where the link ends.
+.academic-programs-page {
+    > .ace-link {
+        display: inline-block;
+        margin: 0 1.5rem 1.5rem 0;
+        vertical-align: middle;
+
+        &::before {
+            content: "\2039";
+            display: inline-block;
+            margin-right: 0.375rem;
+        }
+    }
+
+    > .ace-apply {
+        margin-bottom: 1.5rem;
+        vertical-align: middle;
+    }
+}

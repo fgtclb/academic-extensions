@@ -84,6 +84,16 @@ Rules in the stylesheet of the site package, scoped by the outermost element:
         margin-top: 2rem;
     }
 
+The development instances style the contacts with the partial
+`_academic-persons-list.scss
+<https://github.com/fgtclb/academic-extensions/blob/main/packages-dev/dev-site/Resources/Private/Scss/frontend/_academic-persons-list.scss>`__,
+which styles the profile lists of `academic_persons` as well, since a contact
+renders the same item markup, together with the shared rules of
+`_academic-base.scss
+<https://github.com/fgtclb/academic-extensions/blob/main/packages-dev/dev-site/Resources/Private/Scss/frontend/_academic-base.scss>`__,
+both of the site package `academics_dev_site`, a complete example to copy
+from.
+
 Every contact is rendered through the partial :file:`Contacts/Item.html`, so a
 project that needs other markup for a contact overrides that one partial
 rather than the list template.
