@@ -88,11 +88,10 @@ the list and, below them, the field that chooses the pages.
     reads "show" while the stored value hides. A template override checks
     :html:`{settings.hideActiveState}`.
 
-    The state is preset only for a request without a selection of the visitor.
-    A visitor who changes the sorting or a category submits no state while the
-    select is hidden, and gets the list in the state :guilabel:`All`. Hide the
-    sorting and the category filter as well when a preset state must hold, as
-    a list of running projects usually wants.
+    With the select hidden, the list keeps the preset state when the visitor
+    changes the sorting or a category, and whatever state the URL of a link
+    carries. A list of running projects can therefore offer the category
+    filter and still show only the running ones.
 
 ..  figure:: /Images/Screenshots/project-list-active-only.png
     :alt: The number of projects found above a grid of project cards, without any form
@@ -131,10 +130,11 @@ the list and, below them, the field that chooses the pages.
     <project-list-categories>` presets. The active filter tags of the categories
     are left out with the selects.
 
-    The option stores the inverse, `settings.hideFilter`. The categories are
-    preset only for a request without a selection of the visitor, so a visitor
-    who changes the sorting or the state while the category selects are hidden
-    gets the list without the preset categories.
+    The option stores the inverse, `settings.hideFilter`. With the category
+    selects hidden, the list keeps the preset categories when the visitor
+    changes the sorting or the state. Categories in the URL of a link narrow
+    the list further and never replace a preset category. Without preset
+    categories, such a link filters the list as before.
 
 ..  confval:: Show sorting options
     :name: project-list-hide-sorting
@@ -147,10 +147,10 @@ the list and, below them, the field that chooses the pages.
     the category filter and the state select all switched off, the element
     renders no form.
 
-    The option stores the inverse, `settings.hideSorting`. The sorting is
-    preset only for a request without a selection of the visitor, so a visitor
-    who changes a category or the state while the sorting selects are hidden
-    gets the list sorted by title, A to Z, not by the sorting chosen here.
+    The option stores the inverse, `settings.hideSorting`. With the sorting
+    selects hidden, the list keeps the sorting chosen here when the visitor
+    changes a category or the state, and whatever sorting the URL of a link
+    carries.
 
 ..  confval:: Sorting
     :name: project-list-sorting
@@ -188,9 +188,12 @@ the list and, below them, the field that chooses the pages.
     type unless that is meant.
 
     The tree shows every category of the installation that belongs to a type
-    of the group `projects`. A selection the visitor submits replaces the
-    categories chosen here, and the active filter tags show them as tags the
-    visitor can remove.
+    of the group `projects`. While the category selects are shown, a selection
+    the visitor submits replaces the categories chosen here of the category
+    types the form offers, and the active filter tags show them as tags the
+    visitor can remove. A category of a type the form does not offer, because
+    :ref:`configuration-list-filter` leaves it out, stays. While the selects
+    are hidden, the categories chosen here always apply.
 
 ..  confval:: Show hidden records
     :name: project-list-show-hidden-records
@@ -269,3 +272,18 @@ An active project gets :html:`active` instead. That class names the state in
 every language, so a site styles the two states by it. A
 site package with a :file:`Project/Item.html` of its own shows the badge only
 once it takes over that block.
+
+..  _integrator-project-list-two-lists:
+
+Two lists on one page
+=====================
+
+All :guilabel:`Projects` elements of a page read the selection from the same
+URL arguments. A submission of the form is answered by the first of them on
+the page: it redirects to a URL that carries the selection as that element
+sees it, the presets it keeps included. For another :guilabel:`Projects`
+element of the page, a sorting or an active state the first element hides
+replaces the one its visitor chose. The preset categories of category selects
+the first element hides, and its preset categories of the category types its
+form does not offer, are added to the categories the visitor chose. Put lists
+whose forms hide or offer different parts on pages of their own.

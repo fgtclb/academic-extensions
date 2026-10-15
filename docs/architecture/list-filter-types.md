@@ -191,8 +191,12 @@ it render one when none of its types has a category.
 The finder submits no sorting. `DemandFactory::createDemandObject()` applies the
 sorting of the element to a demand that carries none, so the target list keeps
 its configured sorting - which also fixes the filter form of a list whose
-sorting select is hidden. The selection replaces the list's preset categories,
-as the list's own filter does.
+sorting select is hidden. The selection replaces the list's preset categories
+of the types the finder offers, as the list's own filter does, and keeps the
+others (ACE-916). The same holds for the form of a list whose filter types leave
+out the type of a preset. A list that hides its filter keeps every preset
+category, and the finder's selection narrows it, see
+[List filter URLs](list-filter-urls.md).
 
 A preselected category is a plain uid list in the FlexForm
 (`settings.preselectedCategories`, a `category` field with `oneToMany`, which
