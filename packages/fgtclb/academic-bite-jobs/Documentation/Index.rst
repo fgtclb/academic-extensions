@@ -61,6 +61,11 @@ advertisements are also available in the plugin.
         Install :guilabel:`academic_bite_jobs` via Composer, the Extension
         Manager or a TER upload.
 
+    ..  card:: :ref:`Upgrade <upgrade>`
+
+        The steps to upgrade :guilabel:`academic_bite_jobs` to a newer
+        version, in the order to take them.
+
     ..  card:: :ref:`Configuration <configuration>`
 
         Configure the extension and its plugins for your installation.
@@ -90,6 +95,7 @@ advertisements are also available in the plugin.
 
     Introduction/Index
     Installation/Index
+    Upgrade/Index
     Configuration/Index
     Templates/Index
     Developers/Index
