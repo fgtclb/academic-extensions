@@ -182,20 +182,40 @@ dispatch the after-save event for it.
 - **THEN** the visitor returns to the form page and the form shows that the
   job advert could not be created
 
+#### Scenario: A request without a job
+
+- **WHEN** the form receives a submission that carries no job at all
+- **THEN** nothing is saved and the visitor returns to the form page without
+  a message
+
+### Requirement: Changes of an after-save listener are stored
+
+A change a listener of the after-save event makes to the saved job, or to
+another record, through a repository SHALL be stored before the visitor is
+redirected, also when the listener does not persist it itself. This applies
+on TYPO3 v13 and v14 alike.
+
+#### Scenario: A listener changes the title
+
+- **WHEN** a listener of the after-save event changes the title of the saved
+  job and hands it to the repository without persisting it
+- **THEN** the job is stored with the changed title
+
 ### Requirement: The message mode items say what they do
 
 The message mode of the content element SHALL offer its items with labels
-that describe their effect: "Use the site setting" for the item that defers
-to the site setting, "always", "never", and "Suppress when a redirect page is
-set" for the conditional item, with German labels on a German backend. The
-stored values SHALL stay `-1`, `1`, `2` and `0`.
+that describe their effect: "Use the site or TypoScript setting" for the
+item that defers to the site setting or the TypoScript constant, "always",
+"never", and "Suppress when a redirect page is set" for the conditional item,
+with German labels on a German backend. The stored values SHALL stay `-1`,
+`1`, `2` and `0`.
 
 #### Scenario: Editor opens the content element
 
 - **WHEN** an editor opens the job form content element in an English
   backend
-- **THEN** the message mode offers "Use the site setting", "always", "never"
-  and "Suppress when a redirect page is set"
+- **THEN** the message mode offers "Use the site or TypoScript setting",
+  "always", "never" and "Suppress when a redirect page is set"
 
 #### Scenario: German backend
 

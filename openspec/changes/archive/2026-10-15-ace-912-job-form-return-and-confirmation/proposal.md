@@ -31,8 +31,9 @@ shows it on a page where it makes no sense (ACE-919).
   message "Your job advert could not be created", instead of continuing with
   an empty uid.
 - The FlexForm items `-1` and `0` of the message mode are relabelled to "Use
-  the site setting" and "Suppress when a redirect page is set", in English
-  and German, with the description of the site setting. Keys and values stay.
+  the site or TypoScript setting" and "Suppress when a redirect page is set",
+  in English and German, with the description of the site setting. Keys and
+  values stay.
 
 ## Capabilities
 

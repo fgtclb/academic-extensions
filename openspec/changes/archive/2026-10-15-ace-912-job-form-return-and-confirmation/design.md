@@ -79,12 +79,15 @@ filters (ACE-723), so the `ResponsePropagation` middleware answers `303` on
 both cores and no page is rendered.
 
 Throwing skips what Extbase does after an action: the
-`AfterRequestDispatchedEvent` and `clearCachesOfRegisteredPageIds()` of
-`Extbase\Core\Bootstrap`. The controller calls
-`CacheService::clearCachesOfRegisteredPageIds()` itself before it throws. The
-saved job is hidden, so no cached page shows it, but Extbase also flushes the
-pages named in `TCEMAIN.clearCacheCmd` of the storage folder, and a site may
-rely on that. `CacheService` is a singleton, the injected instance is the one
+`AfterRequestDispatchedEvent`, and `persistAll()` followed by
+`clearCachesOfRegisteredPageIds()` in `Extbase\Core\Bootstrap`. The controller
+calls `persistAll()` and then `CacheService::clearCachesOfRegisteredPageIds()`
+itself before it throws, in that order. The first keeps the change of a
+listener of `AfterSaveJobEvent`, which is `@api`, that updates the job or
+another record through a repository without persisting it. The second clears
+the caches the saved records registered: the saved job is hidden, so no cached
+page shows it, but Extbase also flushes the pages named in
+`TCEMAIN.clearCacheCmd` of the storage folder, and a site may rely on that. `CacheService` is a singleton, the injected instance is the one
 the persistence backend registered the record with. The event is not
 replaced: nothing in the extensions listens to it, and the test listener that
 recorded the response is removed.
@@ -99,7 +102,9 @@ rejected field already, and the generic message named a PHP method.
 It queues "Job not created" for the form queue and leaves through the "back
 to the form" exit, so it never reaches the event, the mail or the decision.
 `listPid` is read as `(int)($this->settings['listPid'] ?? 0)` and used only
-when it is above 0.
+when it is above 0. A request for the create action without a job, which used
+to return `redirect('new')`, leaves through the same exit without a message:
+nothing was saved, so there is nothing to confirm or to report.
 
 ## Risks / Trade-offs
 
