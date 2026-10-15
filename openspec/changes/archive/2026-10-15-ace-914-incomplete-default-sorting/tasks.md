@@ -46,5 +46,5 @@
   `lintMarkdown -n`: 480 files, 0 problems.
 - [x] 4.4 Commit in TYPO3 Core format, `[BUGFIX] ACE-914: …`, naming TYPO3
   v12 and v13, with `Resolves: ACE-914`.
-- [ ] 4.5 Archive the change with spec sync as the last commit, with
+- [x] 4.5 Archive the change with spec sync as the last commit, with
   `Related: ACE-914`.
