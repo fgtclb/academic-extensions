@@ -51,6 +51,11 @@ partners alongside the page content.
         Install :guilabel:`academic_contacts4pages` via Composer, the
         Extension Manager or a TER upload.
 
+    ..  card:: :ref:`Upgrade <upgrade>`
+
+        The steps to upgrade :guilabel:`academic_contacts4pages` to a newer
+        version, in the order to take them.
+
     ..  card:: :ref:`Configuration <configuration>`
 
         Configure the extension and its plugin for your installation.
@@ -71,6 +76,7 @@ partners alongside the page content.
 
     Introduction/Index
     Installation/Index
+    Upgrade/Index
     Configuration/Index
     KnownProblems/Index
     Changelog/Changelog-2

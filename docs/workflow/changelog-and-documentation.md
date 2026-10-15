@@ -55,6 +55,24 @@ The extension key is not always the directory name: `academic-contact4pages`
 ships `academic_contacts4pages`. The manual's `Index.rst` states the key, the
 directory does not.
 
+### The upgrade chapter
+
+Every manual carries `Upgrade/` (ACE-910): an index page with the table of
+which page applies to which installed version and what to do before any
+upgrade, and one page per upgrade path, `From23To24.rst` on this branch. A
+page lists the steps of its own extension in the order they have to be done,
+from the package update over the database, the upgrade wizards and the
+configuration to the templates and the code, and links the changelog entry of
+each step. It names an extension that has to be upgraded first or together,
+because there is no guide across the extensions: every package is split out
+and rendered on its own.
+
+The changelog stays the record of what changed. The upgrade page is the order
+to apply it in, so a new Breaking or Deprecation entry of a release adds its
+step to the page of the upgrade path that release belongs to, in the same
+change. `main` carries the same `From23To24.rst`, byte-identical, next to the
+pages of the paths to 3.0, and an edit of it is made on both branches.
+
 ## Rendering the manual
 
 Rendering goes through the harness like every other check, so it uses the same

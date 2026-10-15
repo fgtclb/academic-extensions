@@ -47,6 +47,11 @@ user sources like LDAP imports.
         Install :guilabel:`academic_persons_sync` via Composer, the
         Extension Manager or a TER upload.
 
+    ..  card:: :ref:`Upgrade <upgrade>`
+
+        The steps to upgrade :guilabel:`academic_persons_sync` to a newer
+        version, in the order to take them.
+
     ..  card:: :ref:`Known problems <known-problems>`
 
         Known issues and information about them.
@@ -62,6 +67,7 @@ user sources like LDAP imports.
     :hidden:
 
     Installation/Index
+    Upgrade/Index
     KnownProblems/Index
     Changelog/Changelog-2
 
