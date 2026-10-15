@@ -271,6 +271,13 @@ whether it is expanded and works by keyboard:
         -   :yaml:`false`
         -   The filter is hidden until the visitor expands it.
 
+..  figure:: /Images/Screenshots/study-plan-filter-collapsed.png
+    :alt: A button Filter by category above the semester columns, the category buttons hidden.
+    :class: with-border with-shadow
+
+    With plugin.tx_academicstudyplan.filter.collapsible switched on, the
+    filter waits behind its toggle.
+
 ..  code-block:: yaml
     :caption: config/sites/my-site/settings.yaml
 
