@@ -58,9 +58,15 @@ project managers, research participants or cooperation partners.
         Install :guilabel:`academic_projects` via Composer, the Extension
         Manager or a TER upload.
 
+    ..  card:: :ref:`For integrators <integrator>`
+
+        The two content elements, what each one shows and every option of
+        their backend form.
+
     ..  card:: :ref:`Configuration <configuration>`
 
-        Configure the extension and its plugins for your installation.
+        The site sets, the site settings and the TypoScript of the
+        extension, and the project page type.
 
     ..  card:: :ref:`Templates <templates>`
 
@@ -73,8 +79,8 @@ project managers, research participants or cooperation partners.
 
     ..  card:: :ref:`For developers <developers>`
 
-        The events both project list plugins dispatch, and what a listener
-        may change with them.
+        The events both project list plugins dispatch, one page each, and
+        what a listener may change with them.
 
     ..  card:: :ref:`Known problems <known-problems>`
 
@@ -92,6 +98,7 @@ project managers, research participants or cooperation partners.
 
     Introduction/Index
     Installation/Index
+    Integrator/Index
     Configuration/Index
     Templates/Index
     Styling/Index

@@ -14,6 +14,9 @@ same files, so they configure an installation identically.
 Pick one of them per site and stay with it — see
 :ref:`Do not combine both <one-mechanism-per-site>` for what happens otherwise.
 
+The content elements and the options of their backend forms are described in
+:ref:`integrator`.
+
 ..  _configuration-components:
 
 What the sets contain
@@ -34,9 +37,10 @@ the backend offers, not how much TypoScript is loaded.
     *   -   Set
         -   Delivers
     *   -   `fgtclb/academic-projects-project-list`
-        -   The :guilabel:`Projects` content element.
+        -   The :ref:`Projects <integrator-project-list>` content element.
     *   -   `fgtclb/academic-projects-project-list-single`
-        -   The :guilabel:`Selected Projects` content element.
+        -   The :ref:`Selected Projects <integrator-project-list-single>`
+            content element.
     *   -   `fgtclb/academic-projects`
         -   Everything above. This is the set to use unless you deliberately
             want a subset, and it is the name this extension published before
@@ -505,44 +509,14 @@ the same names, like the filter settings above.
 
     The three settings and the two partials.
 
-..  _configuration-active-state:
+..  _configuration-plugin-options:
 
-The state of a project
-======================
+The options of the content elements
+===================================
 
-A project is active while it has no end date or its end date is still ahead,
-and completed once its end date has passed. The :guilabel:`Active state`
-filter of the project lists selects by that rule, and a template reads the same
-state from every project as :html:`{project.activeState}`: `active` or
-`completed`, never empty.
-
-A project page whose end date was never stored has no end date either, and is
-active. That is a page created in the page tree, a page switched to the project
-page type, an imported page or one from before the extension was installed,
-as long as no editor has entered an end date. The :guilabel:`Active` filter
-lists it, and the :guilabel:`Completed` filter does not.
-
-..  _configuration-active-state-badge:
-
-The state on the project cards
-------------------------------
-
-The option :guilabel:`Show active state badge` of the :guilabel:`Projects` and
-the :guilabel:`Selected Projects` content elements shows the state on every
-project card, with the labels :xml:`activeState.active` and
-:xml:`activeState.completed` of this extension. It is off by default, and a
-content element saved before the option existed stays without the badge.
-
-The partial :file:`Project/Item.html` renders it above the title:
-
-..  code-block:: html
-
-    <p class="ace-state completed">Completed</p>
-
-An active project gets :html:`active` instead. That class names the state in
-every language, so a site styles the two states by it. A
-site package with a :file:`Project/Item.html` of its own shows the badge only
-once it takes over that block.
+What the :guilabel:`Projects` and the :guilabel:`Selected Projects` content
+elements show, every option of their backend forms, the state of a project and
+the state badge on the project cards are described in :ref:`integrator`.
 
 ..  _configuration-crop-variants:
 
