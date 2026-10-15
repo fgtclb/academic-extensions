@@ -57,7 +57,8 @@ The event replaces the view events of single actions that
 
 The `extension points page
 <https://docs.typo3.org/p/fgtclb/academic-base/main/en-us/Developers/ExtensionPoints/Index.html>`__
-lists the event as public API.
+lists the event as public API, and
+:ref:`developers-event-modify-plugin-view-event` describes it in full.
 
 Impact
 ======

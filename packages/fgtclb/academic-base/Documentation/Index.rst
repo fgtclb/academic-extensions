@@ -82,7 +82,8 @@ extensions.
     ..  card:: :ref:`For developers <developers>`
 
         What a project may build on: the events, interfaces and domain models
-        of every academic extension, and what is not public API.
+        of every academic extension, and what is not public API. The three
+        events this extension owns, one page each.
 
     ..  card:: :ref:`Known problems <known-problems>`
 

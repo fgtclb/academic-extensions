@@ -532,8 +532,8 @@ Which icons are served
 The JSON map and the endpoint serve the same icons. The icons of the frontend
 icon registry, and no other: what the
 :file:`Configuration/FrontendIcons.php` of an extension or a site package
-registers, what a listener of
-:php:`\FGTCLB\AcademicBase\Event\CollectFrontendIconsEvent` contributes, and
+registers, what a listener of :ref:`CollectFrontendIconsEvent
+<developers-event-collect-frontend-icons-event>` contributes, and
 the icons of category types and category groups. The icon registry of TYPO3 is
 never read, so a core icon or the backend icon of a record type is not served,
 even when a template asks for its identifier. A site package hands an icon of

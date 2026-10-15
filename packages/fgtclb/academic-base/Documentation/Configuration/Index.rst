@@ -332,42 +332,12 @@ red drawing TYPO3 shows for an unknown icon, marked
 :file:`Configuration/FrontendIcons.php`, so a site package replaces it like
 any other icon.
 
-..  _configuration-frontend-icons-code:
-
 Icons from code
 ---------------
 
-An extension that computes its icons, from a configuration file of its own for
-example, contributes them through the event
-:php:`\FGTCLB\AcademicBase\Event\CollectFrontendIconsEvent`. It is
-dispatched while the registry is built, before the files are read, so an entry
-of a :file:`Configuration/FrontendIcons.php` with the same identifier replaces
-a contributed icon whatever the order of the two packages.
-
-..  code-block:: php
-    :caption: EXT:my_extension/Classes/EventListener/ContributeFrontendIcons.php
-
-    namespace MyVendor\MyExtension\EventListener;
-
-    use FGTCLB\AcademicBase\Event\CollectFrontendIconsEvent;
-    use TYPO3\CMS\Core\Attribute\AsEventListener;
-    use TYPO3\CMS\Core\Imaging\IconProvider\SvgIconProvider;
-
-    #[AsEventListener(identifier: 'my-extension/contribute-frontend-icons')]
-    final readonly class ContributeFrontendIcons
-    {
-        public function __invoke(CollectFrontendIconsEvent $event): void
-        {
-            $event->addIcon(
-                'my-extension-badge',
-                SvgIconProvider::class,
-                ['source' => 'EXT:my_extension/Resources/Public/Icons/badge.svg'],
-            );
-        }
-    }
-
-:php:`addIcon()` rejects a provider that is not an icon provider with an error
-that names the icon.
+An extension that computes its icons contributes them through the event
+:php:`\FGTCLB\AcademicBase\Event\CollectFrontendIconsEvent`, see
+:ref:`developers-event-collect-frontend-icons-event`.
 
 ..  _configuration-frontend-icons-cache:
 
