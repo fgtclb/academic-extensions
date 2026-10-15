@@ -151,7 +151,10 @@ from its identity map by the plain uid (`DataMapper.php:685` on 12.4.45,
 the default language, every later partnership of the page with that role names
 it in the default language too. The partnership list and teaser group by the
 uid of the role for the same reason, since a translated and an untranslated
-partnership carry their role as two objects.
+partnership carry their role as two objects. The partnerships without a role,
+those with a hidden or deleted role included, reach the templates and the page
+data processor as a list of their own and render after the role groups
+(ACE-917), as `academic_contacts4pages` does for its contacts.
 
 ## Testing it
 
