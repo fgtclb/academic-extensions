@@ -95,6 +95,12 @@ send, `academic_programs` and `academic_persons_edit` on branch `2`.
 - Recognition by class relies on TYPO3 handing over the mutation objects
   unchanged. A future policy cache in `PolicyProvider` that rebuilt them from
   their values would make the listener a no-op.
+- A package loaded before the academic extensions that adds `'unsafe-inline'`
+  to `script-src`, together with a hash of its own in `script-src-attr`,
+  leaves the hash of the form out while the other hash still disables
+  `'unsafe-inline'` in the browser. The form handlers are blocked there. A
+  portable check for a remaining hash needs `Policy::get()`, which TYPO3 12
+  does not have.
 - On a site with `'unsafe-inline'`, a page that keeps a nonce in `script-src`,
   the partner map with its script for example, blocks the handlers of the
   form as it blocks those of the site. The forms follow the site there rather
