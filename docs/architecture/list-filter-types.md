@@ -169,10 +169,16 @@ the same resolver.
 It differs in two places. With both levels empty it offers `degree,topic`, not
 every type with a category. A finder is a compact entry, and a dozen selects is
 no entry. The default is a constant of `ProgramController`, applied before the
-resolver, so a site without a `topic` category gets the degree alone. And it
-ignores the visible count: `finderAction()` calls `resolve()` without one
-rather than `resolveFromSettings()`, so every select is shown and there is no
-disclosure.
+resolver, so a site without a `topic` category gets the degree alone. Only when
+the resolver drops both, because neither is a type of the group with a category
+(removed, renamed or unused by a project), does `finderFilterTypes()` resolve
+again with an empty value and offer every type with a category, as the list
+does (ACE-923). The check is the resolver's own, so a type whose categories are
+all disabled still counts. A value of the element or the site is never replaced
+that way: a finder whose configured types have no category renders no form,
+like a list. And it ignores the visible count: `finderAction()` calls
+`resolve()` without one rather than `resolveFromSettings()`, so every select is
+shown and there is no disclosure.
 
 Its options come from `findAllApplicable()` over the programs in the finder's
 own storage (`pages`, `recursive`), not over the storage of the list it targets,
@@ -219,6 +225,7 @@ something other than what the select shows.
 | The stored order after a save                 | `academic-programs/Tests/Functional/Backend/FormEngine/FilterTypesFieldTest.php`               |
 | The finder: default, order, preselection      | `academic-programs/Tests/Functional/Plugins/AcademicProgramsFinderTest.php`                    |
 | The finder: target URI, sorting, no form      | `academic-programs/Tests/Functional/Plugins/AcademicProgramsFinderTest.php`                    |
+| The finder without a degree and a topic       | `academic-programs/Tests/Functional/Plugins/AcademicProgramsFinderRenamedTypesTest.php`        |
 | The finder renders outside the page cache     | `academic-programs/Tests/Functional/Plugins/AcademicProgramsFinderCachingTest.php`             |
 | A filter without sorting keeps the element's  | `academic-programs/Tests/Functional/Plugins/AcademicProgramsFilterUrlTest.php`                 |
 | Which sorting a demand gets                   | `academic-programs/Tests/Functional/Factory/DemandFactorySortingTest.php`                      |
