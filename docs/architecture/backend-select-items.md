@@ -49,9 +49,9 @@ listener of `ModifyTcaSelectFieldItemsEvent` that read `$parameters['row']`
 without a fallback raised `Undefined array key "row"`, which the debug preset
 turns into an exception (ACE-922). The empty array saves a listener that reads
 the row itself, not one that reads a field of it: `$parameters['row']['pid']`
-still warns, about `pid` now. The event and the two job item providers
-therefore declare `row` optional, `row?:`, so PHPStan reports a listener that
-reads it without a fallback.
+still warns, about `pid` now. The event, and since ACE-927 every item provider
+through the alias, declare `row` optional, `row?:`, so PHPStan reports a
+listener that reads it without a fallback, see the next section.
 
 The inline keys and `flexParentDatabaseRow` are left out by the trait, because
 nothing outside FormEngine has them, and the shapes declare them optional
@@ -64,6 +64,49 @@ but the handler they call, `RecordTypes`, dispatches no event.
 `GetSelectItemsForTcaManagedTableFieldMethodTraitTest` of `academic_base` pins
 the keys, `AcademicJobsNewJobFormSelectItemsListenerTest` of `academic_jobs`
 runs a listener that reads the row through the job form.
+
+## The shape names what TYPO3 passes, not what a uid should be
+
+`ModifyTcaSelectFieldItemsEvent` declares the parameters as the PHPStan type
+alias `ItemsProcFuncParameters`, and `TypeItems`, `EmploymentTypeItems`,
+`ContractItems`, `ProfileShowFieldsItems`, `AddressRecordItems` and
+`ContractRepository::getContractItemsForTcaItemsProcFunc()` import it with
+`@phpstan-import-type`. Until ACE-927 each of them repeated the shape, ten
+copies in seven files, and all of them declared three keys narrower than
+FormEngine fills them. The values come from the initial result of
+`FormDataCompiler` and reach the handler unchanged, through
+`AbstractItemProvider::resolveItemProcessorFunction()` on v12 and v13 alike:
+
+| Key                      | Declared before | What TYPO3 passes                                                                                                                                 |
+|--------------------------|-----------------|---------------------------------------------------------------------------------------------------------------------------------------------------|
+| `inlineParentUid`        | `int`           | `''` for a record that is not edited as an inline child, a `NEW...` string for a parent not saved yet, else the uid, an `int` or a numeric string |
+| `inlineTopMostParentUid` | `int`           | the same, and `null` from the inline records of the site configuration (`SiteTcaInline`, `TcaSiteLanguage`)                                       |
+| `site`                   | `Site\|null`    | a `NullSite` for a record outside any site (`SiteResolving::resolveSite()`), so `SiteInterface\|null`                                             |
+| `items`                  | arrays          | `SelectItem` objects for every item TYPO3 built before the handler, arrays for the items a handler adds                                           |
+
+The default `''` of the inline uids is set in `FormDataCompiler`, and
+`TcaInline` passes the uid of the parent row to a child, commented "it is
+always a string either an id or new...". TYPO3 v12 and v13 do this in the
+same places.
+
+A handler typed against the narrow shape passed PHPStan and failed for the
+common case: a listener that hands `$parameters['inlineParentUid']` to an
+`int` parameter raises a `TypeError` for every record that is not an inline
+child. `AddressRecordItems`, the one reader of an inline uid here, casts it.
+
+`SelectItemsEventParametersTest` of `academic_contacts4pages` compiles the
+form of a page contact on a page without a site and records what a listener
+receives for the contract select. It asserts `''`, a `NullSite`, a
+`SelectItem` for the declared empty item and an array for the contract the
+provider added, on both core versions. The recorded parameters carry the
+alias, so PHPStan checks the assertions against the shape: with the former
+one, it reported each of them as always false.
+
+The recorder copies `items` before it keeps the parameters. On TYPO3 v12 and
+v13 `items` is a reference to the list that `AbstractItemProvider` replaces by
+`SelectItem` objects once the provider returned, so a listener that keeps the
+parameters for later finds the converted list there, not the one it was
+handed. The copy keeps the items as the listener received them.
 
 ## Page TSconfig reaches a FlexForm field by a longer path
 
@@ -158,8 +201,9 @@ as they are: their fields declare no items, so there is nothing to replace.
 
 A handler that reads the items it is handed gets each one as a `SelectItem`,
 which implements `ArrayAccess`, on v12 and v13 alike
-(`AbstractItemProvider::resolveItemProcessorFunction()`). `$item['value']`
-works, a parameter typed `array` fails.
+(`AbstractItemProvider::resolveItemProcessorFunction()`). The items a handler
+adds, and every item of the job form, are arrays. `$item['value']` works for
+both, a parameter typed `array` fails in the backend form.
 
 ## An appended item must not repeat the declared empty value
 
