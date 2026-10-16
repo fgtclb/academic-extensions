@@ -1,10 +1,10 @@
 # TYPO3 Extension `Academic person database - Sync` (READ-ONLY)
 
-|                  | URL                                                                        |
-|------------------|----------------------------------------------------------------------------|
-| **Repository:**  | https://github.com/fgtclb/academic-persons-sync                            |
-| **Read online:** | https://docs.typo3.org/p/fgtclb/academic/academic-persons-sync/main/en-us/ |
-| **TER:**         | https://extensions.typo3.org/extension/academic_persons_sync/              |
+|                  | URL                                                               |
+|------------------|-------------------------------------------------------------------|
+| **Repository:**  | https://github.com/fgtclb/academic-persons-sync                   |
+| **Read online:** | https://docs.typo3.org/p/fgtclb/academic-persons-sync/main/en-us/ |
+| **TER:**         | https://extensions.typo3.org/extension/academic_persons_sync/     |
 
 ## Description
 
