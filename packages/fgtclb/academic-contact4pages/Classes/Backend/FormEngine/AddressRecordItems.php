@@ -48,29 +48,7 @@ use TYPO3\CMS\Core\Versioning\VersionState;
  * Dispatches {@see ModifyTcaSelectFieldItemsEvent} to allow projects or other extensions
  * to modify the available select items.
  *
- * @phpstan-type ItemsProcFuncParameters array{
- *      items: array<int, array{
- *       label?: string|null,
- *       value?: mixed,
- *       icon?: string|null,
- *       group?: string|null,
- *      }>,
- *      config: array<string, mixed>,
- *      TSconfig: array<string, mixed>|null,
- *      table: string,
- *      row: array<string, mixed>,
- *      field: string,
- *      effectivePid: int,
- *      site: \TYPO3\CMS\Core\Site\Entity\Site|null,
- *      flexParentDatabaseRow?: array<string, mixed>|null,
- *      inlineParentUid?: int,
- *      inlineParentTableName?: string,
- *      inlineParentFieldName?: string,
- *      inlineParentConfig?: array<string, mixed>,
- *      inlineTopMostParentUid?: int,
- *      inlineTopMostParentTableName?: string,
- *      inlineTopMostParentFieldName?: string,
- *  }
+ * @phpstan-import-type ItemsProcFuncParameters from ModifyTcaSelectFieldItemsEvent
  */
 final class AddressRecordItems
 {
@@ -118,8 +96,8 @@ final class AddressRecordItems
     {
         $contractUid = $this->resolveContractUid($parameters);
         if ($contractUid > 0) {
-            // The record items core added from the `foreign_table`. TYPO3 v13 hands the items
-            // over as `SelectItem` objects, v14 as arrays.
+            // The record items core added from the `foreign_table`, which TYPO3 hands over as
+            // `SelectItem` objects. Items a caller adds itself may be arrays.
             $parameters['items'] = array_values(array_filter(
                 $parameters['items'],
                 static fn(array|SelectItem $item): bool => (int)($item['value'] ?? 0) <= 0,
