@@ -260,39 +260,57 @@ name**, and referenced in resource paths by **extension key**:
 ```php
 protected function setUp(): void
 {
-    $this->configurationToUseInTestInstance = $this->frontendPluginTestConfiguration();
+    $this->configurationToUseInTestInstance = $this->frontendPluginTestConfiguration([
+        // …
+    ]);
     $this->addCoreExtensionsToLoad('typo3/cms-fluid-styled-content');
-    $this->addTestExtensionsToLoad('georgringer/numbered-pagination', 'tests/plugin-templates');
+    $this->addTestExtensionsToLoad('georgringer/numbered-pagination', 'tests/plugin-templates', 'tests/test-profile-query-constraints');
     parent::setUp();
 }
 ```
 
 ```php
-'setup' => [
-    'EXT:fluid_styled_content/Configuration/TypoScript/setup.typoscript',
-    'EXT:academic_persons/Configuration/TypoScript/Default/setup.typoscript',
-    'EXT:test_plugin_templates/Configuration/TypoScript/setup.typoscript',
-    // …
-],
+'setup' => array_merge(
+    [
+        'EXT:fluid_styled_content/Configuration/TypoScript/setup.typoscript',
+        'EXT:academic_persons/Configuration/TypoScript/Default/setup.typoscript',
+        'EXT:test_plugin_templates/Configuration/TypoScript/setup.typoscript',
+        // …
+    ],
+    $additionalSetupFiles,
+),
 ```
 
-— [`AcademicPersonsListPluginTest.php:35-36`](../../packages/fgtclb/academic-persons/Tests/Functional/Plugins/AcademicPersonsListPluginTest.php#L35-L36)
-and [`:57-62`](../../packages/fgtclb/academic-persons/Tests/Functional/Plugins/AcademicPersonsListPluginTest.php#L57-L62)
+From `setUp()` of [`AcademicPersonsListPluginTest.php`](../../packages/fgtclb/academic-persons/Tests/Functional/Plugins/AcademicPersonsListPluginTest.php#L24-L38)
+and its [`setUpFrontendRootPageForTestCase()`](../../packages/fgtclb/academic-persons/Tests/Functional/Plugins/AcademicPersonsListPluginTest.php#L64-L72).
 
 Other spellings in use:
 
 ```php
 $this->testExtensionsToLoad[] = 'tests/test-jobcontact-schema';
 ```
-— [`ContactTcaUpgradeWizardTest.php:17`](../../packages/fgtclb/academic-jobs/Tests/Functional/Upgrades/ContactTcaUpgradeWizardTest.php#L17)
+From `setUp()` of [`ContactTcaUpgradeWizardTest.php`](../../packages/fgtclb/academic-jobs/Tests/Functional/Upgrades/ContactTcaUpgradeWizardTest.php#L15-L19).
+
+```php
+$this->addTestExtension(...array_values([
+    'tests/language-files',
+]));
+```
+From `setUp()` of [`ProfileTitleProviderTest.php`](../../packages/fgtclb/academic-persons/Tests/Functional/PageTitle/ProfileTitleProviderTest.php#L25-L31),
+through the helper of
+[`AbstractAcademicPersonsTestCase`](../../packages/fgtclb/academic-persons/Tests/Functional/AbstractAcademicPersonsTestCase.php#L40-L47).
 
 ```php
 protected array $testExtensionsToLoad = [
-    // …
-    'tests/language-files',
+    'fgtclb/environment-state-manager',
+    'fgtclb/academic-base',
+    'fgtclb/academic-persons',
+    'tests/test-settings-shared-column',
 ];
 ```
-— [`ProfileTitleProviderTest.php:28`](../../packages/fgtclb/academic-persons/Tests/Functional/PageTitle/ProfileTitleProviderTest.php#L28)
+From [`UpgradeCheckSharedColumnTest.php`](../../packages/fgtclb/academic-persons/Tests/Functional/Upgrade/UpgradeCheckSharedColumnTest.php#L30-L35).
+Declaring the property again replaces the list of the abstract test case, so it
+has to repeat every entry of that list.
 
 **The package name is not derivable from the extension key.** All of them use
 the `tests/` vendor, but the second segment follows no rule: `test_plugin_templates`

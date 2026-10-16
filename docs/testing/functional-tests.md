@@ -6,8 +6,11 @@ through the same code paths production uses. It is the only suite here that
 sees the database, the TCA that TYPO3 actually compiled, dependency injection,
 and — for the plugin tests — a rendered frontend page.
 
-It is also by far the larger suite: 537 functional test classes against 137 unit
-test classes, and 621 CSV fixtures. Measured with
+It is also by far the larger suite. There are about four functional test
+classes to every unit test class, and more CSV fixtures than functional test
+classes. On 2026-10-16 that was 581 functional and 147 unit test classes in
+`packages/fgtclb/`, and 672 CSV fixtures. The numbers move with every change
+that adds a test, so measure them rather than trusting the ones above:
 
 ```bash
 find packages/fgtclb/*/Tests/Functional -name '*Test.php' | wc -l
@@ -15,25 +18,21 @@ find packages/fgtclb/*/Tests/Unit -name '*Test.php' | wc -l
 find packages -path '*Tests*' -name '*.csv' | wc -l
 ```
 
-| Extension                | Functional | Unit |
-|--------------------------|------------|------|
-| `academic-base`          | 36         | 20   |
-| `academic-bite-jobs`     | 16         | 3    |
-| `academic-contact4pages` | 29         | 4    |
-| `academic-jobs`          | 48         | 3    |
-| `academic-partners`      | 58         | 9    |
-| `academic-persons`       | 139        | 40   |
-| `academic-persons-edit`  | 67         | 24   |
-| `academic-persons-sync`  | 4          | 1    |
-| `academic-programs`      | 57         | 8    |
-| `academic-projects`      | 40         | 10   |
-| `academic-study-plan`    | 19         | 1    |
-| `typo3-category-types`   | 24         | 14   |
+Per package, functional and unit test classes, the packages of
+`packages-dev/` included:
 
-`packages-dev/dev-site` adds eight functional and five unit classes on top, and
-`packages-dev/testing-helper` the two functional classes of the
-[shared base class](#the-shared-base-class). Both suites collect them, see
-[Unit tests](unit-tests.md#discovery).
+```bash
+for d in packages/fgtclb/*/ packages-dev/*/; do
+    printf '%-24s %4d %4d\n' "$(basename "$d")" \
+        "$(find "$d" -path '*/Tests/Functional/*' -name '*Test.php' | wc -l)" \
+        "$(find "$d" -path '*/Tests/Unit/*' -name '*Test.php' | wc -l)"
+done
+```
+
+`academic-persons` carries the most of both. The three packages below
+`packages-dev/` have tests of their own, among them the two functional classes
+of the [shared base class](#the-shared-base-class). Both suites collect them,
+see [Unit tests](unit-tests.md#discovery).
 
 ## Running them
 
@@ -207,11 +206,11 @@ A single test class adds what only it needs. Assigning the array again would
 drop the inherited entries, so tests append:
 
 ```php
-$this->addTestExtensionsToLoad('georgringer/numbered-pagination', 'tests/plugin-templates');
 $this->addCoreExtensionsToLoad('typo3/cms-fluid-styled-content');
+$this->addTestExtensionsToLoad('georgringer/numbered-pagination', 'tests/plugin-templates', 'tests/test-profile-query-constraints');
 ```
 
-— [`AcademicPersonsListPluginTest.php:35-36`](../../packages/fgtclb/academic-persons/Tests/Functional/Plugins/AcademicPersonsListPluginTest.php#L35-L36)
+From `setUp()` of [`AcademicPersonsListPluginTest.php`](../../packages/fgtclb/academic-persons/Tests/Functional/Plugins/AcademicPersonsListPluginTest.php#L24-L38).
 
 Those two helpers come from `FrontendPluginRenderingTrait`; `academic-persons`
 additionally has `addTestExtension()`/`addCoreExtension()` on its own abstract
@@ -287,8 +286,8 @@ Two checks keep it in place:
 | [`academic-persons-edit/Tests/Functional/Plugins/AcademicPersonsEditProfileEditingAuthorizationTest.php`](../../packages/fgtclb/academic-persons-edit/Tests/Functional/Plugins/AcademicPersonsEditProfileEditingAuthorizationTest.php) | Driving a JSON API through the plugin, and asserting every way a request is refused.                                                                                                                                                                                                                                                                                            |
 
 Records come from CSV fixtures next to the test, imported with
-`importCSVDataSet()` (used in 132 files) and, where the test writes, asserted
-back with `assertCSVDataSet()` (61 call sites). Fixtures of a plugin test live in a
+`importCSVDataSet()` and, where the test writes, asserted back with
+`assertCSVDataSet()`. Fixtures of a plugin test live in a
 `Fixtures/<TestClassName>/` folder beside it, one file per scenario, which keeps
 a fixture from being quietly reused by a test it was not written for.
 
