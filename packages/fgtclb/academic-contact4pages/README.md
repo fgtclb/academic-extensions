@@ -1,5 +1,11 @@
 # TYPO3 Extension `Academic Contacts For Pages` (READ-ONLY)
 
+|                  | URL                                                                 |
+|------------------|---------------------------------------------------------------------|
+| **Repository:**  | https://github.com/fgtclb/academic-contact4pages                    |
+| **Read online:** | https://docs.typo3.org/p/fgtclb/academic-contacts4pages/main/en-us/ |
+| **TER:**         | https://extensions.typo3.org/extension/academic_contacts4pages/     |
+
 ## Description
 
 Provides selection of contacts on page level.
