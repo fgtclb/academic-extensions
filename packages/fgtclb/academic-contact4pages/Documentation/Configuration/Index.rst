@@ -50,7 +50,9 @@ described in :ref:`integrator`.
     extension does not declare and that belongs to
     :guilabel:`EXT:academic_persons`. Further constants of that extension are
     mapped the same way, because the partials rendering a contact read them:
-    the crop variant of the lists
+    whether the names link to the detail view
+    :typoscript:`{$plugin.tx_academicpersons.detailLink}`, the crop variant of
+    the lists
     :typoscript:`{$plugin.tx_academicpersons.image.list.cropVariant}`, the
     image placeholders
     :typoscript:`{$plugin.tx_academicpersons.image.placeholder.default}`,
@@ -358,7 +360,11 @@ first:
 A page template that renders the contacts through the :file:`Profile/Item`
 partial of :guilabel:`EXT:academic_persons` needs the partial root paths of
 that extension and of :guilabel:`EXT:academic_base` in its view, see
-:ref:`breaking-contacts4pages-profile-images-render-as-picture`.
+:ref:`breaking-contacts4pages-profile-images-render-as-picture`. The partial
+reads the detail page and whether the names link from the settings the page
+template passes to it. The data processor provides no settings, so the
+mapping of the content element described in :ref:`configuration-components`
+does not reach a page template.
 
 The class name
 :php:`\FGTCLB\AcademicContacts4pages\DataProcessing\ContactsProcessor` in

@@ -64,12 +64,23 @@ this extension, which renders the profile card of :guilabel:`academic_persons`,
 see :ref:`configuration-contact-item-partial`. The name links to the profile
 detail page that the constant
 :typoscript:`plugin.tx_academicpersons.detailPid` of
-:guilabel:`academic_persons` names. The setting
-:typoscript:`plugin.tx_academicpersons.detailLink` does not reach this content
-element, the names are always linked. The crop variant and the placeholders of
-the image and the prefix of the phone links come from the constants of
-:guilabel:`academic_persons` as well, see the note in
-:ref:`configuration-components`.
+:guilabel:`academic_persons` names. Whether the names link at all follows the
+setting :typoscript:`plugin.tx_academicpersons.detailLink` of
+:guilabel:`academic_persons`, :guilabel:`Link the names to the detail view` of
+its site set: with `none`, for a site without profile detail pages, the names
+of the contacts are shown as text, as in the persons elements. The content
+element has no option of its own for it. A site that shows the names without a
+link in the persons elements and wants them linked here sets the plugin
+setting of this extension in its TypoScript setup:
+
+..  code-block:: typoscript
+    :caption: TypoScript setup
+
+    plugin.tx_academiccontacts4pages.settings.detailLink = link
+
+The crop variant and the placeholders of the image and the prefix of the phone
+links come from the constants of :guilabel:`academic_persons` as well, see the
+note in :ref:`configuration-components`.
 
 The headings of the roles take their level from the header layout of the
 content element. The element is cached with the page. Saving the contacts in
