@@ -274,6 +274,13 @@ submits the same form through a translated content element, as the
 development seed has it: the German overlay carries a FlexForm of its own, and
 on `/de/` that one decides the redirect page, the redirect leads to the German
 address of the page and the confirmation is the German one.
+[`AcademicJobsNewJobFormUntranslatedRedirectPageTest`](../../packages/fgtclb/academic-jobs/Tests/Functional/Plugins/AcademicJobsNewJobFormUntranslatedRedirectPageTest.php)
+names a redirect page the form cannot link, one without a German translation,
+a hidden and a deleted one, asserts the redirect back to the form, and reads
+the warning of the controller from a log file, as the next section describes.
+A folder is in a method of its own in the group `not-core-12`, because TYPO3
+v12 links it and v13 does not. A second method in the group `not-core-13` checks
+on v12 that a folder still receives the visitor and nothing is logged.
 
 ## A mail that cannot be sent
 
