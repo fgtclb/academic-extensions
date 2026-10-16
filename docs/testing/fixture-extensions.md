@@ -35,7 +35,7 @@ They sit next to the tests that use them, under
 | `test_messy_profile_factory`           | `tests/test-messy-profile-factory`      | `academic-persons`     | A deliberately misbehaving profile factory and two event listeners.      |
 | `test_partners_stub`                   | `tests/test-partners-stub`              | `academic-partners`    | An `ext_localconf.php` replacing the Guzzle handler stack.               |
 | `test_plugin_templates`                | `tests/plugin-templates`                | `academic-persons`     | Simplified Fluid templates and the TypoScript pointing at them.          |
-| `test_profile_query_constraints`       | `tests/test-profile-query-constraints`  | `academic-persons`     | Two listeners narrowing the profile and contract queries of the plugins. |
+| `test_profile_query_constraints`       | `tests/test-profile-query-constraints`  | `academic-persons`     | Listeners narrowing profile and contract queries, one changing demands.  |
 | `test_programs_category_type_priority` | `tests/programs-category-type-priority` | `academic-programs`    | A `CategoryTypes.yaml` raising the priority of a programs type.          |
 | `test_programs_extra_category_type`    | `tests/programs-extra-category-type`    | `academic-programs`    | A `CategoryTypes.yaml` adding one type to the programs group.            |
 
@@ -226,20 +226,21 @@ The existing ones show the cases that justify one:
   [A migration reads every record](../architecture/database-queries.md#a-migration-reads-every-record-and-a-removed-table-has-no-restrictions).
 - **Dependency injection.** `test_base_dependency_injection` and
   `test_messy_profile_factory` ship `Services.yaml` plus classes, so the
-  container really wires them. `test_profile_query_constraints` is the same
-  case for an event: its two listeners are registered with the `event.listener`
+  container really wires them. `test_profile_query_constraints` is the same case
+  for an event: its three listeners are registered with the `event.listener`
   tag, which only means anything once the container has seen the class, so the
   documented way to register a listener on this branch is the way the test
-  registers one. `test_bitejobs_listener` is the same case for the request and
-  result events of `academic_bite_jobs`. Its recording listener keeps the
-  events in a static property, so a test reads what a listener was handed
-  during a frontend request too. `test_job_after_save_listener` hands in the
-  redirect page a test sets in TypoScript from a listener of the after-save
+  registers one. The one changing the demand in place carries two tags, one per
+  event, each naming its method. `test_bitejobs_listener` is the same case for
+  the request and result events of `academic_bite_jobs`. Its recording listener
+  keeps the events in a static property, so a test reads what a listener was
+  handed during a frontend request too. `test_job_after_save_listener` hands in
+  the redirect page a test sets in TypoScript from a listener of the after-save
   event of the new job form, and a second listener changes the title of the
   saved job and hands it to the repository without persisting it, as a project
-  listener may. It recorded the response of the form plugin as well, while
-  TYPO3 v12 and v13 passed the returned redirect to `header()`. The form throws
-  its redirect now, so the test reads the answer itself (ACE-912).
+  listener may. It recorded the response of the form plugin as well, while TYPO3
+  v12 and v13 passed the returned redirect to `header()`. The form throws its
+  redirect now, so the test reads the answer itself (ACE-912).
 - **Resources resolved through `EXT:` paths.** `test_plugin_templates` and
   `test_language_files` exist because TypoScript and `LLL:` references need a
   real extension path.
