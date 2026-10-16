@@ -317,6 +317,10 @@ Check the result
     visitor uses the rest of the form, a list of running projects with a
     hidden state select shows running projects only, see
     :ref:`important-hidden-project-form-parts-keep-their-presets`.
+*   A list shows a project only when it carries every selected category, as
+    before, and not when it carries only a subcategory of one. The
+    description of the field says so now, see
+    :ref:`important-project-categories-description`.
 *   A list filtered by :guilabel:`Active` lists projects without an end date
     now, so a paginated list can grow by some entries. See
     :ref:`important-projects-without-end-date-are-active`.
