@@ -48,7 +48,7 @@
 				<source>Categories</source>
 			</trans-unit>
 			<trans-unit id="flexform.categories.description">
-				<source>Select categories. Main categories will select all subcategories by OR, multiple categories selects by AND</source>
+				<source>Only projects that carry every category selected here are shown, also when two of them are of the same category type. The subcategories of a selected category are not included. A visitor's filter replaces them.</source>
 			</trans-unit>
 			<trans-unit id="flexform.showHiddenRecords.label">
 				<source>Show hidden records</source>
