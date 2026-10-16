@@ -1,17 +1,17 @@
 # Backend select items
 
-Eleven classes across six extensions build the items of a backend select with an
-`itemsProcFunc`, and 23 fields are configured with one:
+Twelve classes across six extensions build the items of a backend select with an
+`itemsProcFunc`, and 24 fields are configured with one:
 
 ```bash
 grep -rh 'itemsProcFunc' packages/*/*/Configuration | wc -l
 ```
 
-`AddressRecordItems` (contact4pages), `EmploymentTypeItems` and `TypeItems`
-(jobs), `CountryItems` and `PartnerItems` (partners), `ContractItems`,
-`ProfileShowFieldsItems`, `DemandValues` and `RecordTypes` (persons),
-`SortingItemsProcFunc` (projects) and `CategoryTypeItemsProcFunc`
-(category_types). Nine live in a `Classes/Backend/FormEngine/` directory;
+`AddressRecordItems` (contact4pages), `EmploymentTypeItems`, `JobListTypeItems`
+and `TypeItems` (jobs), `CountryItems` and `PartnerItems` (partners),
+`ContractItems`, `ProfileShowFieldsItems`, `DemandValues` and `RecordTypes`
+(persons), `SortingItemsProcFunc` (projects) and `CategoryTypeItemsProcFunc`
+(category_types). Ten live in a `Classes/Backend/FormEngine/` directory;
 `DemandValues` and `RecordTypes` are in `Classes/Tca/`. They are
 configured on TCA columns and on FlexForm elements alike.
 
@@ -242,6 +242,31 @@ over `SelectItemCollection::toArray()`, which returns the `SelectItem` objects
 of the collection, not arrays. The items a handler adds, and every item of the
 job form, are arrays. `$item['value']` works for both, a parameter typed
 `array` fails in the backend form.
+
+## A FlexForm field can offer the items of a record field
+
+The option "Job Type" of the job list filters the jobs by the field `type` of
+the job record, so it offers the same types. Its handler, `JobListTypeItems`,
+calls `TypeItems` with the `table` and the `field` of the record,
+`tx_academicjobs_domain_model_job` and `type`, and an empty item list. A
+listener of `ModifyTcaSelectFieldItemsEvent` keyed to the record field
+therefore adds or removes a type for the list as well, without knowing the
+FlexForm. The handler puts the items the FlexForm field declares, its "None",
+in front of the result. "None" is the choice of no filter, not a type, so the
+listeners never get it and cannot remove it.
+
+Every other parameter stays the one of the FlexForm field. A listener that
+means the record or the list alone checks `flexParentDatabaseRow`:
+`AbstractItemProvider` passes it only when the compiled form has a FlexForm
+parent, on v12, v13 and v14 alike, and the job form of the frontend leaves it
+out. `JobTypeSelectsTest` compiles a job list and a job record and records
+what a listener gets.
+
+The handler hands `TypeItems` its own item list instead of the one FormEngine
+passed by reference. Its copy of the parameters still holds that reference, so
+it binds the new list by reference, `$typeParameters['items'] = &$types`, which
+replaces the reference in the copy. A plain assignment would write through to
+the list of FormEngine.
 
 ## An appended item must not repeat the declared empty value
 
@@ -526,7 +551,7 @@ tree through `FormSelectTreeAjaxController::fetchDataAction()`, the request the
 backend sends when the field is opened. The one of `academic_programs` covers
 the combination with a configured root as well.
 
-## Five of the eleven dispatch an event, six do not
+## Six of the twelve dispatch an event, six do not
 
 `FGTCLB\AcademicBase\Event\ModifyTcaSelectFieldItemsEvent` carries the whole
 parameter array and is dispatched **after** the handler built its items, so a
@@ -534,15 +559,17 @@ project listener has the last word — including over a restriction. A handler
 that narrows its items narrows what the listener receives, not what it may
 return.
 
-Only five handlers dispatch it, so "can my listener reach this select?" has two
-answers:
+Six handlers dispatch it, `JobListTypeItems` through `TypeItems`, with the
+table and the field of the job record, see
+[above](#a-flexform-field-can-offer-the-items-of-a-record-field). So "can my
+listener reach this select?" has two answers:
 
-| Dispatches the event                                | Builds its items and returns                 |
-|-----------------------------------------------------|----------------------------------------------|
-| `AddressRecordItems` (contact4pages)                | `CountryItems`, `PartnerItems` (partners)    |
-| `EmploymentTypeItems`, `TypeItems` (jobs)           | `DemandValues`, `RecordTypes` (persons)      |
-| `ContractItems`, `ProfileShowFieldsItems` (persons) | `SortingItemsProcFunc` (projects)            |
-|                                                     | `CategoryTypeItemsProcFunc` (category_types) |
+| Dispatches the event                                          | Builds its items and returns                 |
+|---------------------------------------------------------------|----------------------------------------------|
+| `AddressRecordItems` (contact4pages)                          | `CountryItems`, `PartnerItems` (partners)    |
+| `EmploymentTypeItems`, `JobListTypeItems`, `TypeItems` (jobs) | `DemandValues`, `RecordTypes` (persons)      |
+| `ContractItems`, `ProfileShowFieldsItems` (persons)           | `SortingItemsProcFunc` (projects)            |
+|                                                               | `CategoryTypeItemsProcFunc` (category_types) |
 
 `CategoryTypeItemsProcFunc` offers the types of a category group, which a
 project changes where it registers them, in `CategoryTypes.yaml` — see

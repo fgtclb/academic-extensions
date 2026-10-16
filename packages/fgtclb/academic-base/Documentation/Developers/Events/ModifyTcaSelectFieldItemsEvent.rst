@@ -44,7 +44,9 @@ parameters a listener hands back are what the field offers.
         -   ``tx_academicjobs_domain_model_job``, ``type`` and
             ``employment_type``
         -   :guilabel:`Job Type` and :guilabel:`Employment Type` of a job
-            record, and the same two selects of the job form in the frontend
+            record, the same two selects of the job form in the frontend, and
+            :guilabel:`Job Type` of the job list, with the table and the field
+            of the record
     *   -   `academic_persons
             <https://docs.typo3.org/p/fgtclb/academic-persons/main/en-us/Developers/Events/ModifyTcaSelectFieldItemsEvent.html>`__
         -   ``tt_content``, ``settings.selectedContracts`` and
@@ -98,16 +100,20 @@ The keys a listener needs most:
             reference or a text. See below for the form of an item.
     *   -   ``table``
         -   The table of the record. For a FlexForm field, the table of the
-            content element, ``tt_content``.
+            content element, ``tt_content``, unless the provider names the
+            record field it offers the items of, as the job list does.
     *   -   ``field``
         -   The field. For a FlexForm field, the name of the FlexForm
-            element, ``settings.showFields`` for example.
+            element, ``settings.showFields`` for example, with the same
+            exception.
     *   -   ``row``
         -   The record being edited. For a FlexForm field, the values of the
             FlexForm. Empty in the job form, and declared optional, see the
             pitfalls below.
     *   -   ``flexParentDatabaseRow``
-        -   For a FlexForm field, the record of the content element.
+        -   For a FlexForm field, the record of the content element. Missing
+            for the field of a record, which tells the two apart where the
+            table and the field are the same.
     *   -   ``site``, ``effectivePid``
         -   The site and the page the record belongs to. For a record outside
             any site, on page 0 for example, ``site`` is a
