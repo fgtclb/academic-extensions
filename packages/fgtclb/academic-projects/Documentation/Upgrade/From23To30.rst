@@ -115,7 +115,7 @@ of the installation in place.
 Run the upgrade wizards
 =======================
 
-Run the two wizards by name, in this order, on TYPO3 13.
+Run the two wizards by name on TYPO3 13.
 
 #.  ``academicProjects_pluginUpgradeWizard``, :guilabel:`Migrate
     academic_projects plugins from "list_type" to "CType".` It turns the
@@ -144,8 +144,12 @@ Run the two wizards by name, in this order, on TYPO3 13.
     wizard migrated no record at all. See :ref:`important-1785796200` and
     :ref:`important-ace-847-academic-projects`.
 
-    It reads the content elements the plugin wizard creates, so the plugin
-    wizard comes first. TYPO3 does not enforce that order.
+    It reads the :guilabel:`Insert plugin` elements of 1.x as well, so the two
+    wizards can run in either order, also together in one bare
+    ``vendor/bin/typo3 upgrade:run``. Up to 2.3 it read the content elements
+    the plugin wizard creates only, and a bare ``upgrade:run`` recorded it as
+    done before it had anything to read. See
+    :ref:`important-ace-923-academic-projects`.
 
     An installation that ran it with 2.3 has it recorded as done, and TYPO3
     does not offer it again. Mark it undone first. For a wizard that was never

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace FGTCLB\AcademicProjects\Upgrades;
 
+use Doctrine\DBAL\Schema\Column;
 use FGTCLB\AcademicProjects\Domain\Model\Dto\ActiveState;
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
@@ -47,7 +48,9 @@ final class FlexFormUpgradeWizard implements UpgradeWizardInterface
             . ' "settings.hideCompletedProjects") to the selection "settings.activeState" ("active" for a checked'
             . ' box, "all" otherwise), and renames "settings.filter.options" to "settings.hideFilter" and'
             . ' "settings.sorting.options" to "settings.hideSorting", keeping their values. A new setting that is'
-            . ' stored already, from a save in the backend, is kept and the old one is removed.';
+            . ' stored already, from a save in the backend, is kept and the old one is removed. "Insert plugin"'
+            . ' elements of these lists that the plugin wizard did not convert yet are migrated as well, so the'
+            . ' two wizards may run in any order.';
     }
 
     public function executeUpdate(): bool
@@ -84,19 +87,29 @@ final class FlexFormUpgradeWizard implements UpgradeWizardInterface
     }
 
     /**
+     * TYPO3 accepts prerequisites only, never another wizard: `PrerequisiteCollection::add()`
+     * drops a class that does not implement `PrerequisiteInterface` without a word. The
+     * order of this wizard and `PluginUpgradeWizard` is therefore not enforced, and this
+     * wizard reads the "Insert plugin" elements of 1.x itself.
+     *
      * @return string[]
      */
     public function getPrerequisites(): array
     {
         return [
             DatabaseUpdatedPrerequisite::class,
-            PluginUpgradeWizard::class,
         ];
     }
 
     /**
      * Yields the migrated FlexForm data of every project list that stores one of the
      * settings before 2.0, keyed by the uid of the content element.
+     *
+     * A project list of 1.x is an "Insert plugin" element until `PluginUpgradeWizard`
+     * converted it. A bare `typo3 upgrade:run` asks every wizard `updateNecessary()`
+     * before it runs the first one and marks a wizard that needs nothing as done, so
+     * these elements are migrated here as well, while `tt_content.list_type` exists.
+     * The plugin wizard keeps `pi_flexform`, either order gives the same result.
      *
      * @return \Generator<int, array<string, mixed>>
      */
@@ -105,14 +118,26 @@ final class FlexFormUpgradeWizard implements UpgradeWizardInterface
         $queryBuilder = $this->connectionPool->getQueryBuilderForTable('tt_content');
         // Hidden, deleted, time restricted and workspace records are migrated too.
         $queryBuilder->getRestrictions()->removeAll();
+        $contentTypeConstraints = [
+            $queryBuilder->expr()->in(
+                'CType',
+                $queryBuilder->quoteArrayBasedValueListToStringList(self::MIGRATE_CONTENT_TYPES_LIST)
+            ),
+        ];
+        if ($this->contentTableHasListTypeColumn()) {
+            $contentTypeConstraints[] = $queryBuilder->expr()->and(
+                $queryBuilder->expr()->eq('CType', $queryBuilder->createNamedParameter('list')),
+                $queryBuilder->expr()->in(
+                    'list_type',
+                    $queryBuilder->quoteArrayBasedValueListToStringList(self::MIGRATE_CONTENT_TYPES_LIST)
+                ),
+            );
+        }
         $resultSet = $queryBuilder
             ->select('uid', 'pi_flexform')
             ->from('tt_content')
             ->where(
-                $queryBuilder->expr()->in(
-                    'CType',
-                    $queryBuilder->quoteArrayBasedValueListToStringList(self::MIGRATE_CONTENT_TYPES_LIST)
-                ),
+                $queryBuilder->expr()->or(...$contentTypeConstraints),
                 $queryBuilder->expr()->isNotNull('pi_flexform'),
                 $queryBuilder->expr()->neq('pi_flexform', $queryBuilder->createNamedParameter('')),
             )
@@ -150,6 +175,25 @@ final class FlexFormUpgradeWizard implements UpgradeWizardInterface
 
             yield (int)$record['uid'] => $flexFormData;
         }
+    }
+
+    /**
+     * TYPO3 v14 removed the `tt_content.list_type` column together with the plugin
+     * sub-type feature. Once the database comparison dropped it, no element records
+     * any more which plugin it was, and only the content types are read.
+     * See https://docs.typo3.org/permalink/changelog:important-105538-1730752784
+     */
+    private function contentTableHasListTypeColumn(): bool
+    {
+        $columnNames = array_map(
+            static fn(Column $column): string => strtolower($column->getName()),
+            $this->connectionPool
+                ->getConnectionForTable('tt_content')
+                ->createSchemaManager()
+                ->listTableColumns('tt_content')
+        );
+
+        return in_array('list_type', $columnNames, true);
     }
 
     /**

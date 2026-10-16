@@ -646,8 +646,10 @@ makes the new column visible to the rest of the process — see below.
 
 On TYPO3 v13 the column already exists and the method returns early.
 
-**When to use it.** In an upgrade wizard test that migrates `list_type` to
-`CType`. Five call sites, in two shapes:
+**When to use it.** In an upgrade wizard test that seeds "Insert plugin"
+elements (`CType = 'list'` with the plugin in `list_type`), the ones that
+migrate `list_type` to `CType` and any other wizard that reads the elements of
+1.x. Six test classes, in two shapes:
 
 From `setUp()`, before anything has read the `tt_content` schema:
 
@@ -656,14 +658,19 @@ From `setUp()`, before anything has read the `tt_content` schema:
 - [`academic-projects/…/PluginUpgradeWizardTest.php:22`](../../packages/fgtclb/academic-projects/Tests/Functional/Upgrades/PluginUpgradeWizardTest.php#L22)
 - [`academic-persons-edit/…/PluginContentWizardTest.php:22`](../../packages/fgtclb/academic-persons-edit/Tests/Functional/Upgrades/PluginContentWizardTest.php#L22)
 
-From two **test methods**, which is the shape that made the caching defect below
+From **test methods**, which is the shape that made the caching defect below
 visible:
 
 - [`academic-persons-edit/…/RemoveProfileSwitcherContentWizardTest.php:81`](../../packages/fgtclb/academic-persons-edit/Tests/Functional/Upgrades/RemoveProfileSwitcherContentWizardTest.php#L81)
+- [`academic-projects/…/FlexFormUpgradeWizardTest.php:284`](../../packages/fgtclb/academic-projects/Tests/Functional/Upgrades/FlexFormUpgradeWizardTest.php#L284)
 
-The last one is deliberate: that class seeds `CType` fixtures *without* the
+These two are deliberate: each class seeds `CType` fixtures *without* the
 column on v14 and `list_type` fixtures *with* it, so it cannot add the column
-for every test in `setUp()`.
+for every test in `setUp()`. The FlexForm wizard of `academic_projects` reads
+`list_type` only while the column exists, and its tests without the column
+cover that branch on v14 (ACE-923). On MariaDB, MySQL and PostgreSQL an added
+column stays for the rest of the class, so the tests that add it are declared
+last in both classes.
 
 **The trap it exists for.** TYPO3 v14 removed `tt_content.list_type` together
 with the plugin sub-type feature. An upgrade wizard that migrates away from
