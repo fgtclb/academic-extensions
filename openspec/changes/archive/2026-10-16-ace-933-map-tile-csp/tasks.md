@@ -45,5 +45,5 @@
   `cgl -n`, `phpstan`, `unit` and `functional -j 4` on SQLite, green.
 - [x] 4.2 `lintMarkdown -n`, the rendering of the manual of partners and
   `openspec validate --specs --strict`, green.
-- [ ] 4.3 Commit message in TYPO3 Core format with `Resolves: ACE-933`, and
+- [x] 4.3 Commit message in TYPO3 Core format with `Resolves: ACE-933`, and
   the archive of this change with the spec sync as the last commit.
