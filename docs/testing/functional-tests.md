@@ -386,6 +386,11 @@ $page = $this->followSeeOther($answer);
 [`AcademicJobsNewJobFormRedirectPageTest`](../../packages/fgtclb/academic-jobs/Tests/Functional/Plugins/AcademicJobsNewJobFormRedirectPageTest.php)
 is the worked example: it asserts that the confirmation is shown once, on the
 redirect and not on a reload in the same session or for another visitor.
+[`AcademicJobsNewJobFormTranslatedElementTest`](../../packages/fgtclb/academic-jobs/Tests/Functional/Plugins/AcademicJobsNewJobFormTranslatedElementTest.php)
+submits the same form through a translated content element, as the
+development seed has it: the German overlay carries a FlexForm of its own, and
+on `/de/` that one decides the redirect page, the redirect leads to the German
+address of the page and the confirmation is the German one.
 
 The testing framework replaces the `pages` cache with a `NullBackend`, so no
 test is ever served a page from the page cache. A test about what the page
