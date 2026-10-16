@@ -276,8 +276,10 @@ of `academic-persons` is the model:
   `detailLink` in the `ignoreFlexFormSettingsIfEmpty` list of the extension.
 - The template checks only the value that switches something off,
   `{settings.detailLink} != 'none'`, so a caller whose settings do not carry
-  the key, the contacts plugin of `academic_contacts4pages` among them, keeps
-  the old behaviour.
+  the key, a page template of a project for example, keeps the old behaviour.
+  The contacts plugin of `academic_contacts4pages` renders the same partial
+  and maps the constant into its own settings, so it follows the site
+  (ACE-921).
 
 The list-and-detail element shares the data structure of the list and ignores
 the field, so the field carries

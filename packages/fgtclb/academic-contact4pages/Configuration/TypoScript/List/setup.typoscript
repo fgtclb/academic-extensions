@@ -1,6 +1,10 @@
 plugin.tx_academiccontacts4pages {
   settings {
     detailPid = {$plugin.tx_academicpersons.detailPid}
+    # "Profile/Item/DetailLink" of EXT:academic_persons reads whether the names link to the
+    # detail view at all from the plugin settings, so a site without profile detail pages
+    # shows the names of its contacts without a link, as in the persons elements.
+    detailLink = {$plugin.tx_academicpersons.detailLink}
     # "Profile/Item" of EXT:academic_persons reads the list crop variant and the placeholders
     # from the plugin settings, which are the settings of this plugin here.
     image {
