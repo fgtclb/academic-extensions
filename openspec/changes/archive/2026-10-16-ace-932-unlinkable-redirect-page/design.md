@@ -19,8 +19,10 @@ slug. `ContentObjectRenderer::createUrl()` catches the exception and returns
 `''` on both, `UriBuilder::buildFrontendUri()` passes it on, and
 `redirectToUri('')` completes it with `GeneralUtility::locationHeaderUrl()` to
 the script directory, the root of the site. Its scheme comes from the server
-variables and `reverseProxySSL`, not from the request, and the environment of
-the testing framework gave `http://www.acme.com/` for an `https` site.
+variables, on v12 from `HTTPS` and `reverseProxySSL`, on v13 also from
+`X-Forwarded-Proto` of a trusted proxy, not from the request, and the
+environment of the testing framework gave `http://www.acme.com/` for an
+`https` site.
 
 ## Goals / Non-Goals
 
