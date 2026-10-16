@@ -55,9 +55,8 @@ The event replaces the view events of single actions that
 :guilabel:`academic_jobs` and :guilabel:`academic_persons` dispatched up to
 2.4; their changelogs describe the migration.
 
-The `extension points page
-<https://docs.typo3.org/p/fgtclb/academic-base/main/en-us/Developers/ExtensionPoints/Index.html>`__
-lists the event as public API, and
+The :ref:`extension points page <developers-extension-points>` lists the
+event as public API, and
 :ref:`developers-event-modify-plugin-view-event` describes it in full.
 
 Impact
