@@ -6,7 +6,7 @@
     "license": "GPL-2.0-or-later",
     "require": {
         "php": "^8.2 || ^8.3 || ^8.4",
-        "fgtclb/environment-state-manager": "^2.0.1@dev",
+        "fgtclb/environment-state-manager": "^2.0.1",
         "symfony/serializer": "^6.4.26 || ^7.3.4",
         "symfony/yaml": "^6.4.26 || ^7.3.4",
         "typo3/cms-core": "~13.4.35 || ~14.3.7",

@@ -919,10 +919,10 @@
             "dist": {
                 "type": "path",
                 "url": "../packages/fgtclb/academic-base",
-                "reference": "5b8bb62a3dc2075770394a6e66aeed245da934eb"
+                "reference": "a0a00e051ecb9e6de7940e49b4ac41b3a48eda5b"
             },
             "require": {
-                "fgtclb/environment-state-manager": "^2.0.1@dev",
+                "fgtclb/environment-state-manager": "^2.0.1",
                 "php": "^8.2 || ^8.3 || ^8.4",
                 "symfony/serializer": "^6.4.26 || ^7.3.4",
                 "symfony/yaml": "^6.4.26 || ^7.3.4",
@@ -974,7 +974,7 @@
             "dist": {
                 "type": "path",
                 "url": "../packages/fgtclb/academic-bite-jobs",
-                "reference": "e8d0fde4f5f8ebbd4702d6f4d98526fab12c9c9b"
+                "reference": "8a4b1f8e43bd2845ea621f49fadab7465b0c1239"
             },
             "require": {
                 "fgtclb/academic-base": "~3.0.0@dev",
@@ -983,7 +983,7 @@
                 "typo3/cms-install": "~13.4.35 || ~14.3.7"
             },
             "require-dev": {
-                "fgtclb/environment-state-manager": "^2.0.1@dev"
+                "fgtclb/environment-state-manager": "^2.0.1"
             },
             "type": "typo3-cms-extension",
             "extra": {
@@ -1036,7 +1036,7 @@
             "dist": {
                 "type": "path",
                 "url": "../packages/fgtclb/academic-contact4pages",
-                "reference": "56b612479a1045dcad667db2fe1d9d1bef029913"
+                "reference": "ae06db2a63a048daec9c76628becde74c6deb8e9"
             },
             "require": {
                 "fgtclb/academic-base": "~3.0.0@dev",
@@ -1046,7 +1046,7 @@
                 "typo3/cms-install": "~13.4.35 || ~14.3.7"
             },
             "require-dev": {
-                "fgtclb/environment-state-manager": "^2.0.1@dev"
+                "fgtclb/environment-state-manager": "^2.0.1"
             },
             "type": "typo3-cms-extension",
             "extra": {
@@ -1097,7 +1097,7 @@
             "dist": {
                 "type": "path",
                 "url": "../packages/fgtclb/academic-jobs",
-                "reference": "f465788d0c8b835953a5e06436a30275451bd392"
+                "reference": "aaa5d6f4c6a7568e23e071af554603adedc47026"
             },
             "require": {
                 "fgtclb/academic-base": "~3.0.0@dev",
@@ -1111,7 +1111,7 @@
                 "georgringer/numbered-pagination": "<2.1.0 || >= 3.0.0"
             },
             "require-dev": {
-                "fgtclb/environment-state-manager": "^2.0.1@dev"
+                "fgtclb/environment-state-manager": "^2.0.1"
             },
             "suggest": {
                 "georgringer/numbered-pagination": "Install to use numbered pagination in the job list. (~2.1)"
@@ -1175,7 +1175,7 @@
             "dist": {
                 "type": "path",
                 "url": "../packages/fgtclb/academic-partners",
-                "reference": "d3754cfd08219def6d209d347db51b94d446aaa9"
+                "reference": "83141b1e2217b072f7ee8ec63c301a14d7f5b0ed"
             },
             "require": {
                 "fgtclb/academic-base": "~3.0.0@dev",
@@ -1193,7 +1193,7 @@
                 "georgringer/numbered-pagination": "<2.1.0 || >= 3.0.0"
             },
             "require-dev": {
-                "fgtclb/environment-state-manager": "^2.0.1@dev"
+                "fgtclb/environment-state-manager": "^2.0.1"
             },
             "suggest": {
                 "fgtclb/page-backend-layout": "Provides backend category preview",
@@ -1253,11 +1253,11 @@
             "dist": {
                 "type": "path",
                 "url": "../packages/fgtclb/academic-persons",
-                "reference": "c0e67b7ebf07c6d468254f45f523fa331808f3a5"
+                "reference": "117fb4443eb5f69504624e7ac9683625e7fd0980"
             },
             "require": {
                 "fgtclb/academic-base": "~3.0.0@dev",
-                "fgtclb/environment-state-manager": "^2.0.1@dev",
+                "fgtclb/environment-state-manager": "^2.0.1",
                 "php": "^8.2 || ^8.3 || ^8.4",
                 "typo3/cms-core": "~13.4.35 || ~14.3.7",
                 "typo3/cms-extbase": "~13.4.35 || ~14.3.7",
@@ -1327,7 +1327,7 @@
             "dist": {
                 "type": "path",
                 "url": "../packages/fgtclb/academic-persons-edit",
-                "reference": "150e35d56b7368abe722c193dc2dbdbbea54576b"
+                "reference": "0a5ac119641849fdb3b8f8bd1c5b03a0733f90f0"
             },
             "require": {
                 "fgtclb/academic-base": "~3.0.0@dev",
@@ -1339,7 +1339,7 @@
                 "typo3/html-sanitizer": "^2.3"
             },
             "require-dev": {
-                "fgtclb/environment-state-manager": "^2.0.1@dev"
+                "fgtclb/environment-state-manager": "^2.0.1"
             },
             "type": "typo3-cms-extension",
             "extra": {
@@ -1392,7 +1392,7 @@
             "dist": {
                 "type": "path",
                 "url": "../packages/fgtclb/academic-persons-sync",
-                "reference": "80fa7ae0dbf301fe50b93ba07f113ab628a8fd22"
+                "reference": "7edd2bd8408ea3a724107aefec6dd98477b12012"
             },
             "require": {
                 "fgtclb/academic-base": "~3.0.0@dev",
@@ -1403,7 +1403,7 @@
                 "typo3/cms-extbase": "~13.4.35 || ~14.3.7"
             },
             "require-dev": {
-                "fgtclb/environment-state-manager": "^2.0.1@dev"
+                "fgtclb/environment-state-manager": "^2.0.1"
             },
             "type": "typo3-cms-extension",
             "extra": {
@@ -1456,7 +1456,7 @@
             "dist": {
                 "type": "path",
                 "url": "../packages/fgtclb/academic-programs",
-                "reference": "0b48ae6aade4b19c43f06275b577729317449661"
+                "reference": "072a37b191dd1a9d87b351126b7f03b469602316"
             },
             "require": {
                 "fgtclb/academic-base": "~3.0.0@dev",
@@ -1473,7 +1473,7 @@
                 "fgtclb/page-backend-layout": "<2.0.0 || >=3.0.0"
             },
             "require-dev": {
-                "fgtclb/environment-state-manager": "^2.0.1@dev"
+                "fgtclb/environment-state-manager": "^2.0.1"
             },
             "suggest": {
                 "fgtclb/page-backend-layout": "Add backend category preview"
@@ -1531,7 +1531,7 @@
             "dist": {
                 "type": "path",
                 "url": "../packages/fgtclb/academic-projects",
-                "reference": "f73fe4e8fcf74e07eb30099962f6588260371d8d"
+                "reference": "7ea5dc2bdc6de5682b425bca7b4740f972f08c84"
             },
             "require": {
                 "fgtclb/academic-base": "~3.0.0@dev",
@@ -1547,7 +1547,7 @@
                 "fgtclb/category-types": "<2.0.0"
             },
             "require-dev": {
-                "fgtclb/environment-state-manager": "^2.0.1@dev"
+                "fgtclb/environment-state-manager": "^2.0.1"
             },
             "type": "typo3-cms-extension",
             "extra": {
@@ -1600,7 +1600,7 @@
             "dist": {
                 "type": "path",
                 "url": "../packages/fgtclb/academic-study-plan",
-                "reference": "7676b7270ee72ad4b47ff3f3ebe56f74f0296a9a"
+                "reference": "efd43d020dc0e1c7477e8f2aeb5615258125c217"
             },
             "require": {
                 "fgtclb/academic-base": "~3.0.0@dev",
@@ -1612,7 +1612,7 @@
                 "typo3/cms-install": "~13.4.35 || ~14.3.7"
             },
             "require-dev": {
-                "fgtclb/environment-state-manager": "^2.0.1@dev"
+                "fgtclb/environment-state-manager": "^2.0.1"
             },
             "type": "typo3-cms-extension",
             "extra": {
@@ -1721,7 +1721,7 @@
             "dist": {
                 "type": "path",
                 "url": "../packages-dev/monorepo-shared",
-                "reference": "95ef24cb0cb1a00cbfc8948142f81e92e70b9147"
+                "reference": "f01ca2e0a6612896317752f64ead4fb18818f095"
             },
             "require": {
                 "fgtclb/academic-base": "~3.0.0@dev",
@@ -1736,7 +1736,7 @@
                 "fgtclb/academic-projects": "~3.0.0@dev",
                 "fgtclb/academic-study-plan": "~3.0.0@dev",
                 "fgtclb/category-types": "~3.0.0@dev",
-                "fgtclb/environment-state-manager": "^2.0.1@dev",
+                "fgtclb/environment-state-manager": "^2.0.1",
                 "sbuerk/extended-path-repository": "^1.1.0",
                 "typo3/cms-backend": "~13.4.35 || ~14.3.7",
                 "typo3/cms-belog": "~13.4.35 || ~14.3.7",
@@ -1800,7 +1800,7 @@
             "dist": {
                 "type": "path",
                 "url": "../packages/fgtclb/typo3-category-types",
-                "reference": "f4c1cefe56b771c36d406f4bf25f1eb4a25f0ef8"
+                "reference": "383dd977d9e83eec7df737ccc412c3a922e6afb2"
             },
             "require": {
                 "fgtclb/academic-base": "~3.0.0@dev",
@@ -1808,7 +1808,7 @@
                 "typo3/cms-core": "~13.4.35 || ~14.3.7"
             },
             "require-dev": {
-                "fgtclb/environment-state-manager": "^2.0.1@dev"
+                "fgtclb/environment-state-manager": "^2.0.1"
             },
             "type": "typo3-cms-extension",
             "extra": {
