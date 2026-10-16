@@ -158,9 +158,76 @@ would then leave every policy as it is.
 - A policy that the web server or a proxy sends is enforced next to the one of
   TYPO3, or in its place. TYPO3 does not know it, so it needs the same sources
   itself.
-- The tiles of the partner map come from `tile.openstreetmap.org`, which the
-  `img-src` of the default policy does not allow. The site adds that host to
-  `img-src`. That is a separate question, the form above the map works.
+- A page template that draws a map with the map script of `academic_partners`
+  itself, outside the content element, gets no source for the tiles of its
+  map, see below.
+
+## The tiles of the partner map
+
+The partner map loads its tiles as images from OpenStreetMap,
+`https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png`, which `img-src` of the
+default policy does not allow. On this branch the URL is a fixed value of the
+map script, `Resources/Private/TypeScript/frontend/map.ts`, there is no setting
+for it. A `ContentSecurityPolicies.php` would still allow the host on every
+page of every site, so the map registers the source itself instead, for the
+page it is rendered on (ACE-933). `main` does the same for the tile URL its
+sites configure.
+
+`MapTileSourceRegistration` of `academic_partners` derives the source from the
+tile URL: scheme, host and port, with every host label up to the last one that
+holds a placeholder replaced by `*`, so `https://{s}.tile.openstreetmap.org/…`
+becomes `https://*.tile.openstreetmap.org`. The derivation is the one of
+`main`, which handles configured URLs as well, and its constant
+`DEFAULT_TILE_URL` has to stay the URL of the map script, which a unit test
+checks. It appends one `MutationCollection` with an `Extend` of `img-src` to the
+`PolicyRegistry` of TYPO3, the request scoped registry `PolicyProvider` applies
+after the mutations of the packages and the site, whatever `inheritDefault`
+says, on v12 and v13 alike.
+
+### Where it registers
+
+The map action is not cacheable, and when the policy is built differs between
+the two core versions:
+
+- **TYPO3 v12** builds the policy in `ContentSecurityPolicyHeaders` after the
+  whole request handler, the non-cacheable parts included. A mutation the map
+  action registers reaches every response, generated or cached.
+- **TYPO3 v13** prepares the policy right after the cacheable content is
+  rendered and before the non-cacheable parts run, `RequestHandler::handle()`
+  with its comment on nonces in non-cacheable parts says so, and
+  `ContentSecurityPolicyHeaders` then keeps the prepared policy. A mutation the
+  action registers reaches the header of a page served from the cache only.
+
+The registration therefore also happens in the cacheable part of the content
+element. `ext_localconf.php` adds the data processor
+`academic-partners-map-tile-source` to `tt_content.academicpartners_map`, with
+`addTypoScript(…, 'defaultContentRendering')` right after `configurePlugin()`,
+so it extends the rendering definition of the plugin wherever that exists. The
+definition copies `lib.contentElement` by reference, and the processor runs
+next to the processors of that object. It is the same on both core versions,
+on v12 it is not needed and changes nothing. The processor carries its
+`data.processor` tag as a Symfony `#[AutoconfigureTag]` attribute and is
+published with `#[Autoconfigure(public: true)]`, both of which exist on
+Symfony 6.4 and 7.4, and it is `final`, so no subclass inherits the tag, see
+[Dependency injection](dependency-injection.md).
+
+TYPO3 writes the mutation collections of the registry into the page cache with
+the page, `MetaDataState` of EXT:frontend, on v12 and v13, and restores them
+before the non-cacheable parts of a cached page run. So the source the
+processor registered applies to every later request of the cached page as
+well. The map action registers the tile URL once more: on a cached page that
+changes nothing, because `SourceCollection::with()` drops an equal source, and
+it covers the cached pages of a site that renders the element without the
+processors of `lib.contentElement`.
+
+### What the map does not need
+
+The stylesheets, the scripts and the marker images are files of the extension,
+and Leaflet's only `data:` image is allowed by the default policy. Leaflet sets
+the position of tiles and markers through the style properties of the elements,
+which a policy does not restrict, and the default policy has
+`style-src-attr 'unsafe-inline'` as well. Attribution links are navigation, not
+loads.
 
 ## The button without JavaScript
 
@@ -203,6 +270,19 @@ only where the browser runs no script at all.
   form shows the filtered list, on v12 and v13. They write the `csp.yaml` of
   the site and reset the scopes of the policy, which are singletons holding the
   site object of an earlier request of the process.
+- `MapTileSourceRegistrationTest` of `academic_partners` covers the source of
+  a tile URL, the URLs without one, the mutation it registers, and that the
+  default tile URL is the one of the map script.
+- `AcademicPartnersMapTileSourceTest` enforces the frontend policy and asserts
+  `img-src` of the map page on the request that generates it and on the one
+  served from the page cache, with the default tile URL and on a site with
+  `inheritDefault: false`, that the page cache carries the source, and that the
+  page of the list gets no tile host. With the data processor removed by
+  TypoScript, the map action alone allows the tiles on both pages on v12 and on
+  the cached page only on v13, a test per core version with the groups
+  `not-core-13` and `not-core-12`. The `PolicyRegistry` is a singleton as well:
+  the test empties it before each request, as a new process starts with an
+  empty one.
 
 ## See also
 

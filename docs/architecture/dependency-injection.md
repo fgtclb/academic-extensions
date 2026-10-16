@@ -123,13 +123,14 @@ In both packages the registration of the ordinary classes still happens in
 Contrary to the note in `AGENTS.md` that these extensions do not use attributes,
 they are used in production code across nine packages:
 
-| Attribute            | Sites   | Examples                                                                    |                                                |
-| -------------------- | ------- | --------------------------------------------------------------------------- |                                                |
-| `#[Exclude]`         | 13      | the eight `Classes/Core12                                                   | Core13/` types and `EnvironmentBuilderFactory` |
-| `#[Autoconfigure]`   | 11      | `academic-base/Classes/Service/ArrayObjectMapper.php:24` (`public: true`)   |                                                |
-| `#[Autowire]`        | 7       | same file, line 28 — `#[Autowire(service: 'academic-base.serializer')]`     |                                                |
-| `#[AsAlias]`         | 2       | `academic-persons/Classes/Service/RecordSynchronizer.php:21`                |                                                |
-| `#[AsCommand]`       | 1       | `academic-partners/Classes/Command/GeocodeCommand.php:28`                   |                                                |
+| Attribute             | Sites | Examples                                                                  |                                                |
+| --------------------- | ----- | ------------------------------------------------------------------------- | ---------------------------------------------- |
+| `#[Exclude]`          | 13    | the eight `Classes/Core12                                                 | Core13/` types and `EnvironmentBuilderFactory` |
+| `#[Autoconfigure]`    | 12    | `academic-base/Classes/Service/ArrayObjectMapper.php:24` (`public: true`) |                                                |
+| `#[Autowire]`         | 7     | same file, line 28 — `#[Autowire(service: 'academic-base.serializer')]`   |                                                |
+| `#[AsAlias]`          | 2     | `academic-persons/Classes/Service/RecordSynchronizer.php:21`              |                                                |
+| `#[AsCommand]`        | 1     | `academic-partners/Classes/Command/GeocodeCommand.php:28`                 |                                                |
+| `#[AutoconfigureTag]` | 1     | `academic-partners/Classes/DataProcessing/MapTileSourceProcessor.php:36`  |                                                |
 
 `#[AsCommand]` there is Symfony's **Console** attribute
 (`Symfony\Component\Console\Attribute\AsCommand`), not a DI one; the two
@@ -291,6 +292,7 @@ repository uses is in both:
 | Attribute                                                      | 6.4 | 7.4 | Use                                                    |
 |----------------------------------------------------------------|-----|-----|--------------------------------------------------------|
 | `#[Autoconfigure]`                                             | yes | yes | Publish, mark non-shared, add tags                     |
+| `#[AutoconfigureTag]`                                          | yes | yes | Add one tag                                            |
 | `#[AsAlias]`                                                   | yes | yes | Register the default implementation of an interface    |
 | `#[Autowire]`                                                  | yes | yes | Pin a service, parameter or expression to one argument |
 | `#[Exclude]`                                                   | yes | yes | Keep a class out of the container                      |
@@ -407,6 +409,15 @@ before reaching for it:
   which is the point of injecting it: the rule about which contacts a visitor
   sees exists once, and the content element and the page template cannot drift
   apart.
+
+`MapTileSourceProcessor` of `academic_partners` (ACE-933) is published the
+same way, although the extension names it by its identifier
+`academic-partners-map-tile-source`, which the tagged locator resolves with its
+collaborator injected: a site that names it by its class gets it constructed
+correctly as well. It carries the `data.processor` tag as an
+`#[AutoconfigureTag]` attribute rather than in `Services.yaml`, as on `main`.
+An attribute tag is registered as an `_instanceof` rule, so a subclass would
+carry the same identifier, and the class is `final` for that reason.
 
 ## Other rules
 
