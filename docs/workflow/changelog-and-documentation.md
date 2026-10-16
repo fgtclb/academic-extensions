@@ -118,7 +118,8 @@ Every manual writes these pages the same way:
 - A `:confval:` reference in running prose carries the backend label as its
   link text, ``:confval:`Startingpoint <partner-list-pages>` ``.
 - Icons and figures are referenced as `/Images/...`, absolute from
-  `Documentation/`.
+  `Documentation/`. An icon in a table cell is a `figure`, never an `image`,
+  see [below](#an-image-in-a-table-cell-is-a-figure).
 - The events table of `Developers/Index.rst` has the columns `Event`,
   `Dispatched`, `What a listener can change` and `Owner`, an event page closes
   with `Rules and pitfalls` and `Introduced in`, and every hidden toctree of
@@ -361,6 +362,54 @@ character class covers the three adornment characters actually used here (`=`,
 to its underline, which is visible at a glance in the same three lines.
 
 Restrict the `find` to the package you touched while writing.
+
+## An image in a table cell is a figure
+
+The plugin table of an integrator chapter shows the icon of each plugin in its
+first column. Written as an `image` directive, that icon is dropped by the
+renderer of docs.typo3.org. render-guides 0.46.0 brought phpDocumentor/guides
+1.11, which turns most directives into their node while compiling a page instead
+of while parsing it, and the compiler does not walk into the rows of a table.
+The cell comes out empty and nothing is logged, so `--fail-on-log` has nothing
+to fail on. The icon column of nine manuals was empty on docs.typo3.org until
+ACE-935, verified with render-guides 0.46.0 and 0.47.2.
+
+A `figure` without a caption renders the same `<img>`, with its `:width:` and
+its `:alt:`, on 0.45.0 and on 0.47.2, because the theme of the renderer still
+creates a figure while parsing:
+
+```rst
+    *   -   ..  figure:: /Images/Icons/persons.svg
+                :width: 32px
+                :alt: Icon of the profile list
+        -   :ref:`Person List <integrator-person-list>`
+```
+
+The image is not the only directive the cell loses. What a cell of a
+`list-table` or a `csv-table` renders on 0.45.0 and on 0.47.2:
+
+| In a table cell                              | 0.45.0           | 0.47.2                    |
+|----------------------------------------------|------------------|---------------------------|
+| `image`, SVG or PNG, with or without options | rendered         | dropped                   |
+| `note`, `tip`, `container`                   | rendered         | its text, without the box |
+| `figure`, `code-block`, `versionadded`       | rendered         | rendered                  |
+| the reference to an image substitution       | its name as text | its name as text          |
+
+A substitution therefore is no way out either: `..  |icon| image::` works in a
+paragraph, but is not replaced in a table cell. The options of a directive in
+a grid table cell are not parsed on either release, they come out as a field
+list, and 0.47.2 drops the image as well.
+
+No manual has a directive other than the figures in a table cell today.
+`DocumentationTableCellDirectiveTest` keeps it that way: it refuses every
+directive in a `list-table`, a `t3-field-list-table` or a `csv-table` but the
+three that render on both releases, and
+every substitution reference in a cell, wherever it is defined, see
+[Unit tests](../testing/unit-tests.md#directives-in-table-cells). A directive
+that is to be allowed is rendered in a cell with both releases first. The
+render is no check for it: `runTests.sh` renders with the `latest` image the
+container engine has cached, which may be older than 0.46.0 and still show
+the cell as written, and a newer one drops it without a word.
 
 ## When a change needs a changelog entry
 

@@ -23,7 +23,7 @@ settings or the TypoScript constants of the site set, see
         -   Content element
         -   CType
         -   Shows
-    *   -   ..  image:: /Images/Icons/study-plan.svg
+    *   -   ..  figure:: /Images/Icons/study-plan.svg
                 :width: 32px
                 :alt: Icon of the study plan content element
         -   :ref:`Study Plan <integrator-study-plan>`

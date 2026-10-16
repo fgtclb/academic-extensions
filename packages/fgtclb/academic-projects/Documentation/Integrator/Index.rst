@@ -32,14 +32,14 @@ site settings, see :ref:`configuration-list-filter`.
         -   Content element
         -   CType
         -   Shows
-    *   -   ..  image:: /Images/Icons/projects.svg
+    *   -   ..  figure:: /Images/Icons/projects.svg
                 :width: 32px
                 :alt: Icon of the Projects content element
         -   :ref:`Projects <integrator-project-list>`
         -   ``academicprojects_projectlist``
         -   The project pages below the chosen pages as cards, with a sorting,
             category filters and a filter by the state of a project.
-    *   -   ..  image:: /Images/Icons/projects.svg
+    *   -   ..  figure:: /Images/Icons/projects.svg
                 :width: 32px
                 :alt: Icon of the Selected Projects content element
         -   :ref:`Selected Projects <integrator-project-list-single>`

@@ -29,7 +29,7 @@ grouping of the jobs is the one setting that exists in TypoScript only, see
         -   Content element
         -   CType
         -   Shows
-    *   -   ..  image:: /Images/Icons/bite-jobs.svg
+    *   -   ..  figure:: /Images/Icons/bite-jobs.svg
                 :width: 32px
                 :alt: Icon of the Job List b-ite content element
         -   :ref:`Job List b-ite <integrator-job-list-bite>`

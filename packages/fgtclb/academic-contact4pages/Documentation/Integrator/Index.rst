@@ -26,7 +26,7 @@ reaches only a content element saved before the option existed.
         -   Content element
         -   CType
         -   Shows
-    *   -   ..  image:: /Images/Icons/contacts.svg
+    *   -   ..  figure:: /Images/Icons/contacts.svg
                 :width: 32px
                 :alt: Icon of the Person’s Contacts on the Page content element
         -   :ref:`Person’s Contacts on the Page <integrator-contacts-list>`
