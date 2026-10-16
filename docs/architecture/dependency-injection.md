@@ -140,14 +140,19 @@ Measured with
 
 | Attribute             | Sites | Examples                                                                                                         |
 |-----------------------|-------|------------------------------------------------------------------------------------------------------------------|
-| `#[Autoconfigure]`    | 26    | `academic-base/Classes/Service/ArrayObjectMapper.php:24` (`public: true`)                                        |
+| `#[Autoconfigure]`    | 27    | `academic-base/Classes/Service/ArrayObjectMapper.php:24` (`public: true`)                                        |
 | `#[Autowire]`         | 7     | same file, line 28, `#[Autowire(service: 'academic-base.serializer')]`                                           |
 | `#[AsAlias]`          | 3     | `academic-persons/Classes/Service/RecordSynchronizer.php:49`                                                     |
 | `#[Exclude]`          | 30    | `academic-base/Classes/Settings/Validation.php:23` and the settings graph                                        |
 | `#[AsEventListener]`  | 18    | `academic-partners/Classes/EventListener/RegisterAcademicPageDoktype.php:33`                                     |
 | `#[AsCommand]`        | 3     | `academic-partners/Classes/Command/GeocodeCommand.php:23`                                                        |
-| `#[AutoconfigureTag]` | 2     | `dev-site/Classes/DataProcessing/IconOverviewProcessor.php:38`, an interface in `academic-base/Classes/Upgrade/` |
+| `#[AutoconfigureTag]` | 3     | `academic-partners/Classes/DataProcessing/MapTileSourceProcessor.php:39`, two more below                         |
 | `#[AutowireIterator]` | 1     | `academic-base/Classes/Upgrade/ConfigurationChecker.php:148`                                                     |
+
+The three `#[AutoconfigureTag]` sites are the data processors
+`dev-site/Classes/DataProcessing/IconOverviewProcessor.php:38` and
+`academic-partners/Classes/DataProcessing/MapTileSourceProcessor.php:39`, and
+an interface in `academic-base/Classes/Upgrade/`.
 
 `#[AsCommand]` there is Symfony's **Console** attribute
 (`Symfony\Component\Console\Attribute\AsCommand`), not a DI one, on the
@@ -445,7 +450,12 @@ class ContactsProcessor implements DataProcessorInterface
 
 `academic_programs` publishes `ProgramDataProcessor` for the same reason, in
 its `Configuration/Services.yaml`, although the extension itself names it by its
-tag identifier `program-data`.
+tag identifier `program-data`. `MapTileSourceProcessor` of `academic_partners`,
+which the map content element runs by its identifier
+`academic-partners-map-tile-source`, is published with
+`#[Autoconfigure(public: true)]` next to its `#[AutoconfigureTag]`. Both
+attributes are safe there for the reason given for `IconOverviewProcessor`
+above: the class is `final`, so no subclass inherits the identifier.
 
 The tag of `ContactsProcessor` sits in `Configuration/Services.yaml` as well,
 not in an `#[AutoconfigureTag]` attribute on the class. An attribute tag is
