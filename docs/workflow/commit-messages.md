@@ -20,14 +20,22 @@ every time.
 
 Body: what changed and why, wrapped at 72 characters. Separate
 paragraphs with a blank line.
+
+Resolves: ACE-NNN
 ```
 
 The issue reference sits **inside the subject**, directly after the tag and
-before the description, separated by a colon. It is not a footer here. 90 of the
-last 100 commits carry an `ACE-NNN` key in that position. The 10 that do not are
-documentation fixes and the TYPO3 v14 support series, which was carried out as a
+before the description, separated by a colon, and is repeated in a footer, see
+[Footers](#footers). On 2026-10-16, all of the last 100 commits on `main`
+carried an `ACE-NNN` key in that position. The ones further back that do not are
+proposals of OpenSpec changes that had no issue yet, a few documentation and
+tooling fixes, and the TYPO3 v14 support series, which was carried out as a
 sequence of steps rather than per issue. Release commits carry no reference
-either.
+either. The number of recent subjects without the key:
+
+```bash
+git log -100 --format=%s | grep -vcE '^(\[!!!\])?\[[A-Z]+\] ACE-[0-9]+: '
+```
 
 ## Subject line
 
@@ -39,11 +47,17 @@ either.
 | First word      | Capitalized                                     |
 | Trailing period | None                                            |
 
-What the repository actually does: 85 of the last 100 subjects are within 52
-characters. The fifteen that are not run to 53–59 characters. Older history is
-looser — across the last 600 commits only 339 stay within 52, and the longest
-subject on record is 138 characters, from February 2024. The 52 character target is
-the current standard; the drift is history, not licence.
+What the repository actually does: on 2026-10-16, 99 of the last 100 subjects
+on `main` are within 52 characters, and the one that is not runs to 61. Across
+the last 600 commits 581 stay within 52 and none exceeds 72. Older history is
+looser, the longest subject on record is 138 characters, from February 2024.
+The 52 character target is the current standard, the drift is history, not
+licence. Measured with
+
+```bash
+git log -100 --format=%s | awk 'length <= 52' | wc -l
+git log -600 --format=%s | awk 'length <= 52' | wc -l
+```
 
 The budget is tighter than it looks. `[BUGFIX] ACE-358: ` alone is 18
 characters, so the description itself has about 34 left. A subject that does not
@@ -78,19 +92,25 @@ Taken from the last 600 commits rather than from a generic list, with
 git log -600 --format='%s' | grep -oP '^(\[!!!\])?\[[A-Z]+\]' | sort | uniq -c
 ```
 
-The counts are what is in use; a tag that does not appear here is not
-established practice in this repository. They are a moving window, so re-run
-the command rather than trusting the table after a long series of commits.
+The counts are what is in use, measured on `main` on 2026-10-16. A tag that
+does not appear here is not established practice in this repository. They are a
+moving window, so re-run the command rather than trusting the table after a
+long series of commits.
 
 | Tag              | Count | Use                                             | Example commit                                                        |
 |------------------|-------|-------------------------------------------------|-----------------------------------------------------------------------|
-| `[TASK]`         | 304   | Refactoring, tests, CI, dependencies, tooling   | `94c7aedc5` `[TASK] ACE-382: Cache only composer's dist archives`     |
-| `[BUGFIX]`       | 130   | Fixes incorrect behaviour                       | `8b5557037` `[BUGFIX] ACE-358: Drop the defaults on TEXT columns`     |
-| `[DOCS]`         | 83    | Documentation only, shipped or developer facing | `7d139a44f` `[DOCS] ACE-294: Record the TYPO3 v15 blockers`           |
-| `[FEATURE]`      | 31    | New, user-facing functionality                  | `4264cfe4b` `[FEATURE] ACE-236: Select the displayed address records` |
-| `[!!!][TASK]`    | 29    | Breaking change, marker first                   | `63fd7b099` `[!!!][TASK] ACE-306: Remove the profile switcher`        |
-| `[RELEASE]`      | 11    | Release commits, maintainers only               | `1f5334422` `[RELEASE] 2.3.4`                                         |
-| `[!!!][FEATURE]` | 10    | Breaking new functionality                      | `[!!!][FEATURE] ACE-304: Replace a profile image`                     |
+| `[TASK]`         | 348   | Refactoring, tests, CI, dependencies, tooling   | `94c7aedc5` `[TASK] ACE-382: Cache only composer's dist archives`     |
+| `[BUGFIX]`       | 101   | Fixes incorrect behaviour                       | `8b5557037` `[BUGFIX] ACE-358: Drop the defaults on TEXT columns`     |
+| `[FEATURE]`      | 78    | New, user-facing functionality                  | `4264cfe4b` `[FEATURE] ACE-236: Select the displayed address records` |
+| `[DOCS]`         | 34    | Documentation only, shipped or developer facing | `7d139a44f` `[DOCS] ACE-294: Record the TYPO3 v15 blockers`           |
+| `[!!!][TASK]`    | 25    | Breaking change, marker first                   | `63fd7b099` `[!!!][TASK] ACE-306: Remove the profile switcher`        |
+| `[!!!][FEATURE]` | 12    | Breaking new functionality                      | `[!!!][FEATURE] ACE-304: Replace a profile image`                     |
+| `[!!!][BUGFIX]`  | 2     | Breaking fix of incorrect behaviour             | `661477377` `[!!!][BUGFIX] ACE-793: Keep core page description`       |
+| `[RELEASE]`      | 0     | Release commits, maintainers only               | `1f5334422` `[RELEASE] 2.3.4`                                         |
+
+`[RELEASE]` has no commit in that window. The last release commit in the
+history of `main`, `1f5334422`, is from May 2026. Release commits still use
+this tag.
 
 The `[!!!]` marker always comes first and is combined with the tag that
 describes the nature of the change, never used alone.
@@ -103,7 +123,9 @@ audited later.
 ## Complete examples
 
 Two messages from the history, verbatim. Both are ordinary commits, not
-showcases — this is the expected level of detail.
+showcases, and this is the expected level of detail. Both are from August 2026,
+before every commit carried a footer. Written today, they would end with
+`Resolves: ACE-381` and `Resolves: ACE-345` below the body.
 
 `bbc4ea33e`, a `[TASK]` that renames tests and explains why the old names were
 wrong, which alternative was rejected and on which core versions the result was
@@ -181,16 +203,62 @@ double quotes in the other. That is not standardized; readability is.
 
 ## Footers
 
-`Resolves:` and `Releases:` come from the TYPO3 Core workflow, where they drive
-forge and the cherry-pick targets. Neither exists here, and both **may be
-skipped**. The issue reference goes into the subject instead, as described
-above.
+Every commit that belongs to an issue ends with at least one footer, separated
+from the body by a blank line, one issue per line. The key stays in the
+subject as well. Two keywords are in use:
 
-That is also what the history shows: across the last 600 commits only four carry
-a `Resolves:` or `Related:` footer, all four repeat a reference that is already
-in their subject, and the most recent of them is from March 2026.
+- `Resolves: ACE-NNN` names each issue the commit fixes or delivers.
+  `b7f1cfda8` resolves two, `ACE-912` and `ACE-919`.
+- `Related: ACE-NNN` names every further issue the commit touches. It also
+  names the issue of the subject when the commit delivers nothing of it: the
+  proposal and the archive commit of an OpenSpec change, or a step before or
+  after the commit that resolves the issue.
 
-`Change-Id:` is a Gerrit artefact and never appears here — review happens on
+An issue delivered in several commits carries `Resolves:` on each commit that
+delivers a part of it.
+
+`Resolves:` lines come first. A defect fix that also touches three earlier
+issues, `b0741283f`:
+
+```
+[BUGFIX] ACE-894: Open study plan dialogs per copy
+
+…
+
+Resolves: ACE-894
+Related: ACE-704
+Related: ACE-707
+Related: ACE-818
+```
+
+The archive commit of an OpenSpec change, `dcc1b1c5b`, names the issue it
+archives with `Related:`, because the commit before it resolved the issue:
+
+```
+[TASK] ACE-922: Archive the select items row change
+
+…
+
+Related: ACE-922
+```
+
+A commit without an issue of its own and without a related one, a release for
+example, carries no footer. A proposal without an issue of its own names the
+issues it touches with `Related:`, as `2d44e4ba7` does. On 2026-10-16, every
+one of the last 60 commits on `main` carried `Resolves:` or `Related:`, which
+is the practice since late September 2026. Check it with
+
+```bash
+git log -60 --format='%h %(trailers:key=Resolves,key=Related,valueonly,separator=%x2C)'
+```
+
+`Releases:` comes from the TYPO3 Core workflow, where it names the branches a
+change is cherry-picked to. Some commits of August and September 2026 carry
+`Releases: main`, none since. Leave it out: the target branch is the one the
+pull request is opened against, and a backport is a pull request of its own,
+see [Backporting](backporting.md).
+
+`Change-Id:` is a Gerrit artefact and never appears here, review happens on
 GitHub.
 
 ## Issue references
