@@ -170,3 +170,10 @@ per page. This applies on TYPO3 v13 and v14.
   per Page" empty on a site that keeps the shipped settings, and the list has
   twelve profiles
 - **THEN** the list shows ten profiles on the first of two pages
+
+#### Scenario: An element saved without the field
+
+- **WHEN** a person list and details element with pagination switched on was
+  saved without a "Results per Page" field, on a site that keeps the shipped
+  settings, and the list has twelve profiles
+- **THEN** the list shows ten profiles on the first of two pages
