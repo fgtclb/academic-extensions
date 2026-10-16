@@ -1,0 +1,12 @@
+# A child turns a setting into an array, and a value next to the child does
+# not change that: the setting becomes the child and the value below
+# "_typoScriptNodeValue". Extbase merges the FlexForm of an element over these
+# settings, but a stored string does not replace an array there, so every
+# element keeps both arrays: the one on "/no-sorting", which stores no setting,
+# and the ones on "/list" and "/stored", which do. Read as the strings next to
+# the children, the list on "/no-sorting" would sort by title, Z to A, and show
+# the completed projects only.
+plugin.tx_academicprojects.settings.sorting = title desc
+plugin.tx_academicprojects.settings.sorting.field = title
+plugin.tx_academicprojects.settings.activeState = completed
+plugin.tx_academicprojects.settings.activeState.value = completed

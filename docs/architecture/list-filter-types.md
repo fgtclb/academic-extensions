@@ -101,15 +101,39 @@ settings the templates read, so an override of the form partial changes
 nothing. A part the form shows keeps the selection of the visitor, which
 replaces the default categories as before.
 
+A value of the demand that is not a string is ignored (ACE-926). The demand
+reaches the factory as Extbase took it from the request, nested arrays
+included: `ArrayConverter` hands a source that is not a string over unchanged,
+so a post, or a link with the cache hash of its arguments or on a site that
+does not enforce it, with `demand[sortingField][]=title` reaches the factory
+with an array. The setters of the demands take strings, so each factory turns a
+sorting, a sorting field, a sorting direction or, for projects, an active state
+that is not a string into the empty string, which no setter accepts: the value
+is ignored like an unknown one. Where the form offers that part, the default of
+the extension applies, where the content element hides it, the factory does not
+read the request value at all and the preset of the element applies. The
+category filter needs no such guard, `CategoryFilterNormalizer` reads every
+shape. `academic_projects` applies the same guard to `settings.sorting` and
+`settings.activeState`, which TypoScript turns into an array as soon as the
+setting has a child, also next to a value of its own:
+`TypoScriptService::convertTypoScriptArrayToPlainArray()` keeps that value
+below `_typoScriptNodeValue`. The value an element stores does not replace such
+an array: Extbase merges the FlexForm over the TypoScript settings with
+`ArrayUtility::mergeRecursiveWithOverrule()`, which keeps an array where the
+overrule has a string, on TYPO3 v12 and v13. The other two lists guard their
+sorting setting in `applySortingFromSettings()` (ACE-914).
+
 ## Tests
 
-| What                                          | Test                                                                                                |
-|-----------------------------------------------|-----------------------------------------------------------------------------------------------------|
-| The resolution rules, the split, the settings | `typo3-category-types/Tests/Unit/Filter/FilterTypeResolverTest.php`                                 |
-| Order, count, disclosure, labels, options     | `academic-<partners\|projects\|programs>/Tests/Functional/Plugins/Academic*ListFilterTest.php`      |
-| The fallback, unoffered filters               | `academic-programs/Tests/Functional/Plugins/AcademicProgramsListFilterTest.php`                     |
-| The presets of a hidden part of the form      | `academic-<partners\|projects\|programs>/Tests/Functional/Plugins/Academic*HiddenFormPartsTest.php` |
-| Reading the filters of a form                 | [`CategoryFilterFormAssertionTrait`](../testing/testing-helper.md#categoryfilterformassertiontrait) |
+| What                                          | Test                                                                                                      |
+|-----------------------------------------------|-----------------------------------------------------------------------------------------------------------|
+| The resolution rules, the split, the settings | `typo3-category-types/Tests/Unit/Filter/FilterTypeResolverTest.php`                                       |
+| Order, count, disclosure, labels, options     | `academic-<partners\|projects\|programs>/Tests/Functional/Plugins/Academic*ListFilterTest.php`            |
+| The fallback, unoffered filters               | `academic-programs/Tests/Functional/Plugins/AcademicProgramsListFilterTest.php`                           |
+| The presets of a hidden part of the form      | `academic-<partners\|projects\|programs>/Tests/Functional/Plugins/Academic*HiddenFormPartsTest.php`       |
+| A demand value that is not a string           | `academic-<partners\|projects\|programs>/Tests/Functional/Plugins/Academic*DemandValueNotAStringTest.php` |
+| A setting or a request value of a factory     | `academic-<partners\|projects\|programs>/Tests/Unit/Factory/DemandFactorySortingTest.php`                 |
+| Reading the filters of a form                 | [`CategoryFilterFormAssertionTrait`](../testing/testing-helper.md#categoryfilterformassertiontrait)       |
 
 ## See also
 

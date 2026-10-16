@@ -40,25 +40,25 @@ class DemandFactory
 
         if ($demandFromForm === null || $hideActiveState) {
             if (isset($settings['activeState'])) {
-                $demand->setActiveState(ActiveState::tryFromDefault((string)($settings['activeState']))->value);
+                $demand->setActiveState(ActiveState::tryFromDefault($this->optionValue($settings['activeState']))->value);
             }
         } elseif (isset($demandFromForm['activeState'])) {
-            $demand->setActiveState(ActiveState::tryFromDefault($demandFromForm['activeState'])->value);
+            $demand->setActiveState(ActiveState::tryFromDefault($this->optionValue($demandFromForm['activeState']))->value);
         }
 
         if ($demandFromForm === null || $hideSorting) {
             if (isset($settings['sorting'])) {
-                $demand->setSorting($settings['sorting']);
+                $demand->setSorting($this->optionValue($settings['sorting']));
             }
         } else {
             if (isset($demandFromForm['sorting'])) {
-                $demand->setSorting($demandFromForm['sorting']);
+                $demand->setSorting($this->optionValue($demandFromForm['sorting']));
             }
             if (isset($demandFromForm['sortingField'])) {
-                $demand->setSortingField($demandFromForm['sortingField']);
+                $demand->setSortingField($this->optionValue($demandFromForm['sortingField']));
             }
             if (isset($demandFromForm['sortingDirection'])) {
-                $demand->setSortingDirection($demandFromForm['sortingDirection']);
+                $demand->setSortingDirection($this->optionValue($demandFromForm['sortingDirection']));
             }
         }
 
@@ -130,5 +130,17 @@ class DemandFactory
         }
 
         return $this->categoryRepository->findByGroupAndUidList('projects', array_values(array_unique($uids)));
+    }
+
+    /**
+     * A value of the settings or of a request as the string the setters of the demand
+     * take. A value that is not a string becomes the empty string, which no setter
+     * accepts, so it is ignored like an unknown option instead of raising a `TypeError`.
+     * A request carries an array for `demand[sortingField][]=title`, which Extbase hands
+     * over as it came, and a TypoScript setting is an array as soon as it has a child.
+     */
+    private function optionValue(mixed $value): string
+    {
+        return is_string($value) ? $value : '';
     }
 }
