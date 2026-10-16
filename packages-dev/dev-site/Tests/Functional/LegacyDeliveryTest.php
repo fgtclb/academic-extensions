@@ -407,6 +407,11 @@ final class LegacyDeliveryTest extends AbstractSeedTestCase
         // all, so this masks both without having to know which is which.
         $markup = (string)preg_replace('#(=|%5D=)\d+#', '$1*', $markup);
 
+        // A uid as the key of the view mode of a selected profiles or contracts
+        // element, "tx_...[viewMode][1034]=table", which is keyed by its content
+        // element. Only that argument, so no other key of a query string is masked.
+        $markup = (string)preg_replace('#%5BviewMode%5D%5B\d+%5D#', '%5BviewMode%5D%5B*%5D', $markup);
+
         // The dialog id of a study plan shown by an "Insert records" element,
         // "id=\"popup-c1069-225\"": it carries the uid of that element and of
         // the module, both mirrored with an offset of their own. The rule below
