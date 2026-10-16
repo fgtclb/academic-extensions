@@ -19,13 +19,13 @@ use TYPO3\CMS\Install\Updates\UpgradeWizardInterface;
 
 /**
  * Seeds `contract_sorting` and `role_sorting`, the sort columns the contract and
- * the contacts role relation gained in 3.0.
+ * the contacts role relation gained in 2.4.
  *
  * A page contact is an inline child of three records: of its page, of the contract
  * it belongs to, and of its contacts role. All three relations wrote the shared
  * `sorting` column until now, so saving a contract or a contacts role renumbered
  * its contacts across the pages that own them. Both other relations order by a
- * column of their own from 3.0 on, and every contact that existed before the
+ * column of their own from 2.4 on, and every contact that existed before the
  * update carries `0` in them - which would leave those forms showing their
  * contacts in whatever order the database happens to return.
  *
@@ -94,7 +94,7 @@ final readonly class SeedContactSecondarySortingUpgradeWizard implements Upgrade
         return 'Page contacts are inline children of their page, of their contract and of their'
             . ' contacts role, and all three relations wrote the same sort column until now, so saving'
             . ' a contract or a contacts role could rearrange the contacts of a page. The contract and'
-            . ' the contacts role relation have a sort column of their own from 3.0 on. This wizard'
+            . ' the contacts role relation have a sort column of their own from 2.4 on. This wizard'
             . ' fills them with the order those forms show today.';
     }
 
