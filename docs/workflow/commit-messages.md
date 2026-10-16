@@ -20,14 +20,22 @@ every time.
 
 Body: what changed and why, wrapped at 72 characters. Separate
 paragraphs with a blank line.
+
+Resolves: ACE-NNN
 ```
 
 The issue reference sits **inside the subject**, directly after the tag and
-before the description, separated by a colon. It is not a footer here. 84 of the
-last 100 commits on `2` carry an `ACE-NNN` key in that position. The 16 that do
-not are documentation fixes, support-matrix and branch-model work, the release
-automation scripts and a handful of housekeeping commits. Release commits carry
-no reference either.
+before the description, separated by a colon, and is repeated in a footer, see
+[Footers](#footers). On 2026-10-16, 99 of the last 100 commits on `2` carried an
+`ACE-NNN` key in that position, the one that did not was `662089a5b`. Further
+back, the commits without a key are documentation fixes, support-matrix and
+branch-model work, the release automation scripts and a handful of housekeeping
+commits. Release commits carry no reference either. The number of recent
+subjects without the key:
+
+```bash
+git log origin/2 -100 --format=%s | grep -vcE '^(\[!!!\])?\[[A-Z]+\] ACE-[0-9]+: '
+```
 
 ## Subject line
 
@@ -39,14 +47,18 @@ no reference either.
 | First word      | Capitalized                                     |
 | Trailing period | None                                            |
 
-What the branch actually does: 46 of the last 50 subjects are within 52
-characters, and the four that are not run to 55–63. Widen the window and the
-picture changes: only 62 of the last 100 stay within 52, because a single
-documentation series (`ACE-253`, 25 commits, all of them over) names an
-extension key in every subject. Across the last 600 commits only 320 stay within
-52, 34 exceed even the 72 character cap, and the longest subject on record is 93
-characters, from July 2025. The 52 character target is the current standard; the
-drift is history, not licence.
+What the branch actually does: on 2026-10-16, 97 of the last 100 subjects on
+`2` were within 52 characters, and the three that were not run to 53, 53 and
+56. Across the last 600 commits 422 stay within 52 and 21 exceed even the 72
+character cap. The longest in that window runs to 85 characters, from September
+2025, and the longest on record is 138, from February 2024. The 52 character
+target is the current standard, the drift is history, not licence. Measured
+with
+
+```bash
+git log origin/2 -100 --format=%s | awk 'length <= 52' | wc -l
+git log origin/2 -600 --format=%s | awk 'length <= 52' | wc -l
+```
 
 The budget is tighter than it looks. `[BUGFIX] ACE-358: ` alone is 18
 characters, so the description itself has about 34 left. A subject that does not
@@ -75,23 +87,30 @@ this repository consistently contain four things:
 
 ## Tags
 
-Taken from the last 600 commits on `2` rather than from a generic list. The
-counts are what is in use; a tag that does not appear here is not established
-practice on this branch.
+Taken from the last 600 commits on `2` rather than from a generic list, with
+
+```bash
+git log origin/2 -600 --format='%s' | grep -oP '^(\[!!!\])?\[[A-Z]+\]' | sort | uniq -c
+```
+
+The counts are what is in use, measured on 2026-10-16. A tag that does not
+appear here is not established practice on this branch. They are a moving
+window, so re-run the command rather than trusting the table after a long
+series of commits.
 
 | Tag              | Count | Use                                             | Example commit                                                        |
 |------------------|-------|-------------------------------------------------|-----------------------------------------------------------------------|
-| `[TASK]`         | 339   | Refactoring, tests, CI, dependencies, tooling   | `6f88b64db` `[TASK] ACE-382: Cache only composer's dist archives`     |
-| `[BUGFIX]`       | 113   | Fixes incorrect behaviour                       | `1dd253043` `[BUGFIX] ACE-358: Drop the defaults on TEXT columns`     |
-| `[DOCS]`         | 75    | Documentation only, shipped or developer facing | `b6a4c9f2b` `[DOCS] ACE-303: Document the WebP requirement`           |
-| `[FEATURE]`      | 25    | New, user-facing functionality                  | `ae4d6eb55` `[FEATURE] ACE-236: Select the displayed address records` |
-| `[!!!][TASK]`    | 19    | Breaking change, marker first                   | `b768ae21f` `[!!!][TASK] ACE-306: Remove the profile switcher`        |
-| `[RELEASE]`      | 17    | Release commits, maintainers only               | `1f5334422` `[RELEASE] 2.3.4`                                         |
-| `[!!!][FEATURE]` | 5     | Breaking new functionality                      | `494a94d7a` `[!!!][FEATURE] ACE-242: Synchronize hidden profiles`     |
+| `[TASK]`         | 269   | Refactoring, tests, CI, dependencies, tooling   | `6f88b64db` `[TASK] ACE-382: Cache only composer's dist archives`     |
+| `[BUGFIX]`       | 188   | Fixes incorrect behaviour                       | `1dd253043` `[BUGFIX] ACE-358: Drop the defaults on TEXT columns`     |
+| `[DOCS]`         | 88    | Documentation only, shipped or developer facing | `b6a4c9f2b` `[DOCS] ACE-303: Document the WebP requirement`           |
+| `[FEATURE]`      | 30    | New, user-facing functionality                  | `ae4d6eb55` `[FEATURE] ACE-236: Select the displayed address records` |
+| `[!!!][TASK]`    | 12    | Breaking change, marker first                   | `b768ae21f` `[!!!][TASK] ACE-306: Remove the profile switcher`        |
+| `[RELEASE]`      | 9     | Release commits, maintainers only               | `1f5334422` `[RELEASE] 2.3.4`                                         |
+| `[!!!][FEATURE]` | 3     | Breaking new functionality                      | `494a94d7a` `[!!!][FEATURE] ACE-242: Synchronize hidden profiles`     |
 
-Four commits in that range carry something else — two `[REMOVE]`, one `[DOC]`
-and one `[BUGIX]`. The last two are typos for `[DOCS]` and `[BUGFIX]`; none of
-the four is a tag to copy.
+One commit in that range carries something else, `7c9ae9a0c`
+`wip: !!! [TASK] Restructure persons edit templating`, which is not a form to
+copy.
 
 The `[!!!]` marker always comes first and is combined with the tag that
 describes the nature of the change, never used alone.
@@ -104,7 +123,9 @@ audited later.
 ## Complete examples
 
 Two messages from this branch, verbatim and complete. Both are ordinary commits,
-not showcases — this is the expected level of detail.
+not showcases, and this is the expected level of detail. Both are from August
+2026, before every commit carried a footer. Written today, they would end with
+`Resolves: ACE-358` and `Resolves: ACE-381` below the body.
 
 `1dd253043`, a `[BUGFIX]` that names the exact failure, the core versions and
 database systems that see it, the alternative that was rejected and what the
@@ -208,17 +229,62 @@ added tests prove.
 
 ## Footers
 
-`Resolves:` and `Releases:` come from the TYPO3 Core workflow, where they drive
-forge and the cherry-pick targets. Neither exists here, and both **may be
-skipped**. The issue reference goes into the subject instead, as described
-above.
+Every commit that belongs to an issue ends with at least one footer, separated
+from the body by a blank line, one issue per line. The key stays in the
+subject as well. Two keywords are in use:
 
-That is also what the history shows: across the last 600 commits on `2` only
-four carry such a footer — three `Resolves:`, which each repeat a reference that
-is already in their subject, and one `Related:` pointing at a second issue. They
-date from February and March 2026, and nothing since has used one.
+- `Resolves: ACE-NNN` names each issue the commit fixes or delivers.
+  `5f5552734` resolves two, `ACE-912` and `ACE-919`.
+- `Related: ACE-NNN` names every further issue the commit touches. It also
+  names the issue of the subject when the commit delivers nothing of it: the
+  proposal and the archive commit of an OpenSpec change, or a step before or
+  after the commit that resolves the issue.
 
-`Change-Id:` is a Gerrit artefact and never appears here — review happens on
+An issue delivered in several commits carries `Resolves:` on each commit that
+delivers a part of it.
+
+`Resolves:` lines come first. A defect fix that also touches three earlier
+issues, `8e293728d`:
+
+```
+[BUGFIX] ACE-430: Show translated records only once
+
+…
+
+Resolves: ACE-430
+Related: ACE-484
+Related: ACE-874
+Related: ACE-905
+```
+
+The archive commit of an OpenSpec change, `9453e8cb9`, names the issue it
+archives with `Related:`, because the commit before it resolved the issue:
+
+```
+[TASK] ACE-922: Archive the select items row change
+
+…
+
+Related: ACE-922
+```
+
+A commit without an issue of its own and without a related one, a release for
+example, carries no footer. A proposal without an issue of its own names the
+issues it touches with `Related:`. On 2026-10-16, every one of the last 60
+commits on `2` carried `Resolves:` or `Related:`, which is the practice since
+late September 2026. Check it with
+
+```bash
+git log origin/2 -60 --format='%h %(trailers:key=Resolves,key=Related,valueonly,separator=%x2C)'
+```
+
+`Releases:` comes from the TYPO3 Core workflow, where it names the branches a
+change is cherry-picked to. Some commits of August and September 2026 carry
+`Releases: 2`, none since. Leave it out: the target branch is the one the pull
+request is opened against, and a backport is a pull request of its own, see
+[Backporting](backporting.md).
+
+`Change-Id:` is a Gerrit artefact and never appears here, review happens on
 GitHub.
 
 ## Issue references
