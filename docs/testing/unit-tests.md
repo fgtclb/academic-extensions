@@ -5,8 +5,8 @@ database, no site, no request. Everything the subject needs is passed to it or
 stubbed. That makes the suite fast enough to run on every save, and it makes a
 failure point at one class instead of at a stack.
 
-There are 110 unit test classes: 94 across the twelve extensions, four in
-`packages-dev/dev-site`, seven in `packages-dev/monorepo-shared` and five in
+There are 112 unit test classes: 95 across the twelve extensions, four in
+`packages-dev/dev-site`, eight in `packages-dev/monorepo-shared` and five in
 `packages-dev/testing-helper`. Twelve of them are the one-line version
 compatibility test every extension carries (see
 [below](#the-version-compatibility-test)). Measured with
@@ -87,11 +87,15 @@ branch alias key (ACE-784). Its traits have no tests of their own — they are e
 through the extensions that use them.
 [`packages-dev/monorepo-shared/`](../../packages-dev/monorepo-shared) carries
 the check that every `ext_emconf.php` of the repository names its dependencies
-by extension key, see [below](#the-ext_emconfphp-dependency-keys), and the one
-that every translation names its extension without an underscore, see
+by extension key, see [below](#the-ext_emconfphp-dependency-keys), the one
+that every upgrade wizard has a title and a description, see
+[below](#the-description-of-upgrade-wizards), the one that every translation
+names its extension without an underscore, see
 [below](#the-extension-name-of-translations), the checks of the manual
 links and the branch alias key, see [below](#the-links-of-the-manuals), the
-check of the form `bin/set-version` writes, see
+check of the link table of every package README, see
+[below](#the-link-table-of-the-readmes), the check of the form
+`bin/set-version` writes, see
 [below](#the-form-binset-version-writes), and the check that every inline event
 handler of a template is allowed by the Content Security Policy of its
 extension, see [below](#inline-event-handlers).
@@ -110,7 +114,7 @@ them follow the shape below.
 
 **Every test class is `final`, declares `strict_types`, and extends
 `TYPO3\TestingFramework\Core\Unit\UnitTestCase`.** There is no local abstract
-unit test case, and no unit test extends another test class. The fifteen below
+unit test case, and no unit test extends another test class. The seventeen below
 `packages-dev/` and `ClassAliasMapTest` of `academic_base` are the exception to
 the base class: they need nothing of the TYPO3 testing framework and extend
 PHPUnit's `TestCase` directly.
@@ -353,6 +357,45 @@ the directory the test container mounts. The key of the alias is the version
 name composer gives the branch, `2.x-dev` here and `dev-main` on `main`, and the
 test maps it back to the bare branch name, `2` on this branch. A newly cut
 version branch changes both, see [Releasing](../workflow/releasing.md).
+
+## The link table of the READMEs
+
+[`ReadmeLinkTableTest`](../../packages-dev/monorepo-shared/Tests/Unit/ReadmeLinkTableTest.php)
+reads the `README.md` of every package below `packages/fgtclb/` and asserts the
+link table below its title in the form ACE-934 gave it: one blank line after
+the title, an empty first header cell and `URL` as the second, and these rows
+in this order:
+
+| Row                | Has to be                                                             |
+|--------------------|-----------------------------------------------------------------------|
+| `**Repository:**`  | `https://github.com/fgtclb/<package directory>`, the split repository |
+| `**Read online:**` | `https://docs.typo3.org/p/<composer name>/<manual version>/en-us/`    |
+| `**TER:**`         | `https://extensions.typo3.org/extension/<extension key>/`             |
+
+A package without the table fails, and so does a table with another header,
+another row or another order. The padding is left to `lintMarkdown`.
+
+The manual version is the major and minor version of the package's `VERSION`
+on a version branch, `2.4` here, and `main` on the branch `main`, because
+docs.typo3.org renders the manual of a version line per release tag. The
+branch is the one `DocumentationGuidesTest` reads from the root branch alias.
+The README a release ships to the TER therefore links the manual of that
+release. The link answers 404 until the release is tagged, `2.4` until 2.4.0.
+A minor version bump on this branch fails the test until the READMEs link the
+manual of the new version, which is intended. A data set per branch form
+covers the mapping, so the form of `main` is tested here too.
+
+`-` stands in the "Read online" row only for a package of the list
+`MANUALS_NOT_RENDERED` in the test, which names the issue that makes its manual
+render. Today that is `academic-base` with ACE-937: its manual is not rendered
+on docs.typo3.org yet. A listed package that links a manual fails, so the
+change that links it also removes its entry, and an entry that names no
+package directory fails as well.
+
+The tables were written by hand and copied from one README to the next. Until
+ACE-934 five READMEs linked a manual path that answered 404 and four had no
+manual link at all, and nothing reported it. All of them linked the manual of
+`main` until ACE-939.
 
 ## The branch alias key
 

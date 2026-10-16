@@ -54,9 +54,10 @@ Three packages that are never released as extensions and never shipped to an
 installation:
 
 - `packages-dev/monorepo-shared/` — `fgtclb/academics-monorepo-shared`, type
-  `library`. It centralizes the TYPO3 core dependency constraints, and checks
-  the `ext_emconf.php` dependency keys of every extension and the extension
-  name of every translation, in templates and in PHP.
+  `library`. It centralizes the TYPO3 core dependency constraints, and its
+  unit tests check the whole repository at once, which a split extension
+  cannot. [Discovery](../testing/unit-tests.md#discovery) of the unit tests
+  page lists the checks.
 - `packages-dev/testing-helper/` — `fgtclb/academics-monorepo-testing-helper`,
   type `library`. Shared functional-test traits.
 - `packages-dev/dev-site/` — `fgtclb/academics-monorepo-dev-site`, extension key

@@ -1,10 +1,10 @@
 # TYPO3 extension `academic_study_plan` (READ-ONLY)
 
-|                  | URL                                                             |
-|------------------|-----------------------------------------------------------------|
-| **Repository:**  | https://github.com/fgtclb/academic-study-plan                   |
-| **Read online:** | https://docs.typo3.org/p/fgtclb/academic-study-plan/main/en-us/ |
-| **TER:**         | https://extensions.typo3.org/extension/academic_study_plan/     |
+|                  | URL                                                            |
+|------------------|----------------------------------------------------------------|
+| **Repository:**  | https://github.com/fgtclb/academic-study-plan                  |
+| **Read online:** | https://docs.typo3.org/p/fgtclb/academic-study-plan/2.4/en-us/ |
+| **TER:**         | https://extensions.typo3.org/extension/academic_study_plan/    |
 
 ## Description
 

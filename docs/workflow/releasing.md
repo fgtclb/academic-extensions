@@ -146,6 +146,12 @@ and a unit test fails until they do, see
 [Unit tests](../testing/unit-tests.md#the-links-of-the-manuals). On an ordinary
 run neither changes.
 
+The "Read online" link in the table of every package `README.md` follows the
+version line as well, and the script does not write it. It names the minor
+version here, `2.4`, and `main` on `main`, so a minor bump on this branch
+fails a unit test until the READMEs link the new manual, see
+[Unit tests](../testing/unit-tests.md#the-link-table-of-the-readmes).
+
 ## `bin/release` — orchestrate the release
 
 ```shell
