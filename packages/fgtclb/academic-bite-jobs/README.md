@@ -1,10 +1,10 @@
 # TYPO3 Extension `Academic Bite Jobs` (READ-ONLY)
 
-|                  | URL                                                                     |
-|------------------|-------------------------------------------------------------------------|
-| **Repository:**  | https://github.com/fgtclb/academic-bite-jobs                            |
-| **Read online:** | https://docs.typo3.org/p/fgtclb/academic/academic-bite-jobs/main/en-us/ |
-| **TER:**         | https://extensions.typo3.org/extension/academic_bite_jobs/              |
+|                  | URL                                                            |
+|------------------|----------------------------------------------------------------|
+| **Repository:**  | https://github.com/fgtclb/academic-bite-jobs                   |
+| **Read online:** | https://docs.typo3.org/p/fgtclb/academic-bite-jobs/main/en-us/ |
+| **TER:**         | https://extensions.typo3.org/extension/academic_bite_jobs/     |
 
 ## Description
 
