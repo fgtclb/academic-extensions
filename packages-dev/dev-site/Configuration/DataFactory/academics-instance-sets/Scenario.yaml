@@ -2960,14 +2960,14 @@ entities:
                                             <value index="vDEF">235</value>
                                         </field>
                                         <field index="settings.flashMessageCreationMode">
-                                            <value index="vDEF">1</value>
+                                            <value index="vDEF">0</value>
                                         </field>
                                     </language>
                                 </sheet>
                             </data>
                         </T3FlexForms>
                     languageVariants:
-                      - { self: { id: 528, language: 1, CType: academicjobs_newjobform, header: 'Stelle ausschreiben', header_layout: 2, pi_flexform: "<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"yes\" ?>\n<T3FlexForms>\n    <data>\n        <sheet index=\"sDEF\">\n            <language index=\"lDEF\">\n                <field index=\"settings.redirectPageId\">\n                    <value index=\"vDEF\">235</value>\n                </field>\n                <field index=\"settings.flashMessageCreationMode\">\n                    <value index=\"vDEF\">1</value>\n                </field>\n            </language>\n        </sheet>\n    </data>\n</T3FlexForms>" } }
+                      - { self: { id: 528, language: 1, CType: academicjobs_newjobform, header: 'Stelle ausschreiben', header_layout: 2, pi_flexform: "<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"yes\" ?>\n<T3FlexForms>\n    <data>\n        <sheet index=\"sDEF\">\n            <language index=\"lDEF\">\n                <field index=\"settings.redirectPageId\">\n                    <value index=\"vDEF\">235</value>\n                </field>\n                <field index=\"settings.flashMessageCreationMode\">\n                    <value index=\"vDEF\">0</value>\n                </field>\n            </language>\n        </sheet>\n    </data>\n</T3FlexForms>" } }
             -
               self:
                 id: 235

@@ -1695,7 +1695,7 @@ entities:
                                               <value index="vDEF">1235</value>
                                           </field>
                                           <field index="settings.flashMessageCreationMode">
-                                              <value index="vDEF">1</value>
+                                              <value index="vDEF">0</value>
                                           </field>
                                       </language>
                                   </sheet>
@@ -1718,7 +1718,7 @@ entities:
                                                   <value index="vDEF">1235</value>
                                               </field>
                                               <field index="settings.flashMessageCreationMode">
-                                                  <value index="vDEF">1</value>
+                                                  <value index="vDEF">0</value>
                                               </field>
                                           </language>
                                       </sheet>
