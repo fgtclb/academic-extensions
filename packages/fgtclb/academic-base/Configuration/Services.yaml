@@ -24,3 +24,9 @@ services:
         target: TYPO3\CMS\Extbase\Domain\Model\FileReference
         sources: array
 
+  # @internal not part of public API
+  FGTCLB\AcademicBase\EventListener\DropInlineEventHandlerHashesWhereInlineIsAllowed:
+    tags:
+      - name: event.listener
+        identifier: 'academic-base/drop-inline-event-handler-hashes-where-inline-is-allowed'
+        event: TYPO3\CMS\Core\Security\ContentSecurityPolicy\Event\PolicyMutatedEvent
