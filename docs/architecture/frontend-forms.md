@@ -189,6 +189,12 @@ its wrapper.
   confirmation left on an unrendered redirect page, a change a listener does
   not persist itself, a request without a job, and the cache clearing, on
   v13 and v14.
+- `academic-jobs/Tests/Functional/Plugins/AcademicJobsNewJobFormTranslatedElementTest.php`
+  submits a job on `/de/` through a German overlay of the element with a
+  FlexForm of its own. It asserts that the overlay decides the redirect page
+  and the mode, the `303` to the German address of the redirect page or,
+  without one, to the German form page, the German confirmation, and that the
+  job is stored in the default language, on v13 and v14.
 - `academic-jobs/Tests/Functional/Plugins/AcademicJobsNewJobFormRejectedSubmissionTest.php`
   asserts that a rejected submission queues no error message of Extbase, also
   not into the session for the confirmation that follows.
