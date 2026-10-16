@@ -95,6 +95,8 @@ or the code fills in, a category type or a field name for example.
         - :file:`Partials/Project/ActiveFilters.html`
     *   - :xml:`filter.moreFilters`
         - :file:`Partials/Project/DemandCategories.html`
+    *   - :xml:`filter.submit`
+        - :file:`Partials/Project/SortingAndFilters.html`
     *   - :xml:`list.noProjectsFound`
         - :file:`Partials/Project/ItemList.html`
     *   - :xml:`list.resultCount.singular`, :xml:`list.resultCount.plural`

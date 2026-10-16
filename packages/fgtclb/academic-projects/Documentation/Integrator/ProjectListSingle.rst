@@ -25,7 +25,9 @@ Selected Projects
 
 The :guilabel:`Selected Projects` element shows project pages an editor picks
 one by one, with the cards and the form of the
-:ref:`Projects <integrator-project-list>` element. It is the element for a
+:ref:`Projects <integrator-project-list>` element. The form works under the
+Content Security Policy of TYPO3 as described there, see
+:ref:`integrator-project-list-content-security-policy`. It is the element for a
 short list of projects that share no parent page: the projects of a research
 group on its page, the projects a news article or a person page refers to, or
 a hand picked selection on a landing page.

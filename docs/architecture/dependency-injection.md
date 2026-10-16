@@ -143,8 +143,8 @@ Measured with
 | `#[Autoconfigure]`    | 26    | `academic-base/Classes/Service/ArrayObjectMapper.php:24` (`public: true`)                                        |
 | `#[Autowire]`         | 7     | same file, line 28, `#[Autowire(service: 'academic-base.serializer')]`                                           |
 | `#[AsAlias]`          | 3     | `academic-persons/Classes/Service/RecordSynchronizer.php:49`                                                     |
-| `#[Exclude]`          | 28    | `academic-base/Classes/Settings/Validation.php:23` and the settings graph                                        |
-| `#[AsEventListener]`  | 17    | `academic-partners/Classes/EventListener/RegisterAcademicPageDoktype.php:33`                                     |
+| `#[Exclude]`          | 30    | `academic-base/Classes/Settings/Validation.php:23` and the settings graph                                        |
+| `#[AsEventListener]`  | 18    | `academic-partners/Classes/EventListener/RegisterAcademicPageDoktype.php:33`                                     |
 | `#[AsCommand]`        | 3     | `academic-partners/Classes/Command/GeocodeCommand.php:23`                                                        |
 | `#[AutoconfigureTag]` | 2     | `dev-site/Classes/DataProcessing/IconOverviewProcessor.php:38`, an interface in `academic-base/Classes/Upgrade/` |
 | `#[AutowireIterator]` | 1     | `academic-base/Classes/Upgrade/ConfigurationChecker.php:148`                                                     |
@@ -163,7 +163,9 @@ extension to the compiled TCA, `LimitJobDetailCacheLifetime` of
 `academic-jobs`, which ends the page cache of a job detail with the next start
 or end time of the job, `WarmUpFrontendIconRegistry` of
 `academic-base`, which builds the frontend icon registry when the system caches
-are warmed up, `AddCategoryTypeFrontendIcons` of `typo3-category-types`,
+are warmed up, `DropInlineEventHandlerHashesWhereInlineIsAllowed` of
+`academic-base`, which takes the `script-src-attr` of the extensions out of a
+frontend policy that allows inline scripts already, `AddCategoryTypeFrontendIcons` of `typo3-category-types`,
 which contributes the category type icons to that registry,
 `ResolveCategoryTypeGroupMarker` of the same extension, which narrows a
 category tree to the categories of one group, and
@@ -243,13 +245,13 @@ one method per persistence event. Five are registered by YAML tag:
 `academic-persons/Classes/EventListener/UpdateProfileImageMetadata.php`,
 `.../AssignContractOrganisationalUnitSorting.php`,
 `academic-persons-edit/Classes/EventListener/GenerateSlugForProfile.php` and
-`.../SyncChangesToTranslations.php`. Fourteen are registered by attribute: the
+`.../SyncChangesToTranslations.php`. Fifteen are registered by attribute: the
 `RegisterAcademicPageDoktype` and the `AddPageModuleCategorySummary` of
 `academic-partners`, `academic-programs` and `academic-projects`,
 `ApplySettingsToTca` of `academic-persons` and `academic-jobs`,
 `LimitJobDetailCacheLifetime` of `academic-jobs`,
-`WarmUpFrontendIconRegistry` and `LiftVisibilityForHiddenRecordsOverlay` of
-`academic-base`, `AddCategoryTypeFrontendIcons` and
+`WarmUpFrontendIconRegistry`, `DropInlineEventHandlerHashesWhereInlineIsAllowed`
+and `LiftVisibilityForHiddenRecordsOverlay` of `academic-base`, `AddCategoryTypeFrontendIcons` and
 `ResolveCategoryTypeGroupMarker` of `typo3-category-types` and
 `FlushProfileViewCaches` of `academic-persons`.
 
@@ -391,13 +393,14 @@ Both spellings are in use here: five listener classes are registered by YAML
 tag (`academic-jobs/Configuration/Services.yaml`,
 `academic-persons/Configuration/Services.yaml` and
 `academic-persons-edit/Configuration/Services.yaml`, which carry one, two and
-two), twelve carry `#[AsEventListener]` on the class: the
+two), thirteen carry `#[AsEventListener]` on the class: the
 `RegisterAcademicPageDoktype` and `AddPageModuleCategorySummary` listeners of
 `academic-partners`, `academic-programs` and `academic-projects`, for example
 `#[AsEventListener(identifier: '…/register-page-doktype')]`,
 `ApplySettingsToTca` of `academic-persons` and `academic-jobs`,
 `LimitJobDetailCacheLifetime` of `academic-jobs`,
-`WarmUpFrontendIconRegistry` of `academic-base` and
+`WarmUpFrontendIconRegistry` and
+`DropInlineEventHandlerHashesWhereInlineIsAllowed` of `academic-base` and
 `AddCategoryTypeFrontendIcons` and `ResolveCategoryTypeGroupMarker` of
 `typo3-category-types`, and
 `FlushProfileViewCaches` of `academic-persons` and
