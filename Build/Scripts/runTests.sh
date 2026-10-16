@@ -240,10 +240,10 @@ openDocumentation() {
     local extensionFolderName="$1"
     local documentationFolder="documentation-rendered/${extensionFolderName}/Documentation-GENERATED-temp"
     if [[ ! -d "${documentationFolder}" ]]; then
-        echo "ERROR: No rendered documentation found for ${extensionFolderName}"
+        echo "Error: No rendered documentation found for package folder \"${extensionFolderName}\""
         echo ""
-        echo "       Run ./Build/Scripts/runtests.sh -s checkRstRenderingAll"
-        echo "        or  ./Build/Scripts/runtests.sh -s checkRstRenderingSingle <extension-folder-key>"
+        echo "       Run ./Build/Scripts/runTests.sh -s checkRstRenderingAll"
+        echo "        or ./Build/Scripts/runTests.sh -s checkRstRenderingSingle <package-folder>"
         echo ""
         echo "       first to have a rendered documentation in place."
         echo ""
@@ -277,7 +277,8 @@ Options:
             - cglHeader: test and fix the file header of all php files, "-n" to only check
             - checkJsBuildClean: check the committed frontend artifacts match their sources
             - checkRstRenderingAll: Test all extension .rst files for rendering errors
-            - checkRstRenderingSingle: Test specified system extension .rst files for rendering errors
+            - checkRstRenderingSingle: Test the .rst files of one package for rendering errors, the argument is
+              its folder below packages/fgtclb/, not its extension key, e.g. "academic-contact4pages"
             - cleanJs: clean up frontend build related files and folders (Build/node_modules)
             - composer: "composer" with all remaining arguments dispatched.
             - composerUpdate: "composer update", handy if host has no PHP
@@ -286,7 +287,8 @@ Options:
             - lintPhp: PHP linting
             - lintTypescript: eslint over the TypeScript sources, fixes by default, "-n" to only check
             - npm: "npm" with all remaining arguments dispatched, run in Build/
-            - openDocumentation: Open a rendered extension documentation in the browser (only linux for now)
+            - openDocumentation: Open the rendered manual of one package in the browser (only linux for now),
+              the argument is the same as for checkRstRenderingSingle
             - phpstan: phpstan tests
             - phpstanGenerateBaseline: regenerate phpstan baseline, handy after phpstan updates
             - recordFunctionalTestTimes: write "Build/phpunit/FunctionalTestTimes-<dbms>.json" from the
@@ -882,18 +884,21 @@ case ${TEST_SUITE} in
     checkRstRenderingSingle)
         extensionKey="${1}"
         if [ -n "${extensionKey}" ]; then
-            if [[ ! -d "packages/fgtclb/${extensionKey}" ]]; then
-                echo "Error: Invalid extension key provided: \"${systemExtensionKey}\""
+            if [[ "${extensionKey}" == */* || "${extensionKey}" == "." || "${extensionKey}" == ".." ]]; then
+                echo "Error: Invalid package folder \"${extensionKey}\", expected a single folder name below packages/fgtclb/"
+                SUITE_EXIT_CODE=1
+            elif [[ ! -d "packages/fgtclb/${extensionKey}" ]]; then
+                echo "Error: No package folder \"${extensionKey}\" found below packages/fgtclb/"
                 SUITE_EXIT_CODE=1
             elif [[ ! -d "packages/fgtclb/${extensionKey}/Documentation" ]]; then
-                echo "Error: Valid extension \"${extensionKey}\" does not contain a \"Documentation\" folder"
+                echo "Error: Package folder \"${extensionKey}\" does not contain a \"Documentation\" folder"
                 SUITE_EXIT_CODE=1
             else
                 executeRstRendering "${extensionKey}"
                 SUITE_EXIT_CODE=$?
             fi
         else
-            echo "Error: No system extension key provided as first argument"
+            echo "Error: No package folder below packages/fgtclb/ provided as first argument"
             SUITE_EXIT_CODE=1
         fi
         ;;
@@ -1149,15 +1154,15 @@ case ${TEST_SUITE} in
     openDocumentation)
         extensionKey="${1}"
         if [ -n "${extensionKey}" ]; then
-            if [[ ! -d "documentation-rendered/${extensionKey}/Documentation-GENERATED-temp" ]]; then
-                echo "Error: Valid extension \"${extensionKey}\" does not contain a rendered \"Documentation\" folder"
+            if [[ "${extensionKey}" == */* || "${extensionKey}" == "." || "${extensionKey}" == ".." ]]; then
+                echo "Error: Invalid package folder \"${extensionKey}\", expected a single folder name below packages/fgtclb/"
                 SUITE_EXIT_CODE=1
             else
                 openDocumentation "${extensionKey}"
                 SUITE_EXIT_CODE=$?
             fi
         else
-            echo "Error: No extension key provided as first argument"
+            echo "Error: No package folder below packages/fgtclb/ provided as first argument"
             SUITE_EXIT_CODE=1
         fi
         ;;

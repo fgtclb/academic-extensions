@@ -443,7 +443,7 @@ jobs:
       # the results in "documentation-rendered/<extension>/". This is a real
       # gate, not just an artifact producer: the renderer runs with
       # "--fail-on-log --fail-on-error", so a warning fails the job.
-      # "checkRstRenderingSingle <extension>" renders a single one locally.
+      # "checkRstRenderingSingle <package-folder>" renders a single one locally.
       - name: "Render documentation of all extensions"
         run: "Build/Scripts/runTests.sh -b docker -s checkRstRenderingAll"
 
