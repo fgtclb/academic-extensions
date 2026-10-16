@@ -61,6 +61,10 @@ trait GetSelectItemsForTcaManagedTableFieldMethodTrait
                 // find nothing.
                 'TSconfig' => BackendUtility::getPagesTSconfig($currentPageId)['TCEFORM.'][$tableName . '.'][$fieldName . '.']['itemsProcFunc.'] ?? null,
                 'table' => $tableName,
+                // There is no record outside FormEngine. An empty row keeps a handler or a
+                // listener of ModifyTcaSelectFieldItemsEvent that reads `row` itself from
+                // a warning, while one that reads a field of the row still needs a fallback.
+                'row' => [],
                 'field' => $fieldName,
                 'effectivePid' => $currentPageId,
                 'site' => $request->getAttribute('site'),

@@ -168,7 +168,9 @@ describe their events in detail, with examples.
             :guilabel:`academic_jobs` (type, employment type),
             :guilabel:`academic_persons` (the contract and the shown fields
             of the plugins) or :guilabel:`academic_contacts4pages` (the
-            contract and the addresses of a contact)
+            contract and the addresses of a contact), and when the job form
+            of :guilabel:`academic_jobs` builds its type and employment type
+            selects in the frontend
         -   replace the items and the other item provider parameters
     *   -   :php:`\FGTCLB\AcademicBase\Event\ModifyPluginViewEvent`
         -   in every plugin of :guilabel:`academic_bite_jobs`,

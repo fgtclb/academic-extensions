@@ -343,6 +343,18 @@ The parameters of
 entry as nullable for the same reason. See
 :ref:`important-items-proc-func-helper-passes-the-field-ts-config`.
 
+The trait passes an empty :php:`$parameters['row']` now, because there is no
+record outside the backend form, and the event declares :php:`row` optional.
+A listener of the event reads the row, and every field of it, with a
+fallback:
+
+..  code-block:: php
+
+    $row = $parameters['row'] ?? [];
+    $pageId = (int)($row['pid'] ?? $parameters['effectivePid']);
+
+See :ref:`important-select-item-helper-passes-an-empty-row`.
+
 ..  _upgrade-from-2-3-to-3-0-file-upload-converter:
 
 The file upload converter

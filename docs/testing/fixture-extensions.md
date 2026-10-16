@@ -6,7 +6,7 @@ injection, a template override that TypoScript must be able to find, an
 `ext_localconf.php` that has to run during bootstrap. For those, the test ships
 a small TYPO3 extension of its own.
 
-Seventy-nine such fixture extensions exist, in eleven of the twelve extensions.
+Eighty such fixture extensions exist, in eleven of the twelve extensions.
 That is the whole population — this is a mechanism used sparingly and only
 where nothing smaller works. Measured with
 
@@ -53,6 +53,7 @@ They sit next to the tests that use them, under
 | `test_icon_rules`                           | `tests/icon-rules`                                | `academic-base`          | Icons following every icon rule, in both registries and category types.       |
 | `test_job_after_save_listener`              | `tests/test-job-after-save-listener`              | `academic-jobs`          | Listeners setting the redirect page and changing the job after a save.        |
 | `test_job_icons`                            | `tests/job-icons`                                 | `academic-jobs`          | Job icons replaced in `FrontendIcons.php`, and without effect in `Icons.php`. |
+| `test_job_select_items_listener`            | `tests/test-job-select-items-listener`            | `academic-jobs`          | A listener reading `row` of the select items event without a fallback.        |
 | `test_job_validation_override`              | `tests/job-validation-override`                   | `academic-jobs`          | A jobs `Settings.yaml` naming nine fields, a TCA override, two TCA listeners. |
 | `test_jobcontact_schema`                    | `tests/test-jobcontact-schema`                    | `academic-jobs`          | `ext_tables.sql` without TCA for a removed table an upgrade wizard reads.     |
 | `test_language_files`                       | `tests/language-files`                            | `academic-persons`       | An XLF pair with awkward label keys (dots, dashes).                           |
@@ -105,7 +106,7 @@ They sit next to the tests that use them, under
 
 Each is a real, complete TYPO3 extension: a `composer.json` of type
 `typo3-cms-extension`, an `ext_emconf.php`, and whatever it exists to provide.
-Twenty-three of the seventy-nine have a `Classes/` folder with a `TESTS\…` PSR-4
+Twenty-four of the eighty have a `Classes/` folder with a `TESTS\…` PSR-4
 root. The other fifty-six are pure resources. The `ext_emconf.php` is checked
 like every other one: its `depends` names extension keys, and a fixture
 extension may name another fixture extension, which a real extension may not —
@@ -343,6 +344,13 @@ The existing ones show the cases that justify one:
   response of the form plugin as well, while TYPO3 v13 passed the returned
   redirect to `header()`. The form throws its redirect now, so the test reads
   the answer itself (ACE-912).
+  `test_job_select_items_listener` listens to the select items event of
+  `academic_base` and reads `row` without a fallback, as a listener written
+  against the former shape of the event did, so the job form test runs it in
+  the frontend request (ACE-922). The item provider tests of the backend
+  register their listeners as closures on the container of the test instead,
+  which a frontend request does not reach: the testing framework boots a
+  container of its own for every request.
   `test_frontend_user_sync_events` needs a package for two reasons: its
   listeners of the synchronisation events register through
   the container, and its `frontendUserSync` map, which reads a value one of

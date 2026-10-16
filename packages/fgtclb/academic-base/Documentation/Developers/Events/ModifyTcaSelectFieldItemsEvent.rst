@@ -104,7 +104,8 @@ The keys a listener needs most:
             element, ``settings.showFields`` for example.
     *   -   ``row``
         -   The record being edited. For a FlexForm field, the values of the
-            FlexForm. Missing in the job form, see the pitfalls below.
+            FlexForm. Empty in the job form, and declared optional, see the
+            pitfalls below.
     *   -   ``flexParentDatabaseRow``
         -   For a FlexForm field, the record of the content element.
     *   -   ``site``, ``effectivePid``
@@ -186,10 +187,13 @@ Rules and pitfalls
 *   **Check table and field.** One listener is called for every field of the
     table above. A listener that does not check both changes all of them.
 *   **No record in the frontend.** In the job form, the parameters carry
-    ``items``, ``config``, ``TSconfig``, ``table``, ``field``,
-    ``effectivePid`` and ``site``, but no ``row`` and none of the keys of an
-    inline parent. Read ``row`` with a fallback, as
-    :php:`$parameters['row'] ?? []`.
+    ``items``, ``config``, ``TSconfig``, ``table``, ``row``, ``field``,
+    ``effectivePid`` and ``site``, and none of the keys of an inline parent.
+    ``row`` is an empty array there, because the job does not exist yet. The
+    event declares ``row`` optional, so static analysis reports a listener
+    that reads it without a fallback. Read it as
+    :php:`$parameters['row'] ?? []`, and every field of it with a fallback
+    too, as :php:`$row['pid'] ?? $parameters['effectivePid']`.
 *   **A FlexForm field has two rows.** ``row`` holds the values of the
     FlexForm, the content element is ``flexParentDatabaseRow``.
 *   **Keep the stored values in mind.** Removing an item hides it from the
