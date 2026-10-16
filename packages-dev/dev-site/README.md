@@ -163,7 +163,10 @@ frontend build compiles it into
 The `/legacy/` tree gets it through the static template of this package, the
 `/` tree through the set `fgtclb/academics-dev-site-stylesheet`, which the site
 configuration of both instances names after the theme. The manual of each
-extension links its partial as the example to copy from.
+extension links its partial as the example to copy from. On a page with the
+profile editor the same file links `editor.css` of `EXT:rte_ckeditor` first,
+the interface stylesheet of CKEditor 5 the core ships, which the rich text
+fields of the editor need from TYPO3 13.4.36 and 14.3.8 on.
 `Tests/Functional/StylesheetClassesTest.php` keeps every partial but the one of
 the profile editor in step with the markup of the extensions it styles, and the
 map rules of the partner partial with the stylesheets of Leaflet. The partial

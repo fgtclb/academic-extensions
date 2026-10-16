@@ -244,6 +244,88 @@ final class LegacyDeliveryTest extends AbstractSeedTestCase
     }
 
     /**
+     * Both trees link the interface stylesheet of CKEditor 5 on the page of the profile
+     * editor, and on no other page.
+     *
+     * The profile editor of EXT:academic_persons_edit imports CKEditor 5 from the import
+     * map of EXT:rte_ckeditor. From TYPO3 13.4.36 and 14.3.8 on the styles of its toolbar
+     * and balloons come in `editor.css` of that extension, which only the backend form
+     * links, so the development instances link it themselves. The file is some 220 KB, so
+     * it is linked where the editor is and nowhere else: asserted on the page of the
+     * editor, in English and German, and on the root page and the page of the job form,
+     * whose CKEditor 4 brings its own skin.
+     *
+     * The page of the editor is shown at any login only, so every request is made as
+     * the first frontend user of the seed.
+     */
+    #[Test]
+    public function bothTreesLinkTheRichTextEditorStylesheetOnlyWithTheProfileEditor(): void
+    {
+        $this->importSeed();
+        $this->writeSiteConfigurations();
+
+        $editorPaths = $this->pathsOfPagesWith(['academicpersonsedit_profileediting']);
+        $this->assertCount(1, $editorPaths, 'The seed lost the page of the profile editor.');
+        $otherPaths = ['/', ...$this->pathsOfPagesWith(['academicjobs_newjobform'])];
+        $this->assertCount(2, $otherPaths, 'The seed lost the page of the job form.');
+        $translatedEditorPath = $this->translatedPathOf($editorPaths[0]);
+
+        $expectations = [];
+        foreach ([$editorPaths[0], $translatedEditorPath] as $path) {
+            $expectations[$path] = 1;
+        }
+        foreach ($otherPaths as $path) {
+            $expectations[$path] = 0;
+        }
+
+        $failures = [];
+        foreach ($expectations as $path => $expected) {
+            foreach ([$path, self::LEGACY_SEGMENT . $path] as $requested) {
+                $response = $this->executeFrontendSubRequest(
+                    new InternalRequest(self::BASE . $requested),
+                    (new InternalRequestContext())->withFrontendUserId(1),
+                );
+                if ($response->getStatusCode() !== 200) {
+                    $failures[] = sprintf('"%s" answers %d', $requested, $response->getStatusCode());
+                    continue;
+                }
+                $count = preg_match_all('#<link rel="stylesheet" href="[^"?]*/Css/editor\.css#', (string)$response->getBody());
+                if ($count !== $expected) {
+                    $failures[] = sprintf('"%s" links the stylesheet %d times, expected %d', $requested, $count, $expected);
+                }
+            }
+        }
+
+        $this->assertSame([], $failures, "The interface stylesheet of CKEditor 5 is not linked as expected:\n  " . implode("\n  ", $failures));
+    }
+
+    /**
+     * The German path of a page of the `/` tree, which the seed translates.
+     */
+    private function translatedPathOf(string $path): string
+    {
+        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('pages');
+        $queryBuilder->getRestrictions()->removeAll();
+        $slug = $queryBuilder
+            ->select('translation.slug')
+            ->from('pages', 'page')
+            ->join('page', 'pages', 'translation', $queryBuilder->expr()->eq('translation.l10n_parent', $queryBuilder->quoteIdentifier('page.uid')))
+            ->where(
+                $queryBuilder->expr()->eq('page.slug', $queryBuilder->createNamedParameter($path)),
+                $queryBuilder->expr()->eq('page.sys_language_uid', $queryBuilder->createNamedParameter(0, Connection::PARAM_INT)),
+                $queryBuilder->expr()->lt('page.uid', $queryBuilder->createNamedParameter(self::PAGE_OFFSET, Connection::PARAM_INT)),
+                $queryBuilder->expr()->eq('translation.sys_language_uid', $queryBuilder->createNamedParameter(1, Connection::PARAM_INT)),
+            )
+            ->orderBy('translation.uid')
+            ->setMaxResults(1)
+            ->executeQuery()
+            ->fetchOne();
+        $this->assertIsString($slug, sprintf('The seed lost the German variant of "%s".', $path));
+
+        return '/de' . $slug;
+    }
+
+    /**
      * The paths of the pages of the `/` tree that carry a content element of one of the
      * given types, one page per type, in the order of the types.
      *

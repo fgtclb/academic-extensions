@@ -245,6 +245,40 @@ committed site configuration names the set.
 `LegacyDeliveryTest::bothTreesLinkTheStylesheetOfTheDevelopmentInstancesOnce()`
 asserts both routes.
 
+The same file links one stylesheet that is not compiled here: the interface
+stylesheet of CKEditor 5, which the rich text fields of the profile editor need
+(ACE-936). The editor imports CKEditor 5 from the import map of
+`EXT:rte_ckeditor`, and where the styles of its toolbar, buttons, balloons and
+dialogs come from depends on the patch level of the core:
+
+| TYPO3              | CKEditor 5      | Interface styles                                                                      |
+|--------------------|-----------------|---------------------------------------------------------------------------------------|
+| 13.4.35, 14.3.7    | 47.6.0          | injected as `<style>` elements by the scripts themselves, on any page                 |
+| 13.4.36, 14.3.8 on | 48.5.2 or later | `EXT:rte_ckeditor/Resources/Public/Css/editor.css`, some 220 KB, linked by FormEngine |
+
+On the patch levels of the second row a frontend page gets no styles at all:
+the toolbar icons render at the size of their SVG, and the toolbar, the link
+balloon and the accessibility dialog are not laid out. `Stylesheet.typoscript`
+therefore links `editor.css` of the core, before the stylesheet of the
+instances, on a page that holds a content element of the profile editor and on
+no other page, with an `if.isTrue.numRows` over `tt_content` of the current
+page. On the first row the file holds the few rules TYPO3 adds and the scripts
+still inject the rest, so the link changes nothing there.
+
+The file of the core is linked rather than its rules compiled into
+`academic-extensions.css`. It is the stylesheet of the very CKEditor build the
+core ships, so a core update that moves to the next CKEditor release moves the
+stylesheet with it. Compiling it from the `ckeditor5` npm package would pin one
+release for two cores and every patch level of them, and put another 220 KB on
+every page. A partial of our own would only cover the parts someone noticed. It
+also needs no thought about the licence: CKEditor 5 is licensed under the GPL,
+and nothing of it is copied into this repository.
+`LegacyDeliveryTest::bothTreesLinkTheRichTextEditorStylesheetOnlyWithTheProfileEditor()`
+asserts the link on the page of the editor, in both trees and both languages,
+and its absence on the root page and on the page of the job form. The job form
+of `academic_jobs` runs CKEditor 4 from its CDN, which loads its own skin and
+needs nothing from the site.
+
 It is an example, written against the markup and the Bootstrap 5 classes it
 carries, and the manual of each extension links its partial for an integrator
 to copy from. It is never released, see
@@ -582,8 +616,12 @@ What follows from taking a library from the core:
   write it in
   `packages-dev/dev-site/Resources/Private/Scss/frontend/_academic-persons-edit.scss`,
   scoped to the editor's stage so it cannot reach a `cropper-` class another
-  extension brought along. Check for the stylesheet as well as for the module,
-  and name a missing one in the manual.
+  extension brought along. CKEditor 5 went the same way in TYPO3 13.4.36 and
+  14.3.8, where its styles moved from its scripts into a stylesheet of
+  `EXT:rte_ckeditor` that only the backend links, see
+  [The stylesheet of the development instances](#the-stylesheet-of-the-development-instances).
+  Check for the stylesheet as well as for the module, on every patch level the
+  branch supports, and name a missing one in the manual.
 - **A version the core ships is not automatically the right one** — but it is
   the first candidate, and the API difference has to be a real obstacle before
   a copy is shipped instead. Check the version, not the presence of a mapping.
