@@ -47,6 +47,13 @@ This branch supports **TYPO3 v12 and v13**.
   a site set points at the very files the static template registration points
   at. Content elements are hidden globally and re-enabled per component. Site
   sets do nothing on v12, so the static half is the load-bearing one here.
+- An inline event handler in a template is **allowed by the hash of its exact
+  text** in `script-src-attr`, from the `Configuration/ContentSecurityPolicies.php`
+  of its extension, or the frontend policy of TYPO3 blocks it. A unit test of
+  `monorepo-shared` holds every template and every hash together, with the
+  profile editor of `academic_persons_edit` as the one documented exception,
+  and a listener of `academic_base` takes the directive out again where a site
+  allows inline scripts already.
 
 ## Pages
 
@@ -71,6 +78,7 @@ This branch supports **TYPO3 v12 and v13**.
 | [Content element rendering](content-element-rendering.md)       | The two rendering shapes, what the `Default` layout renders, why a template needs it, and who renders a plugin's header.                                            |
 | [Page type rendering](page-type-rendering.md)                   | How the program, partner and project page types refine the site's page object, and where their page record comes from on `FLUIDTEMPLATE` and `PAGEVIEW`.            |
 | [Hidden records](hidden-records.md)                             | What the plugin option "Show hidden records" needs beyond the query settings on a translated page, on v12 and v13, and the trait that provides it.                  |
+| [Content Security Policy](content-security-policy.md)           | Why the partner, project and program filter forms keep their inline handler, the hash allowed, the listener for sites with inline scripts, and the button.          |
 
 ## See also
 

@@ -5,8 +5,8 @@ database, no site, no request. Everything the subject needs is passed to it or
 stubbed. That makes the suite fast enough to run on every save, and it makes a
 failure point at one class instead of at a stack.
 
-There are 108 unit test classes: 93 across the twelve extensions, four in
-`packages-dev/dev-site`, six in `packages-dev/monorepo-shared` and five in
+There are 110 unit test classes: 94 across the twelve extensions, four in
+`packages-dev/dev-site`, seven in `packages-dev/monorepo-shared` and five in
 `packages-dev/testing-helper`. Twelve of them are the one-line version
 compatibility test every extension carries (see
 [below](#the-version-compatibility-test)). Measured with
@@ -90,9 +90,11 @@ the check that every `ext_emconf.php` of the repository names its dependencies
 by extension key, see [below](#the-ext_emconfphp-dependency-keys), and the one
 that every translation names its extension without an underscore, see
 [below](#the-extension-name-of-translations), the checks of the manual
-links and the branch alias key, see [below](#the-links-of-the-manuals), and
-the check of the form `bin/set-version` writes, see
-[below](#the-form-binset-version-writes).
+links and the branch alias key, see [below](#the-links-of-the-manuals), the
+check of the form `bin/set-version` writes, see
+[below](#the-form-binset-version-writes), and the check that every inline event
+handler of a template is allowed by the Content Security Policy of its
+extension, see [below](#inline-event-handlers).
 
 **Test classes are autoloaded, not included.** Each extension registers its own
 `Tests/` namespace as `autoload-dev`, for example
@@ -391,6 +393,49 @@ package manifest declares the key, and is the same test as on `main`. The test
 cannot run the tools themselves, `pkw` and `tailor` are not part of the
 container, so the pre-release checklist asks for that run, see
 [Releasing](../workflow/releasing.md#pre-release-checklist).
+
+## Inline event handlers
+
+[`InlineEventHandlerTest`](../../packages-dev/monorepo-shared/Tests/Unit/InlineEventHandlerTest.php)
+reads every Fluid template below `packages/fgtclb/*/Resources/Private/` and
+collects its inline event handlers: an `on…` attribute of a tag or of a
+ViewHelper, quoted or not, and an `on…` key of a Fluid array, as
+`additionalAttributes` takes it, also as the first argument of an inline call
+(ACE-924). It fails for every handler whose text the
+`Configuration/ContentSecurityPolicies.php` of the same extension does not
+allow, that is an `InlineEventHandlerMutation` of `academic_base` for the
+frontend scope with exactly that text. A plain `Mutation` with the same hash
+does not count: the listener that takes the directive out on a site with
+`'unsafe-inline'` recognises the mutation by its class. A second test fails
+for a hash the file allows that no handler of the extension needs any more,
+because it widens the policy of every site for nothing.
+
+A nonce does not cover an event handler attribute, so the frontend policy of
+TYPO3 blocks a handler that is not allowed once a site enforces the policy.
+Nothing fails in a rendering: the select of a filter form stops submitting,
+and only the console of the browser reports the violation. See
+[Content Security Policy](../architecture/content-security-policy.md).
+
+The text is taken as the browser hashes it: a character reference in an
+attribute of a plain HTML tag is decoded, one in an attribute of a ViewHelper
+is not, because Fluid encodes the value again when it renders the tag, and the
+escaping backslashes of a Fluid string are dropped. A handler built from a
+variable cannot be allowed by a hash and is reported as such. The name is
+matched in any letter case, as HTML does, so a ViewHelper argument whose name
+starts with `on` is reported too. The content of `<f:comment>` is skipped. A
+third test runs the collector over template snippets, a tag, a ViewHelper, a
+character reference in either, an unquoted attribute, a variable, both array
+forms and an inline call, a `data-` attribute and a comment, so a change of the
+patterns cannot turn the check into one of nothing.
+
+`academic_persons_edit` is the one exception, listed with the number of its
+handlers and its reason in the constant `NOT_ALLOWED` of the test. Its profile
+editor on this branch has eight handlers, six of them built from a variable,
+and loads CKEditor 4 from a CDN that the default policy blocks as well. The
+test skips its handlers as long as there are exactly eight, so a new handler
+there fails as one in any other package does, and the entry cannot outlive its
+reason. The test
+is the same as on `main` apart from that exception.
 
 ## See also
 

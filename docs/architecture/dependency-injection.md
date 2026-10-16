@@ -125,7 +125,7 @@ they are used in production code across nine packages:
 
 | Attribute            | Sites   | Examples                                                                    |                                                |
 | -------------------- | ------- | --------------------------------------------------------------------------- |                                                |
-| `#[Exclude]`         | 12      | the eight `Classes/Core12                                                   | Core13/` types and `EnvironmentBuilderFactory` |
+| `#[Exclude]`         | 13      | the eight `Classes/Core12                                                   | Core13/` types and `EnvironmentBuilderFactory` |
 | `#[Autoconfigure]`   | 11      | `academic-base/Classes/Service/ArrayObjectMapper.php:24` (`public: true`)   |                                                |
 | `#[Autowire]`        | 7       | same file, line 28 — `#[Autowire(service: 'academic-base.serializer')]`     |                                                |
 | `#[AsAlias]`         | 2       | `academic-persons/Classes/Service/RecordSynchronizer.php:21`                |                                                |
@@ -137,11 +137,14 @@ commands in `academic-persons` are still registered with `console.command` tags
 in YAML. `#[AsTaggedItem]`, `#[AsController]` and `#[AsEventListener]` have zero
 sites.
 
-Nine of the twelve `#[Exclude]` sites are the core version split in
+Nine of the thirteen `#[Exclude]` sites are the core version split in
 `academic-base`, where the attribute keeps the wrong version's classes out of
-the compiled container. The remaining three are data objects in
+the compiled container. Three are data objects in
 `academic-persons/Classes/Settings/` — a different job for the same attribute,
 described in [Class design](class-design.md#keep-data-objects-out-of-the-container).
+The last one is `academic-base/Classes/Security/InlineEventHandlerMutation.php`,
+a mutation of the Content Security Policy that the extensions return from their
+`Configuration/ContentSecurityPolicies.php`, never a service.
 
 The `#[Autowire]` example is the clearest illustration of the two styles working
 together: `academic-base/Configuration/Services.yaml` lines 15–17 define a
