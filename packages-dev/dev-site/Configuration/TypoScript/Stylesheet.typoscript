@@ -9,4 +9,18 @@
 # Included by the static template of this package for the "/legacy/" tree, and by
 # the set "fgtclb/academics-dev-site-stylesheet" for the "/" tree, where it comes
 # after the stylesheets of the theme.
+#
+# The interface stylesheet of CKEditor 5 comes first, and only on a page with the
+# profile editor of EXT:academic_persons_edit. The editor imports CKEditor 5 from
+# the import map of EXT:rte_ckeditor, and from TYPO3 13.4.36 and 14.3.8 on the
+# styles of its toolbar, buttons and balloons are no longer injected by its
+# scripts. They are in "editor.css" of EXT:rte_ckeditor, which the backend form
+# links and a frontend page does not. Linking the file of the core keeps the
+# styles at the version of the editor the core ships. Before those patch levels
+# the file holds a few TYPO3 additions only and the scripts bring the rest.
+page.includeCSS.academicsDevSiteRichTextEditor = EXT:rte_ckeditor/Resources/Public/Css/editor.css
+page.includeCSS.academicsDevSiteRichTextEditor.if.isTrue.numRows {
+    table = tt_content
+    select.where = {#CType} = 'academicpersonsedit_profileediting'
+}
 page.includeCSS.academicsDevSite = EXT:academics_dev_site/Resources/Public/Css/frontend/academic-extensions.css

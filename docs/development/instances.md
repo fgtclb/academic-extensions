@@ -364,6 +364,12 @@ page of those types in `/legacy/` shows its title and its content elements. A
 change to the stylesheet is a change to the SCSS, followed by `buildJs` and a
 commit of the compiled file.
 
+The page of the profile editor links a second stylesheet before it,
+`editor.css` of `EXT:rte_ckeditor`. From TYPO3 13.4.36 and 14.3.8 on it holds
+the interface styles of CKEditor 5, without which the toolbar of a rich text
+field shows oversized icons and no layout, see
+[Frontend assets](frontend-assets.md#the-stylesheet-of-the-development-instances).
+
 To check that it reaches a page, look for it in the source, and fetch it:
 
 ```bash
