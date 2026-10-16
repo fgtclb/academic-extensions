@@ -79,6 +79,29 @@ left in the session by a redirect page never turns up on the form. Rendering
 the default queue in `New.html` was rejected for that reason, and because
 Extbase queued its own error message there.
 
+A redirect page the controller cannot link counts as none (ACE-932). TYPO3
+links no page without a translation into a language with strict fallback, nor
+for example a missing, deleted or hidden page, a page restricted to other
+users or outside its publish dates, or a folder: `PageLinkBuilder` throws
+`UnableToLinkException`, 1551621996 for the strict fallback, and
+`ContentObjectRenderer::createUrl()` catches it and returns `''`, which the
+Extbase `UriBuilder` passes on. `redirectToUri('')` then completed the empty
+address with `GeneralUtility::locationHeaderUrl()` to the script directory,
+the root of the site, on v13 and v14 alike. The scheme of that address follows
+the same rule on both, the `HTTPS` server variable, `reverseProxySSL`, or
+`X-Forwarded-Proto` from a trusted proxy. The
+controller therefore builds the address of the redirect page before it queues
+the confirmation. An empty one is logged as a warning with the redirect page,
+the form page and the language, and `decide()` runs again with no redirect
+page, so the visitor returns to the form and the mode applies as for a form
+without one: the conditional mode shows the confirmation on the form. Keeping
+the first decision would have suppressed it on the very page the visitor is
+shown, and keeping the queue of the plugin would have left it in the session.
+Linking the default language of the page instead was rejected, it ignores the
+strict fallback the site chose. The check sits on the built address rather
+than on the page record, so every source of the page and every reason TYPO3
+has not to link it is covered at once.
+
 That error message, "An error occurred while trying to call ...", is switched
 off: `getErrorFlashMessage()` of the controller returns `false`. TYPO3 v13
 stored it in the session, v14 does not, so on v13 it turned up next to the
@@ -195,6 +218,13 @@ its wrapper.
   and the mode, the `303` to the German address of the redirect page or,
   without one, to the German form page, the German confirmation, and that the
   job is stored in the default language, on v13 and v14.
+- `academic-jobs/Tests/Functional/Plugins/AcademicJobsNewJobFormUntranslatedRedirectPageTest.php`
+  names a redirect page without a German translation for the German form,
+  through the element, the site setting, a listener and `listPid`, and a
+  hidden page, a deleted page and a folder for the English one. It asserts
+  the `303` to the form page, the confirmation in the form, once with the mode
+  "always" and none with the mode "never", the warning about a mail that
+  could not be sent, and the warning in the log, on v13 and v14.
 - `academic-jobs/Tests/Functional/Plugins/AcademicJobsNewJobFormRejectedSubmissionTest.php`
   asserts that a rejected submission queues no error message of Extbase, also
   not into the session for the confirmation that follows.
