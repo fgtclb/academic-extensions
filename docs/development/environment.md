@@ -477,11 +477,43 @@ checks the local image first and retries a failed pull up to three times: an
 anonymous Docker Hub pull is rate limited per source IP, hosted runners share
 address space, and a single failed pull otherwise ends a job with exit 125
 before a test has run. The `ghcr.io` images have never needed it, which is why
-only the Docker Hub ones are guarded.
+only the Docker Hub ones are guarded. The renderer is the exception: it goes
+through `ensureImage()` when it is not cached, see the next paragraphs.
+
+The documentation image is the one a cached copy is not good enough for. It is
+used by its `latest` tag on purpose, so a manual is checked with the release
+of render-guides that docs.typo3.org renders it with, and neither docker nor
+podman refreshes a tag they already have. `checkRstRenderingAll` and
+`checkRstRenderingSingle` therefore pull it once per run in `pullRenderer()`
+before they render, and print the release they render with in a `Renderer:`
+line. A stale cached release hid ACE-935 on main: from 0.46.0 on the renderer
+drops an `image` in a table cell without a log line, and a local 0.45.0 still
+showed it.
+
+When that pull fails, for example because the registry cannot be reached, the
+run says so on stderr and renders with the cached image rather than failing
+without any output. The summary at the end of the run repeats it as
+`Renderer: render-guides <version> (cached, pull failed)`. Without a cached
+image the pull goes through `ensureImage()` and its retries, and the run fails
+when none of them succeeds. With a cached image a fully offline run still fails
+the gate, because the renderer loads the interlink inventories from
+docs.typo3.org and logs a warning when it cannot, but the rendered pages are
+still written. The price of `latest` is accepted: a new renderer release can
+turn the gate red without a change in the repository, see
+[The render is a gate](../workflow/changelog-and-documentation.md#the-render-is-a-gate-not-an-artifact-producer).
 
 `-u` refreshes the PHP images that already exist locally and removes the
 dangling ones, in the `update` arm. Run it when tests start
-failing in ways that do not match the code.
+failing in ways that do not match the code. It does not remove the renderer
+releases a newer pull has superseded, which stay as dangling images of some
+500 to 700 MB each. They carry the source label of render-guides, which
+selects them on both engines, with `docker` in place of `podman` for docker:
+
+```bash
+podman images --filter dangling=true \
+  --filter label=org.opencontainers.image.source=https://github.com/TYPO3-Documentation/render-guides \
+  --quiet | xargs --no-run-if-empty podman rmi
+```
 
 ## Xdebug
 

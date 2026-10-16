@@ -331,8 +331,17 @@ The user-facing manuals live per package in
 `packages/fgtclb/<extension>/Documentation/` and are reST, not Markdown.
 `checkRstRenderingAll` iterates over every extension folder that has a
 `Documentation/` directory — twelve today — and renders each one with the
-`ghcr.io/typo3-documentation/render-guides` image
-; the rendering itself is in `executeRstRendering()`.
+`ghcr.io/typo3-documentation/render-guides` image. The rendering itself is in
+`executeRstRendering()`.
+
+The image is used by its `latest` tag, which is the release docs.typo3.org
+renders with, and both suites pull it before they render. A container engine
+never refreshes a tag it already has, and a stale local release hid ACE-935 on
+main, where 0.46.0 and later drop an image in a table cell that a local 0.45.0
+still showed. A failed pull is reported on stderr and in the summary, and the
+cached image is used. A new renderer release can turn this gate red without a
+change in the repository, and that is accepted, see
+[Container images](environment.md#container-images).
 
 **This is a real gate, not an artifact producer.** The renderer is invoked with
 `--fail-on-log --fail-on-error`, so a warning fails the job. The results are
