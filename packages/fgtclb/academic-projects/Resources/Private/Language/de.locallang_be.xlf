@@ -60,8 +60,8 @@
         <target>Kategorien</target>
       </trans-unit>
       <trans-unit id="flexform.categories.description">
-        <source>Select categories. Main categories will select all subcategories by OR, multiple categories selects by AND</source>
-        <target>Wählen Sie Kategorien aus. Hauptkategorien wählen alle Unterkategorien durch ODER aus, mehrere Kategorien wählen durch UND aus</target>
+        <source>Only projects that carry every category selected here are shown, also when two of them are of the same category type. The subcategories of a selected category are not included. A visitor's filter replaces them for the category types the form offers.</source>
+        <target>Es werden nur Projekte angezeigt, die jede hier ausgewählte Kategorie tragen, auch wenn zwei davon zum selben Kategorietyp gehören. Unterkategorien einer ausgewählten Kategorie werden nicht einbezogen. Eine Filterauswahl der Besucher ersetzt sie für die Kategorietypen, die das Formular anbietet.</target>
       </trans-unit>
       <trans-unit id="flexform.showHiddenRecords.label">
         <source>Show hidden records</source>
