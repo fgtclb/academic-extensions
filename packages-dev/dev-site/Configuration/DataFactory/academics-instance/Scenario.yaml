@@ -3982,13 +3982,14 @@ entities:
                                       </sheet>
                                   </data>
                               </T3FlexForms>
-        # Four site settings are not optional here. Without
+        # Three site settings are not optional here. Without
         # "plugin.tx_academicjobs.persistence.storagePid" a submitted job is written to
-        # pid 0 and is invisible; without "email.from" and "email.recipientEmail"
-        # Symfony Mailer throws after the row was written; and "listPid" is read as
-        # $this->settings['listPid'] with no null coalesce, so an unset value is an
-        # undefined array key - which this repository's error handling turns into an
-        # exception rather than a notice.
+        # pid 0 and is invisible. Without "email.from" and "email.recipientEmail" the
+        # notification mail cannot be built: the job is saved, the failure is logged and
+        # no mail is sent. "listPid" is optional. It is the target of the back link of
+        # the job detail, and the deprecated last resort of the redirect after a saved
+        # job, which the form only reaches when neither its content element nor
+        # "saveForm.fallbackRedirectPageId" names a page.
         - self:
               id: 230
               title: 'Academic jobs'
@@ -4201,6 +4202,10 @@ entities:
                             CType: 'academicjobs_detail'
                             header: 'Stelle'
                             header_layout: 2
+            # The form sends the visitor to "Job submitted", whose text is the
+            # confirmation. "Suppress when a redirect page is set" (0) queues no message
+            # for that page. "Always" (1) would leave one in the session of the visitor
+            # for a page that renders the queue of the plugin, and no page here does.
             - self:
                   id: 234
                   title: 'Post a job'
@@ -4228,7 +4233,7 @@ entities:
                                               <value index="vDEF">235</value>
                                           </field>
                                           <field index="settings.flashMessageCreationMode">
-                                              <value index="vDEF">1</value>
+                                              <value index="vDEF">0</value>
                                           </field>
                                       </language>
                                   </sheet>
@@ -4251,7 +4256,7 @@ entities:
                                                   <value index="vDEF">235</value>
                                               </field>
                                               <field index="settings.flashMessageCreationMode">
-                                                  <value index="vDEF">1</value>
+                                                  <value index="vDEF">0</value>
                                               </field>
                                           </language>
                                       </sheet>
