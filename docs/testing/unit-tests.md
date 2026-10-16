@@ -5,8 +5,8 @@ database, no site, no request. Everything the subject needs is passed to it or
 stubbed. That makes the suite fast enough to run on every save, and it makes a
 failure point at one class instead of at a stack.
 
-There are 173 unit test classes: 150 across the twelve extensions, five in
-`packages-dev/dev-site`, thirteen in `packages-dev/monorepo-shared` and five in
+There are 174 unit test classes: 150 across the twelve extensions, five in
+`packages-dev/dev-site`, fourteen in `packages-dev/monorepo-shared` and five in
 `packages-dev/testing-helper`. Twelve of them are the one-line version
 compatibility test every extension carries (see
 [below](#the-version-compatibility-test)). Measured with
@@ -90,6 +90,8 @@ that every translation names its extension without an underscore, see
 see [below](#the-extension-points), the check that no source file names an
 issue of a customer project, see [below](#customer-issue-keys), the check
 of the manual links, see [below](#the-links-of-the-manuals), the check of
+the link table of every package README, see
+[below](#the-link-table-of-the-readmes), the check of
 the directives in table cells of the manuals, see
 [below](#directives-in-table-cells), the check of
 the branch alias key, see [below](#the-branch-alias-key), the check of the form
@@ -116,7 +118,7 @@ them follow the shape below.
 
 **Every test class is `final`, declares `strict_types`, and extends
 `TYPO3\TestingFramework\Core\Unit\UnitTestCase`.** There is no local abstract
-unit test case, and no unit test extends another test class. The twenty-one below
+unit test case, and no unit test extends another test class. The twenty-four below
 `packages-dev/` are the exception to the base class: they need nothing of
 TYPO3 and extend PHPUnit's `TestCase` directly.
 
@@ -522,6 +524,46 @@ above. The key of the alias is the version name composer gives the branch,
 `dev-main` for `main` and `2.x-dev` for `2`, and the test maps it back to the
 bare branch name. A newly cut version branch changes both, see
 [Releasing](../workflow/releasing.md).
+
+## The link table of the READMEs
+
+[`ReadmeLinkTableTest`](../../packages-dev/monorepo-shared/Tests/Unit/ReadmeLinkTableTest.php)
+reads the `README.md` of every package below `packages/fgtclb/` and asserts the
+link table below its title in the form ACE-934 gave it: one blank line after
+the title, an empty first header cell and `URL` as the second, and these rows
+in this order:
+
+| Row                | Has to be                                                             |
+|--------------------|-----------------------------------------------------------------------|
+| `**Repository:**`  | `https://github.com/fgtclb/<package directory>`, the split repository |
+| `**Read online:**` | `https://docs.typo3.org/p/<composer name>/<manual version>/en-us/`    |
+| `**TER:**`         | `https://extensions.typo3.org/extension/<extension key>/`             |
+
+A package without the table fails, and so does a table with another header,
+another row or another order. The padding is left to `lintMarkdown`.
+
+The manual version is `main` on the branch `main`. On a version branch it is
+the major and minor version of the package's `VERSION`, `2.4` on branch `2`,
+because docs.typo3.org renders the manual of a version line per release tag.
+The branch is the one `DocumentationGuidesTest` reads from the root branch
+alias. A minor version bump on a version branch therefore fails the test until
+the READMEs link the manual of the new version, which is intended: the README
+a release ships to the TER links the manual of that release, and the link
+answers 404 only until the tag is pushed. A branch cut by `bin/cut-branch`
+moves to a version line of its own the same way, so its READMEs have to follow
+before the checks of its first pull request pass. A data set per branch form
+covers the mapping, so the form of a version branch is tested on `main` too.
+
+`-` stands in the "Read online" row only for a package of the list
+`MANUALS_NOT_RENDERED` in the test, which names the issue that makes its manual
+render. Today that is `academic-base` with ACE-937: its manual is not rendered
+on docs.typo3.org yet. A listed package that links a manual fails, so the
+change that links it also removes its entry, and an entry that names no
+package directory fails as well.
+
+The tables were written by hand and copied from one README to the next. Until
+ACE-934 five READMEs linked a manual path that answered 404 and four had no
+manual link at all, and nothing reported it.
 
 ## Directives in table cells
 

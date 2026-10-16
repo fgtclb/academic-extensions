@@ -130,6 +130,13 @@ until they do, see
 [Unit tests](../testing/unit-tests.md#the-links-of-the-manuals). On an ordinary
 run neither changes.
 
+The "Read online" link in the table of every package `README.md` follows the
+version line as well, and the script does not write it. It names `main` on
+`main` and the minor version on a version branch, so a minor bump on a version
+branch and the cut of a new one fail a unit test until the READMEs link the
+new manual, see
+[Unit tests](../testing/unit-tests.md#the-link-table-of-the-readmes).
+
 ## `bin/release` — orchestrate the release
 
 ```shell
