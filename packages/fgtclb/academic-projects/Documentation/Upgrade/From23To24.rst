@@ -74,7 +74,7 @@ missing tables and columns of the installation to be added anyway.
 :bash:`upgrade:run` adds them before it runs a wizard,
 :guilabel:`Admin Tools > Upgrade > Upgrade Wizard` asks for it first.
 
-Run the two wizards by name and in this order:
+Run the two wizards by name:
 
 #.  ``academicProjects_pluginUpgradeWizard``, :guilabel:`Migrate
     academic_projects plugins from "list_type" to "CType".` It turns the
@@ -98,8 +98,12 @@ Run the two wizards by name and in this order:
     wizard migrated no record at all. See :ref:`important-1785796200` and
     :ref:`important-ace-847-academic-projects`.
 
-    It reads the content elements the plugin wizard creates, so the plugin
-    wizard comes first. TYPO3 does not enforce that order.
+    It reads the :guilabel:`Insert plugin` elements of 1.x as well, so the two
+    wizards can run in either order, also together in one bare
+    ``vendor/bin/typo3 upgrade:run``. Up to 2.3 it read the content elements
+    the plugin wizard creates only, and a bare ``upgrade:run`` recorded it as
+    done before it had anything to read. See
+    :ref:`important-ace-923-academic-projects`.
 
     An installation that ran it before has it recorded as done, and TYPO3
     does not offer it again. TYPO3 13 marks a wizard undone with
