@@ -45,7 +45,7 @@ plugin:
       fallbackRedirectPageId: 235
     email:
       # Both addresses must be non-empty: the form mails the notification to
-      # "recipientEmail" from "from", and an empty one raises an exception in
-      # the middle of a frontend request rather than a warning in a log.
+      # "recipientEmail" from "from". With an empty one the job is saved, but
+      # the mail cannot be built and the failure is only logged.
       from: seed-noreply@example.org
       recipientEmail: jobs@example.org
