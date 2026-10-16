@@ -322,6 +322,34 @@ include. Keeping the definition global while the `show` entry moves would make
 the element unreachable on v12; the other way round it would be offered on
 pages that did not ask for it.
 
+### A field of a shared FlexForm that an element ignores
+
+The list, the list-and-detail and the card element of `academic-persons` share
+one data structure, `Configuration/FlexForms/Core12|Core13/List.xml`, and not
+every element reads every field. Two ways hide such a field, and both are in
+use (ACE-923):
+
+- A display condition in the data structure, where the element is told apart
+  by the content type of the record. `settings.detailPid` carries
+  `<displayCond>FIELD:parentRec.CType:!=:academicpersons_listanddetail</displayCond>`,
+  because that element always links to its own page, and
+  `settings.pageTitleFormat`, read only by its detail view, carries `:=:` and
+  is offered there alone. `EvaluateDisplayConditions` resolves `parentRec.` for
+  a flex field on v12 and v13 alike (12.4.45 checked). The condition applies
+  wherever the element exists, so it is the choice for a field that has no
+  effect in an element at all.
+- A `TCEFORM.tt_content.pi_flexform.<CType>.sDEF.<field>.disabled = 1` line in
+  the page TSconfig of the component. The card hides its list, sorting and
+  pagination fields and its unit and function type restriction this way. It
+  travels with the component, so an installation that does not use the card is
+  not configured for it either.
+
+Either way the stored value stays: the DataHandler merges a saved FlexForm into
+the stored one, so a field the form did not send keeps its value and is back
+when the element is switched to a type that offers it.
+`academic-persons/Tests/Functional/Backend/FormEngine/OptionsWithoutEffectTest.php`
+compiles the three elements the way FormEngine opens them and saves each.
+
 ## There is no double-parse guard, and that is deliberate
 
 A site that uses *both* mechanisms parses the shared files twice — a v13 only
