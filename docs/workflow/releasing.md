@@ -55,7 +55,7 @@ bin/set-version <version> <type> [--source-branch=<name>] [--dry-run]
 ```
 
 It edits working-tree files and does **nothing else**: no git, no network
-(`bin/set-version:44-45`). That separation is what makes it safe to run and
+(`bin/set-version:46-47`). That separation is what makes it safe to run and
 inspect on its own.
 
 `<version>` is always a bare `MAJOR.MINOR.PATCH`; the `-dev` suffixes are
@@ -67,17 +67,18 @@ derived, never passed. `<type>` decides how:
 | `post-release` | `X.Y.Z-dev`     | `X.Y.Z`      | `~X.Y.Z@dev`                   | `X.Y.x-dev`  |
 | `dev`          | `X.Y.Z-dev`     | `X.Y.Z`      | `~X.Y.Z@dev`                   | `X.Y.x-dev`  |
 
-`post-release` and `dev` share one derivation (`bin/set-version:195-208`); `dev`
+`post-release` and `dev` share one derivation (`bin/set-version:197-210`); `dev`
 is the thin variant used for branching and forced minor or major bumps.
 `post-release` does **not** increment anything — the version passed is already
 the next one.
 
-What one run rewrites, in order (`bin/set-version:359-455`):
+What one run rewrites, in order (`bin/set-version:373-470`):
 
 1. `Build/Scripts/runTests.sh` → `COMPOSER_ROOT_VERSION`
 2. every split extension → academic composer dependencies,
    `extra.typo3/cms.version`, branch alias, `tailor set-version`, `VERSION`,
-   `edit-on-github-branch` of `Documentation/guides.xml`
+   `edit-on-github-branch` of `Documentation/guides.xml`, the "Read online"
+   link of `README.md`
 3. functional-test fixture extensions → composer dependencies only
 4. every `ext_emconf.php` (splits **and** fixtures) → `version`, plus the
    `depends`/`suggests` constraints for each academic extension key
@@ -88,10 +89,10 @@ What one run rewrites, in order (`bin/set-version:359-455`):
 
 Nothing in that list is hardcoded. The package set is discovered by looking for
 directories under `packages/fgtclb/*/` that carry both a `composer.json` and an
-`ext_emconf.php` (`bin/set-version:226-237`); the extension key is read from
+`ext_emconf.php` (`bin/set-version:228-239`); the extension key is read from
 `extra.typo3/cms.extension-key`, never guessed from the directory name; fixture
 extensions are found under `Tests/Functional/Fixtures/Extensions`
-(`bin/set-version:242-247`); the `packages-dev` packages and the development
+(`bin/set-version:244-249`); the `packages-dev` packages and the development
 instances are discovered by path. A thirteenth extension, a fourth
 `packages-dev` package or a `core-15` instance is picked up by existing, which
 is precisely what the previously hardcoded instance list failed to do.
@@ -112,7 +113,7 @@ and the copy on branch `2` defaults to `2`.
 
 The branch alias is keyed to the version name composer gives that branch:
 `dev-main` for `main`, `2.x-dev` for `2`, `2.2.x-dev` for `2.2`.
-`Build/Scripts/composerBranchVersion.sh` prints it (`bin/set-version:125-142`).
+`Build/Scripts/composerBranchVersion.sh` prints it (`bin/set-version:127-144`).
 Composer applies an alias only under that key and skips any other without a
 word, and `composer validate --strict` accepts it as well. Branch `2` carried
 `dev-2` from its cut until ACE-784, so `2.4.x-dev` did not exist and no split
@@ -131,10 +132,15 @@ until they do, see
 run neither changes.
 
 The "Read online" link in the table of every package `README.md` follows the
-version line as well, and the script does not write it. It names `main` on
-`main` and the minor version on a version branch, so a minor bump on a version
-branch and the cut of a new one fail a unit test until the READMEs link the
-new manual, see
+version line as well, and `Build/Scripts/readmeManualLink.php` writes it from
+`--source-branch` and the version: `main` on `main`, the minor version on a
+version branch (`2.4` for `2.4.0` on `2`). A minor bump on a version branch
+and the cut of a new one therefore link the manual of the new version line
+without a hand edit. A `-` for a manual that is not rendered
+yet stays, and a README that already links the manual is not touched. The
+padding of the table follows the new link. A README without the table stops
+the run. A link changed by hand fails a unit test until it names the manual of
+the branch again, see
 [Unit tests](../testing/unit-tests.md#the-link-table-of-the-readmes).
 
 ## `bin/release` — orchestrate the release
@@ -192,7 +198,7 @@ Pre-flight (`bin/release:178-200`):
 
 Tooling is resolved and verified up front, before anything changes:
 `bin/set-version` needs `composer`, `php`, `tailor`, `pkw`, `jq` and `sed` on
-`PATH` (`bin/set-version:156-162`); `bin/release` additionally needs `git` and an
+`PATH` (`bin/set-version:158-164`); `bin/release` additionally needs `git` and an
 authenticated `gh` (`bin/release:154-162`).
 
 ## `bin/cut-branch`: cut a version branch
@@ -216,7 +222,8 @@ safety gates of `bin/release`, see [above](#two-independent-safety-gates).
    hand or an interrupted run continues
 2. `git checkout -b cut-<branch> <source commit>`
 3. `bin/set-version <current version> dev --source-branch=<branch>`: the branch
-   alias becomes `<branch>.x-dev`, the edit branch of the manuals `<branch>`
+   alias becomes `<branch>.x-dev`, the edit branch of the manuals `<branch>`,
+   and the READMEs link the manual of the version line of the new branch
 4. the `--source-branch` default of `bin/set-version`, `bin/release` and
    `bin/cut-branch` becomes `<branch>`, two lines each
 5. commit `[TASK] Prepare branch <branch>`, push, PR against the new branch,

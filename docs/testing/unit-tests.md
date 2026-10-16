@@ -5,8 +5,8 @@ database, no site, no request. Everything the subject needs is passed to it or
 stubbed. That makes the suite fast enough to run on every save, and it makes a
 failure point at one class instead of at a stack.
 
-There are 174 unit test classes: 150 across the twelve extensions, five in
-`packages-dev/dev-site`, fourteen in `packages-dev/monorepo-shared` and five in
+There are 175 unit test classes: 150 across the twelve extensions, five in
+`packages-dev/dev-site`, fourteen in `packages-dev/monorepo-shared` and six in
 `packages-dev/testing-helper`. Twelve of them are the one-line version
 compatibility test every extension carries (see
 [below](#the-version-compatibility-test)). Measured with
@@ -77,9 +77,11 @@ green because it never looked at it.
 [`packages-dev/testing-helper/`](../../packages-dev/testing-helper) carries the
 tests of the three scripts behind `runTests.sh -j`, which split the functional
 suite, check that the chunks ran every listed test, and record the durations
-(ACE-692), and of `Build/Scripts/composerBranchVersion.sh`, which names the
-branch alias key (ACE-784). Its traits have no tests of their
-own — they are exercised only through the extensions that use them.
+(ACE-692), of `Build/Scripts/composerBranchVersion.sh`, which names the
+branch alias key (ACE-784), and of `Build/Scripts/readmeManualLink.php`, which
+writes the manual link of the package READMEs (ACE-939). Its traits have no
+tests of their own — they are exercised only through the extensions that use
+them.
 [`packages-dev/monorepo-shared/`](../../packages-dev/monorepo-shared) carries
 the check that every `ext_emconf.php` of the repository names its dependencies
 by extension key, see [below](#the-ext_emconfphp-dependency-keys), the one
@@ -118,7 +120,7 @@ them follow the shape below.
 
 **Every test class is `final`, declares `strict_types`, and extends
 `TYPO3\TestingFramework\Core\Unit\UnitTestCase`.** There is no local abstract
-unit test case, and no unit test extends another test class. The twenty-four below
+unit test case, and no unit test extends another test class. The twenty-five below
 `packages-dev/` are the exception to the base class: they need nothing of
 TYPO3 and extend PHPUnit's `TestCase` directly.
 
@@ -546,13 +548,14 @@ The manual version is `main` on the branch `main`. On a version branch it is
 the major and minor version of the package's `VERSION`, `2.4` on branch `2`,
 because docs.typo3.org renders the manual of a version line per release tag.
 The branch is the one `DocumentationGuidesTest` reads from the root branch
-alias. A minor version bump on a version branch therefore fails the test until
-the READMEs link the manual of the new version, which is intended: the README
-a release ships to the TER links the manual of that release, and the link
-answers 404 only until the tag is pushed. A branch cut by `bin/cut-branch`
-moves to a version line of its own the same way, so its READMEs have to follow
-before the checks of its first pull request pass. A data set per branch form
-covers the mapping, so the form of a version branch is tested on `main` too.
+alias. The README a release ships to the TER therefore links the manual of
+that release, and the link answers 404 only until the tag is pushed.
+`bin/set-version` writes the link with `Build/Scripts/readmeManualLink.php`
+from the same branch and version, so a minor version bump on a version branch
+and a branch cut by `bin/cut-branch` keep the test green, see
+[Releasing](../workflow/releasing.md). A link changed by hand fails it. A data
+set per branch form covers the mapping, so the form of a version branch is
+tested on `main` too.
 
 `-` stands in the "Read online" row only for a package of the list
 `MANUALS_NOT_RENDERED` in the test, which names the issue that makes its manual
@@ -625,6 +628,7 @@ changes nothing:
 | the academic keys last in `depends` and `suggests`, in package order    | the same                                                            |
 | no `"providesPackages": {}`                                             | `packages/fgtclb/*/composer.json`, `packages-dev/*/composer.json`   |
 | `require` and `require-dev` in composer's order                         | every manifest of the repository with `config.sort-packages`        |
+| the "Read online" link `readmeManualLink.php` writes                    | `packages/fgtclb/*/README.md`                                       |
 
 packwright writes `ext_emconf.php` from its data, so a comment is lost and a
 constraint it sets moves to the end of its list. `composer config` re-encodes
@@ -633,7 +637,9 @@ which TYPO3 reads alike. Until ACE-787 a run with an unchanged version
 rewrote 22 files on `main`, and every release carried them into its commits.
 The test cannot run the tools themselves, `pkw` and `tailor` are not part of
 the container, so the pre-release checklist asks for that run, see
-[Releasing](../workflow/releasing.md#pre-release-checklist).
+[Releasing](../workflow/releasing.md#pre-release-checklist). The README check
+runs `Build/Scripts/readmeManualLink.php --check` with the branch of the root
+branch alias and the package's `VERSION`, it needs nothing but PHP.
 
 ## Class alias maps ship
 
