@@ -18,7 +18,7 @@ proposal, and nothing here forces one.
 | Path                                                   | Tracked | What it is                                                                                                                              |
 |--------------------------------------------------------|---------|-----------------------------------------------------------------------------------------------------------------------------------------|
 | `openspec/config.yaml`                                 | yes     | The workflow schema (`spec-driven`), the project context shown to the agent, and per-artifact rules.                                    |
-| `openspec/specs/<capability-path>/spec.md`             | yes     | The **main specs**: the current behaviour contract, one file per capability. Empty at the moment — it fills up as changes are archived. |
+| `openspec/specs/<capability-path>/spec.md`             | yes     | The **main specs**: the current behaviour contract, one file per capability, filled by archiving changes.                               |
 | `openspec/changes/<change-name>/`                      | yes     | One **active change**: its artifacts, plus a generated `.openspec.yaml` and `README.md`.                                                |
 | `openspec/changes/archive/<YYYY-MM-DD>-<change-name>/` | yes     | Archived changes, moved there by `openspec archive` after their delta specs were folded into the main specs.                            |
 | `.claude/commands/opsx/`, `.claude/skills/openspec-*/` | yes     | The Claude Code commands and skills — **generated**, see below.                                                                         |
@@ -178,7 +178,9 @@ validate --all --strict` checks every change and spec at once.
 - **A change travels with its pull request and is archived in it.** The active
   change directory is committed with the implementation, and the last commit of
   the pull request archives it, so a merged branch never carries an active
-  change and the main specs on `main` describe what `main` does.
+  change and the main specs on `main` describe what `main` does. The archive
+  commit names the issue with a `Related:` footer, see
+  [Commit messages](commit-messages.md#footers).
 - **Specs are organized per extension.** `<capability-path>` is
   `<extension-directory>/<capability>`, for example
   `academic-persons/profile-translation-sync` — the directory name under
