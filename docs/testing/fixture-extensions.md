@@ -6,7 +6,7 @@ injection, a template override that TypoScript must be able to find, an
 `ext_localconf.php` that has to run during bootstrap. For those, the test ships
 a small TYPO3 extension of its own.
 
-Eighty such fixture extensions exist, in eleven of the twelve extensions.
+Eighty-one such fixture extensions exist, in eleven of the twelve extensions.
 That is the whole population — this is a mechanism used sparingly and only
 where nothing smaller works. Measured with
 
@@ -84,6 +84,7 @@ They sit next to the tests that use them, under
 | `test_programs_frontend_icons`              | `tests/programs-frontend-icons`                   | `academic-programs`      | Fact icons replaced in `FrontendIcons.php` and `Icons.php`, a `frontendIcon`. |
 | `test_programs_plain_text_facts`            | `tests/programs-plain-text-facts`                 | `academic-programs`      | The rich text editor of three program fields switched in three ways.          |
 | `test_programs_removed_category_type`       | `tests/programs-removed-category-type`            | `academic-programs`      | A `CategoryTypes.yaml` removing a type from the programs group.               |
+| `test_programs_renamed_category_types`      | `tests/programs-renamed-category-types`           | `academic-programs`      | The degree and the topic removed, a qualification and a subject added.        |
 | `test_programs_titled_category_type`        | `tests/programs-titled-category-type`             | `academic-programs`      | A program type with a translated title, and the shipped degree retitled.      |
 | `test_project_list_events`                  | `tests/test-project-list-events`                  | `academic-projects`      | Two listeners on the project demand and list events, and a list template.     |
 | `test_project_profile_column_removed`       | `tests/project-column-removed`                    | `academic-persons-edit`  | A listener after the persons settings removing a project column.              |
@@ -106,8 +107,8 @@ They sit next to the tests that use them, under
 
 Each is a real, complete TYPO3 extension: a `composer.json` of type
 `typo3-cms-extension`, an `ext_emconf.php`, and whatever it exists to provide.
-Twenty-four of the eighty have a `Classes/` folder with a `TESTS\…` PSR-4
-root. The other fifty-six are pure resources. The `ext_emconf.php` is checked
+Twenty-four of the eighty-one have a `Classes/` folder with a `TESTS\…` PSR-4
+root. The other fifty-seven are pure resources. The `ext_emconf.php` is checked
 like every other one: its `depends` names extension keys, and a fixture
 extension may name another fixture extension, which a real extension may not —
 see [Unit tests](unit-tests.md#the-ext_emconfphp-dependency-keys).
