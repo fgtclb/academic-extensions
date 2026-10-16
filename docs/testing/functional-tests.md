@@ -391,6 +391,10 @@ submits the same form through a translated content element, as the
 development seed has it: the German overlay carries a FlexForm of its own, and
 on `/de/` that one decides the redirect page, the redirect leads to the German
 address of the page and the confirmation is the German one.
+[`AcademicJobsNewJobFormUntranslatedRedirectPageTest`](../../packages/fgtclb/academic-jobs/Tests/Functional/Plugins/AcademicJobsNewJobFormUntranslatedRedirectPageTest.php)
+names a redirect page without a German translation, asserts the redirect back
+to the German form, and reads the warning of the controller from a log file,
+as described in [A mail that cannot be sent](#a-mail-that-cannot-be-sent).
 
 The testing framework replaces the `pages` cache with a `NullBackend`, so no
 test is ever served a page from the page cache. A test about what the page
