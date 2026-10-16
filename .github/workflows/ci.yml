@@ -444,6 +444,8 @@ jobs:
       # gate, not just an artifact producer: the renderer runs with
       # "--fail-on-log --fail-on-error", so a warning fails the job.
       # "checkRstRenderingSingle <package-folder>" renders a single one locally.
+      # The suite pulls render-guides:latest itself before it renders, here and
+      # locally, so the job needs no pull or image cache of its own (ACE-938).
       - name: "Render documentation of all extensions"
         run: "Build/Scripts/runTests.sh -b docker -s checkRstRenderingAll"
 

@@ -322,7 +322,10 @@ deliberately still linted.
 
 The `documentation` job runs `checkRstRenderingAll` (a real gate — the renderer
 uses `--fail-on-log --fail-on-error`) and uploads `documentation-rendered/`,
-which holds one folder per extension.
+which holds one folder per extension. The renderer is
+`render-guides:latest`, which both rendering suites pull on every run, locally
+too, so a new renderer release can turn the job red without a change here
+(ACE-938).
 
 `pr-comment.yml` posts the link to that artifact as a single, updated-in-place
 pull-request comment. It is a **separate** workflow on the `workflow_run` event
