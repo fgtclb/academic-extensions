@@ -1,10 +1,10 @@
 # TYPO3 extension `academic_projects` (READ-ONLY)
 
-|                  | URL                                                           |
-|------------------|---------------------------------------------------------------|
-| **Repository:**  | https://github.com/fgtclb/academic-projects                   |
-| **Read online:** | https://docs.typo3.org/p/fgtclb/academic-projects/main/en-us/ |
-| **TER:**         | https://extensions.typo3.org/extension/academic_projects/     |
+|                  | URL                                                          |
+|------------------|--------------------------------------------------------------|
+| **Repository:**  | https://github.com/fgtclb/academic-projects                  |
+| **Read online:** | https://docs.typo3.org/p/fgtclb/academic-projects/2.4/en-us/ |
+| **TER:**         | https://extensions.typo3.org/extension/academic_projects/    |
 
 ## Description
 
