@@ -84,6 +84,26 @@ link; the demand keys are the ones below.
   category of another group, a uid no category has and an active state the
   list does not offer are gone, and so are `__referrer` and
   `__trustedProperties`.
+- **A value that is not a string is ignored** (ACE-926). The demand reaches
+  the factory as Extbase took it from the request, nested arrays included:
+  `ArrayConverter` hands a source that is not a string over unchanged, and
+  as the demand is not part of the cache hash, a plain GET with
+  `demand[sortingField][]=title` reaches the factory as well as a POST. The
+  setters of the demands take strings, so each factory turns a sorting, a
+  sorting field, a sorting direction or an active state that is not a string
+  into the empty string, which no setter accepts: the value is ignored like
+  an unknown one, and the redirect carries the default in its place. A part
+  of the form the element hides never reads the request, its preset applies
+  as before. The category filter needs no such guard,
+  `CategoryFilterNormalizer` reads every shape, nor does the page of the
+  partner list, which `MathUtility::canBeInterpretedAsInteger()` rejects as
+  an array. `academic_projects` applies the same guard to `settings.sorting`
+  and `settings.activeState`, which TypoScript turns into an array as soon
+  as the setting has a child. The value an element stores does not replace
+  such an array: Extbase merges the FlexForm over the TypoScript settings
+  with `ArrayUtility::mergeRecursiveWithOverrule()`, which keeps an array
+  where the overrule has a string, on TYPO3 v12 to v14. The other two lists
+  guard their sorting setting in `applySortingFromSettings()` (ACE-914).
 - **One filter argument for all category types.** The factories resolve the
   type of every category through the repository anyway, so the type a value
   was submitted under is not kept.

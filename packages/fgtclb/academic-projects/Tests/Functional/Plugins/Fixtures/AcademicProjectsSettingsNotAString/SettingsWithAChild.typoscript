@@ -1,0 +1,5 @@
+# A child turns a setting into an array. Extbase keeps both arrays for the
+# element on "/no-settings", which stores no setting, and for the one on
+# "/stored", whose stored strings do not replace an array.
+plugin.tx_academicprojects.settings.sorting.field = title
+plugin.tx_academicprojects.settings.activeState.value = completed

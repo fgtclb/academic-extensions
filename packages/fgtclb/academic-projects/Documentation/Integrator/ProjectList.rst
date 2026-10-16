@@ -55,7 +55,11 @@ show the markup, and :ref:`templates` describes how to override the templates.
 The list is rendered on every request rather than from the page cache, so the
 selection of the visitor takes effect at once. A selection is part of the URL
 and can be bookmarked or shared, see :ref:`feature-1790226101`, and
-:ref:`configuration-route-enhancers` turns it into a readable path.
+:ref:`configuration-route-enhancers` turns it into a readable path. A sorting
+or an active state the form does not offer, in the URL or in a submission, is
+ignored, also a list of values where the form sends one. The default of the
+extension applies in its place where the element shows that part of the form,
+the preset of the element where it hides it.
 
 Related chapters:
 
@@ -110,7 +114,9 @@ the list and, below them, the field that chooses the pages.
     :guilabel:`All` projects, the :guilabel:`Active` ones or the
     :guilabel:`Completed` ones. :ref:`configuration-active-state` describes
     which projects count as which. An empty or unknown value counts as
-    :guilabel:`All`.
+    :guilabel:`All`, and so does a list of values, which TypoScript makes of
+    the setting as soon as it has a child. The state an element stores does
+    not replace such a list.
 
 ..  figure:: /Images/Screenshots/project-list-filtered.png
     :alt: The Active state select set to Completed, a tag "Completed", a "Reset all filters" link, the number of projects found and the completed projects
@@ -174,6 +180,18 @@ the list and, below them, the field that chooses the pages.
         the project budget.
     *   :guilabel:`Start date (oldest first)`,
         :guilabel:`Start date (newest first)`: by the project start.
+
+    Only the items of the select are supported. Any other value, an empty one,
+    a field without a direction or a list of values for example, which the
+    form never stores but an import or a TypoScript value for a content
+    element without the field can produce, is ignored, and the list sorts by
+    title, A to Z. TypoScript makes a list of the setting as soon as it has a
+    child, such as
+    :typoscript:`plugin.tx_academicprojects.settings.sorting.field`, also
+    next to a value of the setting itself, and the sorting an element stores
+    does not replace such a list, so every list the TypoScript applies to then
+    sorts by title, A to Z. Remove the child, or replace the whole setting by a
+    single value, to get the sorting of the element back.
 
 ..  confval:: Categories
     :name: project-list-categories
