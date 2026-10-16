@@ -109,20 +109,61 @@ The keys a listener needs most:
     *   -   ``flexParentDatabaseRow``
         -   For a FlexForm field, the record of the content element.
     *   -   ``site``, ``effectivePid``
-        -   The site and the page the record belongs to.
+        -   The site and the page the record belongs to. For a record outside
+            any site, on page 0 for example, ``site`` is a
+            :php:`\TYPO3\CMS\Core\Site\Entity\NullSite`, not a
+            :php:`Site`. Call only the methods of
+            :php:`\TYPO3\CMS\Core\Site\Entity\SiteInterface` on it, or
+            check for :php:`Site` first. ``site`` is :php:`null` when the
+            caller has none, a form data group without site resolving on
+            TYPO3 v13, or a request without a site in the job form.
+    *   -   ``inlineParentUid``, ``inlineTopMostParentUid``
+        -   The uid of the direct and of the topmost inline parent, when the
+            record is edited as an inline child. A parent that is not saved
+            yet has a ``NEW...`` string instead. For a record that is not
+            edited as an inline child, the common case, both are the empty
+            string ``''``. The site configuration passes :php:`null` as
+            ``inlineTopMostParentUid``. Missing in the job form. Cast the
+            value, as :php:`(int)($parameters['inlineParentUid'] ?? 0)`, and
+            use it only when it is above 0.
+    *   -   ``inlineParentTableName``, ``inlineParentFieldName``,
+            ``inlineParentConfig`` and the same keys of the topmost parent
+        -   The table, the field and the configuration of the inline parent.
+            ``''`` and ``[]`` for a record that is not edited as an inline
+            child. Missing in the job form.
     *   -   ``TSconfig``
         -   The page TSconfig below
             :typoscript:`TCEFORM.<table>.<field>.itemsProcFunc`, or
             :php:`null` when there is none.
 
-In the backend form, TYPO3 v13 hands the static items of a field to the item
-provider as :php:`\TYPO3\CMS\Core\Schema\Struct\SelectItem` objects, TYPO3
-v14 as arrays, and the items a provider adds are arrays on both versions. A
-:php:`SelectItem` implements :php:`\ArrayAccess`, so a closure typed
-:php:`array|SelectItem` that reads :php:`$item['value']` works on both.
+In the backend form, TYPO3 hands the items it built before the item provider
+runs, the static items of the field and those of a ``foreign_table``, as
+:php:`\TYPO3\CMS\Core\Schema\Struct\SelectItem` objects, on TYPO3 v13
+and v14 alike. The items a provider adds are arrays, and the job form of the
+frontend hands every item over as an array. A :php:`SelectItem` implements
+:php:`\ArrayAccess`, so a closure typed :php:`array|SelectItem` that reads
+:php:`$item['value']` works for both.
 
 An item is therefore not always an array. A closure typed :php:`array` alone
-raises a :php:`\TypeError` on TYPO3 v13 for a field with static items.
+raises a :php:`\TypeError` in the backend form for a field with static items.
+
+The event declares these parameters once, as the PHPStan type alias
+:php:`ItemsProcFuncParameters`, and the item providers import it. A listener
+or an item provider of a project imports it the same way, so static analysis
+checks it against the values above:
+
+..  code-block:: php
+
+    /**
+     * @phpstan-import-type ItemsProcFuncParameters from \FGTCLB\AcademicBase\Event\ModifyTcaSelectFieldItemsEvent
+     */
+    final class MyItemsProcFunc
+    {
+        /**
+         * @param ItemsProcFuncParameters $parameters
+         */
+        public function itemsProcFunc(array &$parameters): void {}
+    }
 
 ..  _developers-event-modify-tca-select-field-items-event-example:
 
@@ -194,6 +235,10 @@ Rules and pitfalls
     that reads it without a fallback. Read it as
     :php:`$parameters['row'] ?? []`, and every field of it with a fallback
     too, as :php:`$row['pid'] ?? $parameters['effectivePid']`.
+*   **The inline uids are not always integers.** A listener that passes
+    :php:`$parameters['inlineParentUid']` to a parameter typed :php:`int`
+    raises a :php:`\TypeError` for every record that is not edited as an
+    inline child, because the value is ``''`` there. Cast it first.
 *   **A FlexForm field has two rows.** ``row`` holds the values of the
     FlexForm, the content element is ``flexParentDatabaseRow``.
 *   **Keep the stored values in mind.** Removing an item hides it from the

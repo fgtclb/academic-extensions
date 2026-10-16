@@ -59,8 +59,10 @@ What this extension passes in
     *   -   :php:`getParameters()`
         -   The parameters of the item provider: :php:`items`, :php:`table`,
             :php:`field`, :php:`row`, :php:`config`, :php:`TSconfig`,
-            :php:`effectivePid`, :php:`site`, and the inline parent keys when
-            the contact is edited inline.
+            :php:`effectivePid`, :php:`site` and the inline parent keys. The
+            uids of the inline parents are the empty string ``''`` unless the
+            contact is edited inline, and a ``NEW...`` string for a parent
+            that is not saved yet.
     *   -   :php:`setParameters()`
         -   Replaces the parameters. What counts is :php:`items`, the list the
             select offers.
@@ -74,11 +76,11 @@ The items of an address select:
     Hidden addresses are offered too, marked as hidden. Only addresses of the
     default language and of the workspace of the editor are offered.
 
-In the backend form, TYPO3 v13 hands the static items of a field to the item
-provider as :php:`\TYPO3\CMS\Core\Schema\Struct\SelectItem` objects, TYPO3
-v14 as arrays, and the items a provider adds are arrays on both versions. A
-:php:`SelectItem` implements :php:`\ArrayAccess`, so a closure typed
-:php:`array|SelectItem` that reads :php:`$item['value']` works on both.
+In the backend form, TYPO3 v13 and v14 hand the static items of a field to the
+item provider as :php:`\TYPO3\CMS\Core\Schema\Struct\SelectItem` objects,
+and the items a provider adds are arrays. A :php:`SelectItem` implements
+:php:`\ArrayAccess`, so a closure typed :php:`array|SelectItem` that reads
+:php:`$item['value']` works for both.
 
 Example
 =======

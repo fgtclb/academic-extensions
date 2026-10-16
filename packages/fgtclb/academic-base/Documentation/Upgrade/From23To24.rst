@@ -189,6 +189,20 @@ fallback:
 
 See :ref:`important-select-item-helper-passes-an-empty-row`.
 
+The event now declares the other parameters as TYPO3 passes them, as the
+PHPStan type alias :php:`ItemsProcFuncParameters`. :php:`inlineParentUid` and
+:php:`inlineTopMostParentUid` are the empty string `''` for a record that is
+not edited as an inline child and a `NEW...` string for a parent that is not
+saved yet, :php:`site` is a :php:`NullSite` for a record outside any site, and
+an item TYPO3 built is a :php:`SelectItem`. A listener casts an inline uid,
+checks the site, and types an item as :php:`array|SelectItem`:
+
+..  code-block:: php
+
+    $parentUid = (int)($parameters['inlineParentUid'] ?? 0);
+
+See :ref:`important-select-item-event-declares-what-typo3-passes`.
+
 ..  _upgrade-from-2-3-to-2-4-check:
 
 Check the result
