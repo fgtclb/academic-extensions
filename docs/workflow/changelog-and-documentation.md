@@ -86,9 +86,13 @@ Build/Scripts/runTests.sh -s openDocumentation academic-jobs         # open the 
 ```
 
 The image is `ghcr.io/typo3-documentation/render-guides:latest`
-(`IMAGE_RSTRENDERING`). Neither `-t` nor `-p` matters here: the
-renderer is a self-contained container and needs no vendor tree, which is why
-`composerUpdate` is not a precondition for a documentation change.
+(`IMAGE_RSTRENDERING`), the renderer of docs.typo3.org. Both rendering suites
+pull it before they render, so a local run renders with the same release as CI
+and docs.typo3.org, see
+[Container images](../development/environment.md#container-images).
+Neither `-t` nor `-p` matters here: the renderer is a self-contained container
+and needs no vendor tree, which is why `composerUpdate` is not a precondition
+for a documentation change.
 
 The argument to `checkRstRenderingSingle` and `openDocumentation` is the
 **directory** below `packages/fgtclb/`, not the extension key — the script
@@ -148,12 +152,12 @@ says so in the workflow itself.
 
 The tag `latest` also means a new release of the renderer can turn every
 pull request and the nightly run of both branches red at once, without a change
-here. A pulled image that is newer than the local one is the first thing to
-check when the documentation job of an unrelated change fails: pull it locally
-(`podman pull ghcr.io/typo3-documentation/render-guides:latest`, or `docker
-pull`) and render again. The release of October 2026 started to warn about a
-manual without an interlink shortcode, which every `guides.xml` now declares
-and a repository check keeps (see
+here. A new release is the first thing to check when the documentation job of
+an unrelated change fails: render again locally, which pulls the same release,
+and compare the `Renderer:` line the run prints with the one in the job log.
+The release of October 2026 started to warn about a manual without an
+interlink shortcode, which every `guides.xml` now declares and a repository
+check keeps (see
 [the links of the manuals](../testing/unit-tests.md#the-links-of-the-manuals)).
 
 The job is independent of the source gates — it has no `needs:` — so a
