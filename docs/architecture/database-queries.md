@@ -667,6 +667,29 @@ table, and executes the renames `SchemaMigrator::getUpdateSuggestions()`
 suggests for removal, as the Install Tool does. The renames stay in the
 database of the test case class, so such a class holds one test.
 
+## A migration cannot wait for another wizard
+
+`getPrerequisites()` takes prerequisites only, classes that implement the
+`PrerequisiteInterface` of the core, such as `DatabaseUpdatedPrerequisite`.
+`PrerequisiteCollection::add()` drops any other class without a notice, on v12
+and v13, so naming another wizard there orders nothing. Neither does anything
+else: a bare `typo3 upgrade:run` asks every pending wizard `updateNecessary()`
+before it runs the first one (`UpgradeWizardRunCommand::runAllWizards()`), and
+records a wizard that answers `false` as done. `upgrade:run <identifier>` does
+the same for the one wizard it is given.
+
+A wizard whose records another wizard converts first therefore reads both
+shapes of them. `FlexFormUpgradeWizard` of `academic_projects` migrates the
+FlexForm settings of 1.x project lists, which are "Insert plugin" elements
+(`CType = 'list'` with the plugin in `list_type`) until
+`PluginUpgradeWizard` turns them into content elements of their own type. It
+named that wizard as a prerequisite, which TYPO3 dropped, looked at the new
+content types only, and was recorded as done by a bare `upgrade:run` before a
+single element had the shape it read (ACE-923). It reads the "Insert plugin"
+elements as well now, and either order of the two wizards gives the same
+result. Its test runs both wizards the way `runAllWizards()` does, every
+`updateNecessary()` first, in both orders.
+
 ## A column can hold `NULL` although its field is not `nullable`
 
 A column declared `DEFAULT NULL` in `ext_tables.sql` holds `NULL` in every row
@@ -761,6 +784,9 @@ against a group that does not exist.
   — the ACE-349 changelog entry, including the per-DBMS analysis for TYPO3 v12.
 - `packages/fgtclb/academic-projects/Documentation/Changelog/2.4/Important-FlexFormUpgradeWizardMigratesRecords.rst`
   — the ACE-356 changelog entry, including how to re-run the repaired wizard.
+- `packages/fgtclb/academic-projects/Documentation/Changelog/2.4/Important-FlexFormUpgradeWizardMigratesInsertPluginElements.rst`:
+  the ACE-923 changelog entry, for installations upgraded from 1.x with a bare
+  `upgrade:run`.
 - `packages/fgtclb/academic-jobs/Documentation/Changelog/2.4/Important-JobContactWizardMigratesInvisibleJobs.rst`:
   the ACE-887 changelog entry, including how to run the repaired wizard again.
 - `packages/fgtclb/academic-jobs/Documentation/Changelog/2.4/Important-JobContactWizardFindsRenamedTable.rst`:

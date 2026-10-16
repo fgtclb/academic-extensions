@@ -6,14 +6,19 @@ namespace FGTCLB\AcademicProjects\Tests\Functional\Upgrades;
 
 use FGTCLB\AcademicProjects\Tests\Functional\AbstractAcademicProjectsTestCase;
 use FGTCLB\AcademicProjects\Upgrades\FlexFormUpgradeWizard;
+use FGTCLB\AcademicProjects\Upgrades\PluginUpgradeWizard;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Install\Updates\PrerequisiteInterface;
+use TYPO3\CMS\Install\Updates\UpgradeWizardInterface;
 
 /**
  * Coverage for the FlexForm migration of `EXT:academic_projects`.
  *
- * The wizard rewrites the plugin FlexForm of every already migrated content element, so each
- * test seeds `tt_content` rows carrying the old setting names and reads the stored XML back.
+ * The wizard rewrites the plugin FlexForm of every project list, a content element of the
+ * plugin's type or an "Insert plugin" element of 1.x, so each test seeds `tt_content` rows
+ * carrying the old setting names and reads the stored XML back.
  *
  * **More than one record per test on purpose.** The wizard builds one update statement per
  * record; a defect in how that statement is parameterised shows up differently in the first
@@ -265,6 +270,109 @@ final class FlexFormUpgradeWizardTest extends AbstractAcademicProjectsTestCase
         $this->assertSame(['settings.activeState' => 'active'], $this->settingsOf(2));
     }
 
+    /**
+     * A 1.x project list is still an "Insert plugin" element until the plugin wizard
+     * converted it, and it carries the settings of 1.x all the same (ACE-923).
+     */
+    #[Test]
+    public function updateIsNecessaryForAnInsertPluginElementOf1x(): void
+    {
+        $this->createContentElement(1, 'list', $this->flexForm([
+            'settings.hide_completed_projects' => '1',
+        ]), 'academicprojects_projectlist');
+
+        $this->assertTrue($this->subject()->updateNecessary());
+    }
+
+    #[Test]
+    public function insertPluginElementOfAnotherPluginStaysUntouched(): void
+    {
+        $unrelated = $this->flexForm(['settings.hide_completed_projects' => '1']);
+        $this->createContentElement(1, 'list', $unrelated, 'unrelated_plugin');
+
+        $this->assertFalse($this->subject()->updateNecessary());
+        $this->assertTrue($this->subject()->executeUpdate());
+
+        $this->assertSame($unrelated, $this->flexFormOf(1));
+    }
+
+    /**
+     * @return array<string, array{0: list<class-string<UpgradeWizardInterface>>}>
+     */
+    public static function upgradeRunOrders(): array
+    {
+        return [
+            'FlexForm wizard first' => [[FlexFormUpgradeWizard::class, PluginUpgradeWizard::class]],
+            'plugin wizard first' => [[PluginUpgradeWizard::class, FlexFormUpgradeWizard::class]],
+        ];
+    }
+
+    /**
+     * A bare `typo3 upgrade:run` asks every pending wizard `updateNecessary()` before it
+     * runs the first one, and marks a wizard that needs nothing as done. The FlexForm
+     * wizard therefore decides while the 1.x project lists are still "Insert plugin"
+     * elements, whichever of the two wizards runs first. It named the plugin wizard as a
+     * prerequisite, which TYPO3 drops, so the settings of 1.x were never migrated
+     * (ACE-923). Both orders are covered, the registry decides which one a site gets.
+     *
+     * @param list<class-string<UpgradeWizardInterface>> $order
+     */
+    #[DataProvider('upgradeRunOrders')]
+    #[Test]
+    public function upgradeRunMigratesTheSettingsOfInsertPluginElementsOf1x(array $order): void
+    {
+        $this->createContentElement(1, 'list', $this->flexForm([
+            'settings.hide_completed_projects' => '1',
+            'settings.filter.options' => '1',
+        ]), 'academicprojects_projectlist');
+        $this->createContentElement(2, 'list', $this->flexForm([
+            'settings.hide_completed_projects' => '0',
+            'settings.sorting.options' => '1',
+        ]), 'academicprojects_projectlistsingle');
+        $this->createContentElement(3, 'list', $this->flexForm([
+            'settings.hide_completed_projects' => '0',
+        ]), 'academicprojects_projectlist');
+
+        // What `UpgradeWizardRunCommand::runAllWizards()` does, without the registry.
+        $wizardsToRun = [];
+        foreach ($order as $className) {
+            $wizard = $this->get($className);
+            $this->assertInstanceOf(UpgradeWizardInterface::class, $wizard);
+            if ($wizard->updateNecessary()) {
+                $wizardsToRun[] = $wizard;
+            }
+        }
+        foreach ($wizardsToRun as $wizard) {
+            $this->assertTrue($wizard->executeUpdate());
+        }
+
+        $this->assertSame(['academicprojects_projectlist', ''], $this->typeOf(1));
+        $this->assertSame(['academicprojects_projectlistsingle', ''], $this->typeOf(2));
+        $this->assertSame(['academicprojects_projectlist', ''], $this->typeOf(3));
+        $this->assertSame(['settings.activeState' => 'active', 'settings.hideFilter' => '1'], $this->settingsOf(1));
+        $this->assertSame(['settings.activeState' => 'all', 'settings.hideSorting' => '1'], $this->settingsOf(2));
+        $this->assertSame(['settings.activeState' => 'all'], $this->settingsOf(3));
+        $this->assertFalse($this->subject()->updateNecessary());
+        $pluginWizard = $this->get(PluginUpgradeWizard::class);
+        $this->assertInstanceOf(PluginUpgradeWizard::class, $pluginWizard);
+        $this->assertFalse($pluginWizard->updateNecessary());
+    }
+
+    /**
+     * TYPO3 adds a prerequisite only if it implements the interface, and drops anything
+     * else without a word (`PrerequisiteCollection::add()`).
+     */
+    #[Test]
+    public function everyPrerequisiteIsOneTypo3Accepts(): void
+    {
+        foreach ($this->subject()->getPrerequisites() as $prerequisite) {
+            $this->assertTrue(
+                is_a($prerequisite, PrerequisiteInterface::class, true),
+                sprintf('%s implements %s', $prerequisite, PrerequisiteInterface::class),
+            );
+        }
+    }
+
     private function subject(): FlexFormUpgradeWizard
     {
         $subject = $this->get(FlexFormUpgradeWizard::class);
@@ -293,17 +401,40 @@ final class FlexFormUpgradeWizardTest extends AbstractAcademicProjectsTestCase
             . '</language></sheet></data></T3FlexForms>';
     }
 
-    private function createContentElement(int $uid, string $cType, string $flexForm): void
+    /**
+     * `list_type` is written only for an "Insert plugin" element, every other record keeps
+     * the default of the column.
+     */
+    private function createContentElement(int $uid, string $cType, string $flexForm, string $listType = ''): void
     {
-        $this->getConnectionPool()->getConnectionForTable('tt_content')->insert(
-            'tt_content',
-            [
-                'uid' => $uid,
-                'pid' => 1,
-                'CType' => $cType,
-                'pi_flexform' => $flexForm,
-            ],
-        );
+        $record = [
+            'uid' => $uid,
+            'pid' => 1,
+            'CType' => $cType,
+            'pi_flexform' => $flexForm,
+        ];
+        if ($listType !== '') {
+            $record['list_type'] = $listType;
+        }
+        $this->getConnectionPool()->getConnectionForTable('tt_content')->insert('tt_content', $record);
+    }
+
+    /**
+     * @return array{0: string, 1: string} CType and list_type
+     */
+    private function typeOf(int $uid): array
+    {
+        $queryBuilder = $this->getConnectionPool()->getQueryBuilderForTable('tt_content');
+        $queryBuilder->getRestrictions()->removeAll();
+        $row = $queryBuilder
+            ->select('CType', 'list_type')
+            ->from('tt_content')
+            ->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($uid)))
+            ->executeQuery()
+            ->fetchAssociative();
+        $this->assertIsArray($row);
+
+        return [(string)$row['CType'], (string)$row['list_type']];
     }
 
     /**
