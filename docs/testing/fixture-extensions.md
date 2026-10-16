@@ -73,9 +73,10 @@ A minimal one, complete:
 }
 ```
 
-Note that none of the eight declares `extra.typo3/cms.version`. They are not path
-repositories, so `sbuerk/extended-path-repository` never reads a version off
-them; only `ext_emconf.php` carries one.
+Note that only one of the seventeen declares `extra.typo3/cms.version`,
+`test_bitejobs_listener` with `2.4.0-dev`. None of them is a path repository, so
+`sbuerk/extended-path-repository` never reads a version off them, and the
+version that counts is the one in `ext_emconf.php`.
 
 — [`test_plugin_templates/composer.json`](../../packages/fgtclb/academic-persons/Tests/Functional/Fixtures/Extensions/test_plugin_templates/composer.json)
 
@@ -116,7 +117,7 @@ Two globs, two jobs:
 - The first finds every fixture extension and merges **both** its `autoload` and
   `autoload-dev` sections into the root autoloader. That is what makes
   `TESTS\TestMessyProfileFactory\Persons\MessyProfileFactory` resolvable at all.
-  The eight fixture extensions that ship classes each declare a root of their
+  The nine fixture extensions that ship classes each declare a root of their
   own, `TESTS\BaseTestDependencyInjection\` or `TESTS\TestJobAfterSaveListener\`
   for example, and each is mapped to its own `Classes/` folder in the generated
   `.Build/vendor/composer/autoload_psr4.php`.
@@ -186,23 +187,35 @@ protected function setUp(): void
 ],
 ```
 
-— [`AcademicPersonsListPluginTest.php:49-57`](../../packages/fgtclb/academic-persons/Tests/Functional/Plugins/AcademicPersonsListPluginTest.php#L49-L57)
-and [`:77-82`](../../packages/fgtclb/academic-persons/Tests/Functional/Plugins/AcademicPersonsListPluginTest.php#L77-L82)
+From `setUp()` of [`AcademicPersonsListPluginTest.php`](../../packages/fgtclb/academic-persons/Tests/Functional/Plugins/AcademicPersonsListPluginTest.php#L42-L58)
+and its [`setUpFrontendRootPageForTestCase()`](../../packages/fgtclb/academic-persons/Tests/Functional/Plugins/AcademicPersonsListPluginTest.php#L83-L88).
 
 Other spellings in use:
 
 ```php
 $this->testExtensionsToLoad[] = 'tests/test-jobcontact-schema';
 ```
-— [`ContactTcaUpgradeWizardTest.php:17`](../../packages/fgtclb/academic-jobs/Tests/Functional/Upgrades/ContactTcaUpgradeWizardTest.php#L17)
+From `setUp()` of [`ContactTcaUpgradeWizardTest.php`](../../packages/fgtclb/academic-jobs/Tests/Functional/Upgrades/ContactTcaUpgradeWizardTest.php#L15-L19).
+
+```php
+$this->addTestExtension(...array_values([
+    'tests/language-files',
+]));
+```
+From `setUp()` of [`ProfileTitleProviderTest.php`](../../packages/fgtclb/academic-persons/Tests/Functional/PageTitle/ProfileTitleProviderTest.php#L25-L31),
+through the helper of
+[`AbstractAcademicPersonsTestCase`](../../packages/fgtclb/academic-persons/Tests/Functional/AbstractAcademicPersonsTestCase.php#L40-L47).
 
 ```php
 protected array $testExtensionsToLoad = [
-    // …
-    'tests/language-files',
+    'fgtclb/environment-state-manager',
+    'fgtclb/academic-base',
+    'tests/hidden-content-types',
 ];
 ```
-— [`ProfileTitleProviderTest.php:28`](../../packages/fgtclb/academic-persons/Tests/Functional/PageTitle/ProfileTitleProviderTest.php#L28)
+From [`KeepCurrentContentTypeSelectableTest.php`](../../packages/fgtclb/academic-base/Tests/Functional/Backend/FormDataProvider/KeepCurrentContentTypeSelectableTest.php#L40-L44).
+Declaring the property again replaces the list of the abstract test case, so it
+has to repeat every entry of that list.
 
 **The package name is not derivable from the extension key.** All of them use
 the `tests/` vendor, but the second segment follows no rule: `test_plugin_templates`
