@@ -284,10 +284,15 @@ of `academic-persons` is the model:
 The list-and-detail element shares the data structure of the list and ignores
 the field, so the field carries
 `<displayCond>FIELD:parentRec.CType:!=:academicpersons_listanddetail</displayCond>`.
-That resolves on v13 and v14 alike. The card hides the list fields it ignores
+So does `settings.detailPid`, which that element ignores as well, while
+`settings.pageTitleFormat`, read only by its detail view, carries `:=:` and is
+offered there alone (ACE-923). That resolves on v13 and v14 alike. The card hides
+the list fields it ignores, its unit and function type restriction included,
 through the page TSconfig of its set instead. A condition in the data structure
 hides the field wherever the element exists, also below a page that does not
-include that page TSconfig.
+include that page TSconfig. Either way the stored value stays: the DataHandler
+merges a saved FlexForm into the stored one, so a field the form did not send
+keeps its value.
 
 A number an element may leave empty uses the same list and needs one step more.
 An entry of the list is a dotted path below `settings`, so
