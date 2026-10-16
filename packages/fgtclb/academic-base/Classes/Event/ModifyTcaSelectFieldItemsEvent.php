@@ -12,7 +12,10 @@ use TYPO3\CMS\Core\Site\Entity\SiteInterface;
  * provided by academic extensions, for example:
  *
  * - {@see \FGTCLB\AcademicJobs\Backend\FormEngine\EmploymentTypeItems::itemsProcFunc()}
- * - {@see \FGTCLB\AcademicJobs\Backend\FormEngine\TypeItems::itemsProcFunc()}
+ * - {@see \FGTCLB\AcademicJobs\Backend\FormEngine\TypeItems::itemsProcFunc()}, also for the
+ *   FlexForm field of the job list through
+ *   {@see \FGTCLB\AcademicJobs\Backend\FormEngine\JobListTypeItems::itemsProcFunc()}, with
+ *   the `table` and the `field` of the job record
  *
  * The parameters are the ones of an itemsProcFunc, declared once as the type alias
  * `ItemsProcFuncParameters`, which the item providers import. They hold what TYPO3
