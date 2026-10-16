@@ -5,8 +5,8 @@ database, no site, no request. Everything the subject needs is passed to it or
 stubbed. That makes the suite fast enough to run on every save, and it makes a
 failure point at one class instead of at a stack.
 
-There are 171 unit test classes: 149 across the twelve extensions, five in
-`packages-dev/dev-site`, twelve in `packages-dev/monorepo-shared` and five in
+There are 173 unit test classes: 150 across the twelve extensions, five in
+`packages-dev/dev-site`, thirteen in `packages-dev/monorepo-shared` and five in
 `packages-dev/testing-helper`. Twelve of them are the one-line version
 compatibility test every extension carries (see
 [below](#the-version-compatibility-test)). Measured with
@@ -90,6 +90,8 @@ that every translation names its extension without an underscore, see
 see [below](#the-extension-points), the check that no source file names an
 issue of a customer project, see [below](#customer-issue-keys), the check
 of the manual links, see [below](#the-links-of-the-manuals), the check of
+the directives in table cells of the manuals, see
+[below](#directives-in-table-cells), the check of
 the branch alias key, see [below](#the-branch-alias-key), the check of the form
 `bin/set-version` writes, see [below](#the-form-binset-version-writes), the
 check that a class alias map ships, see [below](#class-alias-maps-ship), the
@@ -520,6 +522,37 @@ above. The key of the alias is the version name composer gives the branch,
 `dev-main` for `main` and `2.x-dev` for `2`, and the test maps it back to the
 bare branch name. A newly cut version branch changes both, see
 [Releasing](../workflow/releasing.md).
+
+## Directives in table cells
+
+[`DocumentationTableCellDirectiveTest`](../../packages-dev/monorepo-shared/Tests/Unit/DocumentationTableCellDirectiveTest.php)
+reads every `.rst` file of every manual below `packages/fgtclb/` and fails for
+each directive inside a `list-table`, a `t3-field-list-table` or a `csv-table`
+that is not
+`figure`, `code-block` or `versionadded`, a substitution definition included,
+and for each substitution reference such as `|icon|` in a cell, wherever it is
+defined. Inline literals and interpreted text are not read for references. The
+data set names the package, the failure the file, the line and the directive,
+or `substitution`. A grid table is not scanned: the options of a directive in
+a grid table cell are not parsed on either release, they come out as a field
+list, which a local render already shows.
+
+The renderer of docs.typo3.org drops an `image` in a table cell since
+render-guides 0.46.0, and renders a `note` there without its box, and it logs
+nothing, so neither the documentation job nor a local render reports it. A
+local render with an older cached image even shows the cell as written. The
+three allowed directives were rendered in a cell on 0.45.0 and on 0.47.2, see
+[An image in a table cell is a figure](../workflow/changelog-and-documentation.md#an-image-in-a-table-cell-is-a-figure).
+The icon column of nine manuals was empty on docs.typo3.org until ACE-935.
+
+A table ends at the first line that is not blank and is indented no deeper than
+its directive. A second test runs the scan over a snippet with directives
+before, in and after a table, after a paragraph of a cell, in a table inside a
+bullet list, with a domain and the characters `_`, `.` and `+` in its name, as a
+substitution definition and as a reference, and with a reference hidden in a
+literal, and a third asserts that the scan finds the figures of the
+plugin tables, so a change of the patterns cannot turn the check into one of
+nothing.
 
 ## The branch alias key
 

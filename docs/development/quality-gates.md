@@ -336,6 +336,11 @@ The user-facing manuals live per package in
 collected in `documentation-rendered/<extension>/Documentation-GENERATED-temp/`,
 which CI uploads as an artifact.
 
+What the renderer drops without a log line passes the gate. An `image` in a
+table cell is such a case since render-guides 0.46.0, which a unit test
+catches instead, see
+[An image in a table cell is a figure](../workflow/changelog-and-documentation.md#an-image-in-a-table-cell-is-a-figure).
+
 ```bash
 # Everything.
 Build/Scripts/runTests.sh -s checkRstRenderingAll
