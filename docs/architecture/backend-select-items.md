@@ -1,18 +1,19 @@
 # Backend select items
 
-Ten classes across five extensions build the items of a backend select with an
-`itemsProcFunc`, and 24 fields are configured with one:
+Eleven classes across five extensions build the items of a backend select with
+an `itemsProcFunc`, and 26 fields are configured with one:
 
 ```bash
 grep -rh 'itemsProcFunc' packages/*/*/Configuration | wc -l
 ```
 
-`AddressRecordItems` (contact4pages), `EmploymentTypeItems` and `TypeItems`
-(jobs), `CountryItems` and `PartnerItems` (partners), `ContractItems`,
-`ProfileShowFieldsItems`, `DemandValues` and `RecordTypes` (persons) and
-`SortingItemsProcFunc` (projects). Eight live in a `Classes/Backend/FormEngine/`
-directory; `DemandValues` and `RecordTypes` are in `Classes/Tca/`. They are
-configured on TCA columns and on FlexForm elements alike.
+`AddressRecordItems` (contact4pages), `EmploymentTypeItems`, `JobListTypeItems`
+and `TypeItems` (jobs), `CountryItems` and `PartnerItems` (partners),
+`ContractItems`, `ProfileShowFieldsItems`, `DemandValues` and `RecordTypes`
+(persons) and `SortingItemsProcFunc` (projects). Nine live in a
+`Classes/Backend/FormEngine/` directory; `DemandValues` and `RecordTypes` are in
+`Classes/Tca/`. They are configured on TCA columns and on FlexForm elements
+alike.
 
 This page is about what such a handler is handed, what it may do with it, and
 the one trap that costs data.
@@ -58,7 +59,7 @@ nothing outside FormEngine has them, and the shapes declare them optional
 already. `effectivePid` is the page of the form, or the root page of the site
 when the request carries no page. The three controllers of
 `academic-persons-edit` that call a handler outside FormEngine as well, see
-[below](#five-of-the-ten-dispatch-an-event-five-do-not), pass no `row` either,
+[below](#six-of-the-eleven-dispatch-an-event-five-do-not), pass no `row` either,
 but the handler they call, `RecordTypes`, dispatches no event.
 
 `GetSelectItemsForTcaManagedTableFieldMethodTraitTest` of `academic_base` pins
@@ -214,6 +215,44 @@ which implements `ArrayAccess`, on v12 and v13 alike
 adds, and every item of the job form, are arrays. `$item['value']` works for
 both, a parameter typed `array` fails in the backend form.
 
+## A FlexForm field can offer the items of a record field
+
+The option "Job Type" of the job list filters the jobs by the field `type` of
+the job record, so it offers the same types. Its handler, `JobListTypeItems`,
+calls `TypeItems` with the `table` and the `field` of the record,
+`tx_academicjobs_domain_model_job` and `type`, and an empty item list. A
+listener of `ModifyTcaSelectFieldItemsEvent` keyed to the record field
+therefore adds or removes a type for the list as well, without knowing the
+FlexForm. The handler puts the items the FlexForm field declares, its "None",
+in front of the result. "None" is the choice of no filter, not a type, so the
+listeners never get it and cannot remove it. The two FlexForm files of the job
+list, `Core12/PluginList.xml` and `Core13/PluginList.xml`, both declare "None"
+and the handler.
+
+Every other parameter stays the one of the FlexForm field. A listener that
+means the record or the list alone checks `flexParentDatabaseRow`:
+`AbstractItemProvider` passes it only when the compiled form has a FlexForm
+parent, on v12 and v13 alike, and the job form of the frontend leaves it out.
+`JobTypeSelectsTest` compiles a job list and a job record and records what a
+listener gets.
+
+Page TSconfig of the record field does not reach the option. A type added or
+removed with `addItems` or `removeItems` below
+`TCEFORM.tx_academicjobs_domain_model_job.type` needs the same lines for the
+FlexForm field. The two FlexForm files declare no sheets, so TYPO3 puts the
+field in the sheet `sDEF`, and the path names the CType, on v12 and v13 alike:
+
+```typoscript
+TCEFORM.tx_academicjobs_domain_model_job.type.removeItems = 3
+TCEFORM.tt_content.pi_flexform.academicjobs_list.sDEF.settings\.job\.type.removeItems = 3
+```
+
+The handler hands `TypeItems` its own item list instead of the one FormEngine
+passed by reference. Its copy of the parameters still holds that reference, so
+it binds the new list by reference, `$typeParameters['items'] = &$types`, which
+replaces the reference in the copy. A plain assignment would write through to
+the list of FormEngine.
+
 ## An appended item must not repeat the declared empty value
 
 The declared empty item of a select has a value too, usually `''` or `0`, and
@@ -352,7 +391,7 @@ Six test classes do this today:
 `SystemEnvironmentBuilder::REQUESTTYPE_BE` and a `normalizedParams` attribute,
 and set `$GLOBALS['LANG']`, because labels are resolved during the compile.
 
-## Five of the ten dispatch an event, five do not
+## Six of the eleven dispatch an event, five do not
 
 `FGTCLB\AcademicBase\Event\ModifyTcaSelectFieldItemsEvent` carries the whole
 parameter array and is dispatched **after** the handler built its items, so a
@@ -360,14 +399,14 @@ project listener has the last word — including over a restriction. A handler
 that narrows its items narrows what the listener receives, not what it may
 return.
 
-Only five handlers dispatch it, so "can my listener reach this select?" has two
-answers:
+Only six handlers dispatch it, `JobListTypeItems` through `TypeItems`, so "can
+my listener reach this select?" has two answers:
 
-| Dispatches the event                                | Builds its items and returns              |
-|-----------------------------------------------------|-------------------------------------------|
-| `AddressRecordItems` (contact4pages)                | `CountryItems`, `PartnerItems` (partners) |
-| `EmploymentTypeItems`, `TypeItems` (jobs)           | `DemandValues`, `RecordTypes` (persons)   |
-| `ContractItems`, `ProfileShowFieldsItems` (persons) | `SortingItemsProcFunc` (projects)         |
+| Dispatches the event                                          | Builds its items and returns              |
+|---------------------------------------------------------------|-------------------------------------------|
+| `AddressRecordItems` (contact4pages)                          | `CountryItems`, `PartnerItems` (partners) |
+| `EmploymentTypeItems`, `JobListTypeItems`, `TypeItems` (jobs) | `DemandValues`, `RecordTypes` (persons)   |
+| `ContractItems`, `ProfileShowFieldsItems` (persons)           | `SortingItemsProcFunc` (projects)         |
 
 ```bash
 grep -rln ModifyTcaSelectFieldItemsEvent packages/*/*/Classes
