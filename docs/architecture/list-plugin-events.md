@@ -47,6 +47,17 @@ variable for the view comes from the [plugin view event](plugin-view-event.md),
 which every plugin of seven academic extensions dispatches, the partner,
 program and project lists after their list event.
 
+The two shapes also differ in what a demand listener reaches. The partner,
+program and project lists hand the demand their listeners leave on to the
+query, the list event and the view. `ProfileRepository` hands the listeners of
+`ModifyProfileDemandEvent` a copy in each of its three calls, the list query,
+the letters and the next contract validity change, so a listener changes the
+query of that call and nothing the persons list reads from its demand
+afterwards, whether it changes the copy in place or replaces it (ACE-920). The
+order of a selection by hand, the page and the template demand follow the
+request there. A shallow clone is a complete copy because `ProfileDemand`
+holds no object, which its unit test pins.
+
 ## Every event carries the plugin context
 
 The context is declared as

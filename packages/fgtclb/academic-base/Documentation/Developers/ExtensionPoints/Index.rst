@@ -235,7 +235,7 @@ describe their events in detail, with examples.
         -   in the list, list-and-detail and card plugins, before the profile
             query and the query of the letter navigation are built from the
             demand
-        -   replace the demand
+        -   change or replace the demand
     *   -   :php:`\FGTCLB\AcademicPersons\Event\ModifyProfileQueryEvent`
         -   right before the profile query of the list, list-and-detail and
             card plugins, of the letter navigation and of the
