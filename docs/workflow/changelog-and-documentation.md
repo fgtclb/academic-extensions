@@ -95,6 +95,10 @@ The argument to `checkRstRenderingSingle` and `openDocumentation` is the
 checks `packages/fgtclb/${extensionKey}` for existence
 , in the `checkRstRenderingSingle` arm, despite the variable's name. For
 `academic_contacts4pages` the argument is therefore `academic-contact4pages`.
+Both suites reject an argument that contains a `/`, or is `.` or `..`,
+before anything else. `executeRstRendering()` removes and recreates
+`documentation-rendered/<argument>/Documentation-GENERATED-temp/`, and such
+an argument would point it outside `documentation-rendered/`.
 
 ### Where the output lands
 
@@ -120,9 +124,9 @@ per extension, and that single directory is what CI uploads as an artifact.
 
 `openDocumentation` reads only the collected copy and opens
 `documentation-rendered/<ext>/Documentation-GENERATED-temp/Index.html` with
-`xdg-open`. It renders nothing itself: without a preceding render it prints the
-two commands to run first, in `openDocumentation()`. It is
-Linux-only, which the script marks with a `@todo`.
+`xdg-open`. It renders nothing itself: without a preceding render,
+`openDocumentation()` prints the two commands to run first. It is Linux-only,
+which the script marks with a `@todo`.
 
 There is no watch mode in this repository. The loop is edit, render the single
 package, reopen.
