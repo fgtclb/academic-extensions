@@ -195,9 +195,18 @@ are indexed from 0, so the handler's first item replaces the declared one.
 `ContractItems` did that until ACE-842, and a new page contact, whose default
 `0` then had no item, showed `[ MISSING LABEL ("0") ]`. That is the label
 `TcaSelectItems` gives a `selectSingle` value it finds no item for, the item it
-puts back in the list so the value survives the render. `EmploymentTypeItems`,
-`TypeItems` and `ProfileShowFieldsItems` still merge and are deliberately left
-as they are: their fields declare no items, so there is nothing to replace.
+puts back in the list so the value survives the render.
+
+`EmploymentTypeItems` and `TypeItems` of `academic_jobs` merged the same way
+until ACE-923. Their fields declare no items, but an item a project declares in
+the TCA of the job record was replaced by the first shipped one. They append
+their items now and leave out a shipped item whose value is declared already,
+so a declared item keeps its label. `JobTypeSelectsTest` compiles the form of
+a job record with declared items, and `TypeItemsTest` and
+`EmploymentTypeItemsTest` call the handlers with them as arrays, the shape of
+the job form of the frontend. `ProfileShowFieldsItems` still merges and is
+deliberately left as it is: its fields declare no items, so there is nothing to
+replace.
 
 A handler that reads the items it is handed gets each one as a `SelectItem`,
 which implements `ArrayAccess`, on v12 and v13 alike
