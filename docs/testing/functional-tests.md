@@ -6,23 +6,33 @@ through the same code paths production uses. It is the only suite here that
 sees the database, the TCA that TYPO3 actually compiled, dependency injection,
 and — for the plugin tests — a rendered frontend page.
 
-It is also by far the larger suite: 237 functional test classes against 79 unit
-test classes, and 339 CSV fixtures.
+It is also by far the larger suite. There are about three and a half
+functional test classes to every unit test class, and more CSV fixtures than
+functional test classes. On 2026-10-16 that was 325 functional and 92 unit test
+classes in `packages/fgtclb/`, and 413 CSV fixtures. The numbers move with
+every change that adds a test, so measure them rather than trusting the ones
+above:
 
-| Extension                | Functional | Unit |
-|--------------------------|------------|------|
-| `academic-base`          | 13         | 6    |
-| `academic-bite-jobs`     | 12         | 3    |
-| `academic-contact4pages` | 17         | 3    |
-| `academic-jobs`          | 20         | 3    |
-| `academic-partners`      | 29         | 5    |
-| `academic-persons`       | 50         | 23   |
-| `academic-persons-edit`  | 26         | 16   |
-| `academic-persons-sync`  | 2          | 1    |
-| `academic-programs`      | 20         | 3    |
-| `academic-projects`      | 20         | 4    |
-| `academic-study-plan`    | 11         | 1    |
-| `typo3-category-types`   | 17         | 11   |
+```bash
+find packages/fgtclb/*/Tests/Functional -name '*Test.php' | wc -l
+find packages/fgtclb/*/Tests/Unit -name '*Test.php' | wc -l
+find packages -path '*Tests*' -name '*.csv' | wc -l
+```
+
+Per package, functional and unit test classes, the packages of
+`packages-dev/` included:
+
+```bash
+for d in packages/fgtclb/*/ packages-dev/*/; do
+    printf '%-24s %4d %4d\n' "$(basename "$d")" \
+        "$(find "$d" -path '*/Tests/Functional/*' -name '*Test.php' | wc -l)" \
+        "$(find "$d" -path '*/Tests/Unit/*' -name '*Test.php' | wc -l)"
+done
+```
+
+`academic-persons` carries the most of both. The packages below
+`packages-dev/` have tests of their own as well, and both suites collect them,
+see [Unit tests](unit-tests.md#discovery).
 
 ## Running them
 
@@ -213,7 +223,7 @@ $this->testExtensionsToLoad = array_unique([
 ]);
 ```
 
-— [`AcademicPersonsListPluginTest.php:49-57`](../../packages/fgtclb/academic-persons/Tests/Functional/Plugins/AcademicPersonsListPluginTest.php#L49-L57)
+From `setUp()` of [`AcademicPersonsListPluginTest.php`](../../packages/fgtclb/academic-persons/Tests/Functional/Plugins/AcademicPersonsListPluginTest.php#L42-L58).
 
 `academic-persons` also offers `addTestExtension()`/`addCoreExtension()` on its
 own abstract case
@@ -236,10 +246,10 @@ is what builds the instance.
 | [`academic-base/Tests/Functional/Tca/TableConfigurationTest.php`](../../packages/fgtclb/academic-base/Tests/Functional/Tca/TableConfigurationTest.php)                                   | Mutating `$GLOBALS['TCA']` safely, via `TcaHelperMethodsTrait`.                                                                                                                                                                                                                                                                                                                                |
 
 Records come from CSV fixtures next to the test, imported with
-`importCSVDataSet()` (used in 195 files) and, where the test writes, asserted
-back with `assertCSVDataSet()` (63 call sites). Fixtures of a plugin test live
-in a `Fixtures/<TestClassName>/` folder beside it, one file per scenario, which
-keeps a fixture from being quietly reused by a test it was not written for.
+`importCSVDataSet()` and, where the test writes, asserted back with
+`assertCSVDataSet()`. Fixtures of a plugin test live in a
+`Fixtures/<TestClassName>/` folder beside it, one file per scenario, which keeps
+a fixture from being quietly reused by a test it was not written for.
 
 ## A form that redirects
 
@@ -350,9 +360,16 @@ area. The whole-class form is
 and its `Core13/` sibling; the method form is
 [`EnvironmentBuilderFactoryTest.php:36`](../../packages/fgtclb/academic-base/Tests/Functional/Environment/EnvironmentBuilderFactoryTest.php#L36)
 and [`:49`](../../packages/fgtclb/academic-base/Tests/Functional/Environment/EnvironmentBuilderFactoryTest.php#L49),
-one method per core version on the same class. Those eight attributes are the
-only `not-core-*` groups in the repository outside
-`ExtensionCoreVersionCompatTestsTrait`.
+one method per core version on the same class. They are not the only uses of
+the groups. On 2026-10-16, 46 `not-core-*` group attributes in 26 files sat
+outside `ExtensionCoreVersionCompatTestsTrait`, the
+`ShowHiddenRecordsTranslation` tests of jobs, partners, programs and projects
+among them. List them with
+
+```bash
+grep -rn "Group('not-core-" packages packages-dev --include='*.php' \
+    | grep -v ExtensionCoreVersionCompatTestsTrait
+```
 
 The third form is used twice, and it is not an endorsement. Two selected-profile
 list assertions differ from TYPO3 v12 on and skip themselves rather than assert
@@ -364,8 +381,8 @@ if ((new Typo3Version())->getMajorVersion() >= 12) {
 }
 ```
 
-— [`AcademicPersonsListPluginTest.php:397`](../../packages/fgtclb/academic-persons/Tests/Functional/Plugins/AcademicPersonsListPluginTest.php#L397)
-and [`AcademicPersonsListAndDetailPluginTest.php:521`](../../packages/fgtclb/academic-persons/Tests/Functional/Plugins/AcademicPersonsListAndDetailPluginTest.php#L521)
+From [`AcademicPersonsListPluginTest.php:452`](../../packages/fgtclb/academic-persons/Tests/Functional/Plugins/AcademicPersonsListPluginTest.php#L452)
+and [`AcademicPersonsListAndDetailPluginTest.php:521`](../../packages/fgtclb/academic-persons/Tests/Functional/Plugins/AcademicPersonsListAndDetailPluginTest.php#L521).
 
 Both carry a `@todo` to investigate the core-side change and then either fix the
 implementation or restate the expectation. Since every core version this branch
