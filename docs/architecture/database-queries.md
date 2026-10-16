@@ -476,6 +476,16 @@ it comes must get the same list twice. The selection branch of
 `uid` fallback ordering as every other branch, even though the visible order is
 produced afterwards in PHP.
 
+**Do not filter the selection by storage pages.** The editor picked these
+records by hand, so a picked record stored outside the Startingpoint of the
+element is shown, as the card and the selected profiles element of
+`academic-persons` always did. The selection branch of
+`ProfileRepository::resolveDemandForQuery()` switches `respectStoragePage` off
+after `applyDemandSettings()` set the storage pages of the element, so the
+pages stay on the query settings for a listener to read and only stop
+filtering. Enable fields, hidden records, the language aspect and the workspace
+are untouched and still apply (ACE-923).
+
 ### Testing an ordering
 
 Assert the exact result order against a fixture whose `sorting` values
