@@ -281,6 +281,40 @@ its own.
   [TypoScript and site sets](typoscript-and-site-sets.md#a-filter-form-reaches-a-route-through-a-redirect)
   for its routes.
 
+## The view mode of the selected elements
+
+The selected profiles and selected contracts elements of `academic_persons`
+have no demand, and the view mode is their only plugin argument. Every element
+of one plugin type on a page shares the namespace of the plugin, so a plain
+`viewMode` switched every element of the type that offered the switch
+(ACE-918). The argument is a map keyed by the element instead:
+`tx_academicpersons_selectedprofiles[viewMode][<uid>]=table`.
+
+- **The key is the uid of the default-language record.** `l18n_parent` of the
+  content object row when it is set, otherwise `uid`. An overlaid translation
+  carries the default uid as `uid` on TYPO3 v13 and v14, a translation shown
+  with the fallback type `free` its own uid and the default one in
+  `l18n_parent`. Both resolve to the same key, so a link works in every
+  language of the page. The localized uid was rejected because a link would
+  then lose its element when the language changes.
+- **A link carries its own key only.** Every element of a type receives the
+  whole `viewMode` map, so it could pass the keys of the others on. It does
+  not, for three reasons. It could carry only the elements of its own type,
+  never the mode of an element of the other type or the arguments of a list,
+  so a link would keep some choices of the page and drop others. The keys of
+  the request are not validated against the elements of the page, so carrying
+  them would copy whatever a request names into links that end up in the page
+  cache. And every combination of modes would become a cache entry of its own.
+- **The action prepares the links.** Fluid cannot build an array with a
+  computed key, so the two actions assign `viewModeArguments`, the plugin
+  arguments of the link to each mode, and the switch partial uses them when
+  they are given. The list elements keep building their links from
+  `activeListArguments` as above, and keep their plain `viewMode` in the
+  demand and in their route enhancers.
+- **Part of the cache hash.** Both actions are cacheable and nothing excludes
+  the argument, so every chosen mode of every element is a cache entry of its
+  own. There is no route enhancer for these elements.
+
 ## The links of the job list
 
 The job list of `academic_jobs` paginates the same way as the partner list: a

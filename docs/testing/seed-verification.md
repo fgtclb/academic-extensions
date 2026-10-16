@@ -129,7 +129,8 @@ pairs differ.
 What is normalised away is listed in the test, one comment per rule, and it is
 only what a mirror differs in by being one: the `/legacy` path segment, the
 `websiteTitle` of the two sites, the titles of the two root pages, uids in
-attribute values and query strings, and four values drawn per request (the CSP
+attribute values and query string values, the uid that keys the view mode of a
+selected element in a query string, and four values drawn per request (the CSP
 nonce, a cHash, an error page request id, the login form's request token). An
 attribute value may carry two uids, the dialog id of a study plan shown by an
 "Insert records" element names that element and the module
