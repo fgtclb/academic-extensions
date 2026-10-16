@@ -12,6 +12,11 @@ use TYPO3\CMS\Core\Site\Entity\Site;
  *
  * - {@see \FGTCLB\AcademicJobs\Backend\FormEngine\EmploymentTypeItems::itemsProcFunc()}
  * - {@see \FGTCLB\AcademicJobs\Backend\FormEngine\TypeItems::itemsProcFunc()}
+ *
+ * The parameters are the ones of an itemsProcFunc. `row` is declared optional because an
+ * item provider is also called outside FormEngine, where no record exists:
+ * {@see \FGTCLB\AcademicBase\Controller\GetSelectItemsForTcaManagedTableFieldMethodTrait}
+ * passes an empty array, and another caller may leave the key out.
  */
 final class ModifyTcaSelectFieldItemsEvent
 {
@@ -26,7 +31,7 @@ final class ModifyTcaSelectFieldItemsEvent
      *     config: array<string, mixed>,
      *     TSconfig: array<string, mixed>|null,
      *     table: string,
-     *     row: array<string, mixed>,
+     *     row?: array<string, mixed>,
      *     field: string,
      *     effectivePid: int,
      *     site: Site|null,
@@ -56,7 +61,7 @@ final class ModifyTcaSelectFieldItemsEvent
      *      config: array<string, mixed>,
      *      TSconfig: array<string, mixed>|null,
      *      table: string,
-     *      row: array<string, mixed>,
+     *      row?: array<string, mixed>,
      *      field: string,
      *      effectivePid: int,
      *      site: Site|null,
@@ -86,7 +91,7 @@ final class ModifyTcaSelectFieldItemsEvent
      *      config: array<string, mixed>,
      *      TSconfig: array<string, mixed>|null,
      *      table: string,
-     *      row: array<string, mixed>,
+     *      row?: array<string, mixed>,
      *      field: string,
      *      effectivePid: int,
      *      site: Site|null,

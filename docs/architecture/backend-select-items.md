@@ -34,6 +34,37 @@ array a later provider turns it into. For a FlexForm element it is the `vDEF`
 value of that element, because `TcaFlexProcess` compiles the sheet with a row
 assembled from the flex values.
 
+## Outside FormEngine the row is empty
+
+`GetSelectItemsForTcaManagedTableFieldMethodTrait` of `academic_base` calls the
+`itemsProcFunc` of a field without FormEngine, for a frontend form. The job form
+of `academic_jobs` is the one caller, for `type` and `employment_type`. It hands
+over the keys FormEngine passes on every record, in the same order: `items`,
+`config`, `TSconfig`, `table`, `row`, `field`, `effectivePid` and `site`. The
+order is the one of `AbstractItemProvider::resolveItemProcessorFunction()` on
+TYPO3 v12 and v13 alike.
+
+There is no record, so `row` is an empty array. It used to be missing, and a
+listener of `ModifyTcaSelectFieldItemsEvent` that read `$parameters['row']`
+without a fallback raised `Undefined array key "row"`, which the debug preset
+turns into an exception (ACE-922). The empty array saves a listener that reads
+the row itself, not one that reads a field of it: `$parameters['row']['pid']`
+still warns, about `pid` now. The event and the two job item providers
+therefore declare `row` optional, `row?:`, so PHPStan reports a listener that
+reads it without a fallback.
+
+The inline keys and `flexParentDatabaseRow` are left out by the trait, because
+nothing outside FormEngine has them, and the shapes declare them optional
+already. `effectivePid` is the page of the form, or the root page of the site
+when the request carries no page. The three controllers of
+`academic-persons-edit` that call a handler outside FormEngine as well, see
+[below](#five-of-the-ten-dispatch-an-event-five-do-not), pass no `row` either,
+but the handler they call, `RecordTypes`, dispatches no event.
+
+`GetSelectItemsForTcaManagedTableFieldMethodTraitTest` of `academic_base` pins
+the keys, `AcademicJobsNewJobFormSelectItemsListenerTest` of `academic_jobs`
+runs a listener that reads the row through the job form.
+
 ## Page TSconfig reaches a FlexForm field by a longer path
 
 For a TCA column the path is the familiar one:
@@ -293,9 +324,11 @@ Two places in this repository call a handler outside FormEngine and assemble the
 parameters themselves:
 `academic-base`'s `GetSelectItemsForTcaManagedTableFieldMethodTrait`, which is
 `@api`, and the three address, e-mail and phone controllers of
-`academic-persons-edit`. The trait passes the field's `itemsProcFunc.` subtree;
-the three controllers pass no `TSconfig` key at all, which a handler has to read
-as "no setting" rather than as an error.
+`academic-persons-edit`. The trait passes the field's `itemsProcFunc.` subtree
+and an empty `row`, see
+[above](#outside-formengine-the-row-is-empty). The three controllers pass no
+`TSconfig` key at all, which a handler has to read as "no setting" rather than
+as an error.
 
 ## A category tree offers the categories of one group
 
