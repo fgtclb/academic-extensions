@@ -28,6 +28,9 @@ use PHPUnit\Framework\TestCase;
  *   `"providesPackages": []`, which TYPO3 reads like `{}`.
  * - A manifest with `config.sort-packages` has `require` and `require-dev` in the order
  *   composer sorts them.
+ * - The link table of every package README links the manual
+ *   `Build/Scripts/readmeManualLink.php` writes for the branch and the version of the
+ *   package. Its padding is left to `lintMarkdown`.
  */
 final class SetVersionNormalFormTest extends TestCase
 {
@@ -137,6 +140,39 @@ final class SetVersionNormalFormTest extends TestCase
             usort($sorted, static fn(string $a, string $b): int => strnatcmp(self::sortKey($a), self::sortKey($b)));
             $this->assertSame($sorted, $names, sprintf('"%s" is not sorted, composer require would sort it.', $section));
         }
+    }
+
+    /**
+     * @return \Generator<string, array{string}>
+     */
+    public static function readmePackagesDataProvider(): \Generator
+    {
+        $directories = array_map('dirname', glob(self::repositoryPath() . '/packages/fgtclb/*/README.md') ?: []);
+        sort($directories);
+        foreach ($directories as $directory) {
+            yield self::relativePath($directory) => [$directory];
+        }
+    }
+
+    #[DataProvider('readmePackagesDataProvider')]
+    #[Test]
+    public function readmeLinksTheManualSetVersionWrites(string $directory): void
+    {
+        $output = [];
+        $status = 0;
+        exec(
+            implode(' ', array_map('escapeshellarg', [
+                PHP_BINARY,
+                self::repositoryPath() . '/Build/Scripts/readmeManualLink.php',
+                '--check',
+                DocumentationGuidesTest::branch(),
+                trim((string)file_get_contents($directory . '/VERSION')),
+                $directory,
+            ])) . ' 2>&1',
+            $output,
+            $status,
+        );
+        $this->assertSame(0, $status, implode("\n", $output) . "\nbin/set-version would rewrite the README.");
     }
 
     /**
