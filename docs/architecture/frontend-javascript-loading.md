@@ -80,7 +80,10 @@ module it publishes through its import map, the frontend icon factory
 module of another package or of the site package and loaded exactly when that
 one is, so the switch of the consumer covers it. `academic_bite_jobs`, `academic_contacts4pages`,
 `academic_projects`, `academic_persons_sync` and `category_types` load no
-frontend script at all.
+frontend script at all. The filter forms of `academic_partners` and
+`academic_projects` submit through an inline handler instead, which their
+extensions allow by hash, see
+[Content Security Policy](content-security-policy.md).
 
 Each manual documents its switch in a section with the anchor
 `configuration-javascript`, the study plan in its section `asset-switches`, and
@@ -170,3 +173,5 @@ reaches the page only when the module was registered.
   declared, and why the two defaults have to agree.
 - [Overridable partials](overridable-partials.md) - the override that keeps its
   own asset lines.
+- [Content Security Policy](content-security-policy.md) - the inline handlers
+  of the partner and project filter forms and the hash that allows them.

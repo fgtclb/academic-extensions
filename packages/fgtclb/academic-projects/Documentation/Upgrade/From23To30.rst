@@ -478,8 +478,10 @@ The paths below are relative to :file:`Resources/Private/`:
         -   :ref:`feature-1790440964`
     *   -   :file:`Partials/Project/SortingAndFilters.html`
         -   Renders the new partials :file:`Project/ActiveFilters.html` and
-            :file:`Project/ResultCount.html`.
-        -   :ref:`feature-1790946475`
+            :file:`Project/ResultCount.html`, and a submit button inside
+            :html:`<noscript>` for visitors without JavaScript.
+        -   :ref:`feature-1790946475`,
+            :ref:`important-ace-924-academic-projects`
     *   -   :file:`Partials/Project/Item.html`
         -   Renders the image through :file:`Academic/Image.html` of
             :guilabel:`academic_base`, the category icons with the

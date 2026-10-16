@@ -275,6 +275,10 @@ are relative to :file:`Resources/Private/`:
             instead of :html:`academic_projects`. A copy that keeps the old
             name does not see the label overrides of the previous section.
         -   :ref:`important-label-overrides-use-the-documented-path`
+    *   -   :file:`Partials/Project/SortingAndFilters.html`
+        -   Renders a submit button inside :html:`<noscript>` for visitors
+            without JavaScript.
+        -   :ref:`important-ace-924-academic-projects`
     *   -   :file:`Backend/Partials/PageLayout/Doktype30.html`
         -   Removed, and so is :file:`ext_typoscript_setup.typoscript`, which
             registered it. It was never rendered. The page module shows the

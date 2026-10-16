@@ -36,6 +36,10 @@
         <source>Reset all filters</source>
         <target>Alle Filter zurücksetzen</target>
       </trans-unit>
+      <trans-unit id="filter.submit">
+        <source>Show projects</source>
+        <target>Projekte anzeigen</target>
+      </trans-unit>
       <trans-unit id="sys_category.projects.project_department">
         <source>Department</source>
         <target>Organisationseinheit</target>

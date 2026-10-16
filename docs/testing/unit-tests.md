@@ -5,8 +5,8 @@ database, no site, no request. Everything the subject needs is passed to it or
 stubbed. That makes the suite fast enough to run on every save, and it makes a
 failure point at one class instead of at a stack.
 
-There are 169 unit test classes: 148 across the twelve extensions, five in
-`packages-dev/dev-site`, eleven in `packages-dev/monorepo-shared` and five in
+There are 171 unit test classes: 149 across the twelve extensions, five in
+`packages-dev/dev-site`, twelve in `packages-dev/monorepo-shared` and five in
 `packages-dev/testing-helper`. Twelve of them are the one-line version
 compatibility test every extension carries (see
 [below](#the-version-compatibility-test)). Measured with
@@ -94,8 +94,10 @@ the branch alias key, see [below](#the-branch-alias-key), the check of the form
 `bin/set-version` writes, see [below](#the-form-binset-version-writes), the
 check that a class alias map ships, see [below](#class-alias-maps-ship), the
 check of the icons of frontend templates, see
-[below](#icons-of-frontend-templates), and the check that every functional test
-case extends the shared base class, see
+[below](#icons-of-frontend-templates), the check that every inline event
+handler of a template is allowed by the Content Security Policy of its
+extension, see [below](#inline-event-handlers), and the check that every
+functional test case extends the shared base class, see
 [below](#functional-tests-extend-the-shared-base-class).
 
 **Test classes are autoloaded, not included.** Each extension registers its own
@@ -615,6 +617,40 @@ is decided at runtime, and the functional icon tests of each extension render
 it. The test fails as well when it finds no literal identifier at all, so a
 renamed namespace or ViewHelper cannot turn it into a check of nothing. It
 reads no template of a test fixture or a project.
+
+## Inline event handlers
+
+[`InlineEventHandlerTest`](../../packages-dev/monorepo-shared/Tests/Unit/InlineEventHandlerTest.php)
+reads every Fluid template below `packages/fgtclb/*/Resources/Private/` and
+collects its inline event handlers: an `on…` attribute of a tag or of a
+ViewHelper, quoted or not, and an `on…` key of a Fluid array, as
+`additionalAttributes` takes it, also as the first argument of an inline call
+(ACE-924). It fails for every handler whose text the
+`Configuration/ContentSecurityPolicies.php` of the same extension does not
+allow, that is an `InlineEventHandlerMutation` of `academic_base` for the
+frontend scope with exactly that text. A plain `Mutation` with the same hash
+does not count: the listener that takes the directive out on a site with
+`'unsafe-inline'` recognises the mutation by its class. A second test fails
+for a hash the file allows that no handler of the extension needs any more,
+because it widens the policy of every site for nothing.
+
+A nonce does not cover an event handler attribute, so the frontend policy of
+TYPO3 blocks a handler that is not allowed once a site enforces the policy.
+Nothing fails in a rendering: the select of a filter form stops submitting,
+and only the console of the browser reports the violation. See
+[Content Security Policy](../architecture/content-security-policy.md).
+
+The text is taken as the browser hashes it: a character reference in an
+attribute of a plain HTML tag is decoded, one in an attribute of a ViewHelper
+is not, because Fluid encodes the value again when it renders the tag, and the
+escaping backslashes of a Fluid string are dropped. A handler built from a variable cannot be allowed by a hash and is
+reported as such. The name is matched in any letter case, as HTML does, so a
+ViewHelper argument whose name starts with `on` is reported too. The content
+of `<f:comment>` is skipped, as for the icons. A third test runs the collector
+over template snippets, a tag, a ViewHelper, a character reference in either,
+an unquoted attribute, a variable, both array forms and an inline call, a
+`data-` attribute and a comment, so a change of the patterns cannot turn the
+check into one of nothing.
 
 ## Functional tests extend the shared base class
 

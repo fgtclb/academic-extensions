@@ -33,6 +33,12 @@ describing an intention as if it were the state.
   the flash message mode, the decision after a save and the field partials.
   The jobs partials keep their names and pass their own wrapper partial on, so
   a project override of the wrapper still reaches every field.
+- An inline event handler in a template is **allowed by the hash of its exact
+  text** in `script-src-attr`, from the `Configuration/ContentSecurityPolicies.php`
+  of its extension, or the frontend policy of TYPO3 blocks it. A unit test of
+  `monorepo-shared` holds every template and every hash together, and a
+  listener of `academic_base` takes the directive out again where a site allows
+  inline scripts already.
 - A template a project customises in pieces is **built from pieces**, and the
   entry partial keeps its name and its arguments so an existing copy of it is
   not broken. A partial that renders a *value* rather than markup renders it
@@ -173,6 +179,7 @@ describing an intention as if it were the state.
 | [Upgrade checks](upgrade-checks.md)                             | The `academic:upgrade:check` command: the stored configuration it reads, what it compares template overrides with, and which root paths are a project's.                                                     |
 | [Frontend JavaScript loading](frontend-javascript-loading.md)   | The one switch per extension for its frontend scripts: name, default, the set that declares it, where it is checked, what each extension loads, and what a new script has to do.                             |
 | [Hidden records](hidden-records.md)                             | What the plugin option "Show hidden records" needs beyond the query settings on a translated page on v13, and the fetcher that provides it.                                                                  |
+| [Content Security Policy](content-security-policy.md)           | Why the filter forms of the partner and project lists keep their inline handler, the hash allowed in `script-src-attr`, the listener for sites with inline scripts, and the button.                          |
 
 ## See also
 

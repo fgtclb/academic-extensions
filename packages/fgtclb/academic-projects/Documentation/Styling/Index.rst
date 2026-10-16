@@ -60,6 +60,11 @@ The project list
                             </div>
                         </div>
                     </div>
+                    <noscript>
+                        <div class="ace-actions">
+                            <button type="submit" class="ace-control ace-submit btn btn-primary">Show projects</button>
+                        </div>
+                    </noscript>
                 </div>
             </form>
             <div class="ace-filters">
@@ -84,7 +89,9 @@ The project list
 *   The filter bar holds the sorting selects, one filter per category type,
     the further filters inside the :html:`<details class="ace-more">` with its
     :html:`<summary class="ace-toggle">`, and the select of the active state.
-    The form submits itself when a select changes.
+    The form submits itself when a select changes. For a visitor without
+    JavaScript it renders the button inside :html:`<noscript>`, which a
+    visitor with JavaScript does not see.
 *   The active filters and the reset link are wrapped in an `ace-filters` of
     their own, which the partner and program lists do not render. A rule for
     `.ace-filters` therefore applies to the filter bar and to the active
