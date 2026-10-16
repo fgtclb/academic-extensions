@@ -24,6 +24,9 @@ printSummary() {
     fi
     echo "PHP: ${PHP_VERSION}" >&2
     echo "TYPO3: ${CORE_VERSION}" >&2
+    if [[ -n "${RENDERER_INFO}" ]]; then
+        echo "Renderer: ${RENDERER_INFO}" >&2
+    fi
     if [[ ${TEST_SUITE} =~ ^(functional|seedManifest|functionalDeprecated|acceptance|acceptanceInstall)$ ]]; then
         case "${DBMS}" in
             mariadb|mysql|postgres)
@@ -53,7 +56,7 @@ printSummary() {
 # Actions, both times on a docker.io image (ACE-342). Anonymous Docker Hub pulls
 # are rate limited per source IP and hosted runners share address space, which
 # also explains why no ghcr.io pull has failed; only the docker.io images are
-# guarded here.
+# guarded here, and the renderer when it is not cached, see "pullRenderer".
 #
 # The local check comes first so a warm cache still works offline and a pinned
 # image is not re-fetched on every local run.
@@ -76,6 +79,42 @@ ensureImage() {
     done
     echo "Could not pull ${IMAGE} after ${MAX_ATTEMPTS} attempts. Aborting." >&2
     return 1
+}
+
+# Pull the documentation renderer before a run renders with it (ACE-938).
+#
+# The renderer is used by its "latest" tag on purpose, so the manuals are checked
+# with the release docs.typo3.org renders them with. Neither docker nor podman
+# refreshes a tag they already have, though, so without this pull a local run
+# kept rendering with whatever release was pulled last. That hid ACE-935: from
+# render-guides 0.46.0 on an image in a table cell is dropped without a log line,
+# and a local 0.45.0 still showed it.
+#
+# Without a cached image the pull is left to "ensureImage" and its retries, and a
+# run without any renderer fails. The cache is checked first, so a failed pull is
+# not tried again there and its attempt count stays true. With a cached image a
+# failed pull does not fail the run: a registry that cannot be reached is no
+# reason to lose the rendered output. It is reported on stderr and again in the
+# summary, because that run may not render what docs.typo3.org renders. Fully
+# offline the gate fails anyway, since the renderer then cannot load the
+# interlink inventories of docs.typo3.org and logs a warning for each.
+pullRenderer() {
+    local IMAGE=${1}
+    local PULL_STATE=""
+    if ! ${CONTAINER_BIN} image inspect "${IMAGE}" >/dev/null 2>&1; then
+        ensureImage "${IMAGE}" || return 1
+    elif ! ${CONTAINER_BIN} pull "${IMAGE}"; then
+        echo "" >&2
+        echo "###########################################################################" >&2
+        echo "WARNING: Could not pull ${IMAGE}." >&2
+        echo "Rendering with the cached image, which may be older than the release" >&2
+        echo "docs.typo3.org renders with." >&2
+        echo "###########################################################################" >&2
+        echo "" >&2
+        PULL_STATE=" (cached, pull failed)"
+    fi
+    RENDERER_INFO="render-guides $(${CONTAINER_BIN} image inspect "${IMAGE}" --format '{{index .Config.Labels "org.opencontainers.image.version"}}')${PULL_STATE}"
+    echo "Renderer: ${IMAGE}, ${RENDERER_INFO}" >&2
 }
 
 waitFor() {
@@ -309,6 +348,13 @@ Options:
         run while the other core version's dependency set is installed. lintMarkdown needs
         no node dependency either, so it runs without an "npm ci" first.
 
+        checkRstRenderingAll and checkRstRenderingSingle pull the renderer
+        ghcr.io/typo3-documentation/render-guides:latest before they render, so they
+        render with the release docs.typo3.org uses and not with an older cached one.
+        When the pull fails, for example because the registry cannot be reached, they
+        say so on stderr and render with the cached image, and fail when no image is
+        cached.
+
     -b <docker|podman>
         Container environment:
             - docker
@@ -475,6 +521,8 @@ fi
 
 # Option defaults
 TEST_SUITE="help"
+# Set by "pullRenderer" and printed in the summary.
+RENDERER_INFO=""
 CORE_VERSION="13"
 DBMS="sqlite"
 PHP_VERSION="8.2"
@@ -689,7 +737,6 @@ fi
 
 IMAGE_PHP="ghcr.io/typo3/core-testing-$(echo "php${PHP_VERSION}" | sed -e 's/\.//'):latest"
 IMAGE_ALPINE="docker.io/alpine:3.8"
-IMAGE_DOCS="ghcr.io/typo3-documentation/render-guides:latest"
 IMAGE_SELENIUM="docker.io/selenium/standalone-chrome:4.0.0-20211102"
 IMAGE_MARIADB="docker.io/mariadb:${DBMS_VERSION}"
 IMAGE_MYSQL="docker.io/mysql:${DBMS_VERSION}"
@@ -702,6 +749,8 @@ IMAGE_POSTGRES="docker.io/postgres:${DBMS_VERSION}-alpine"
 # settings (fsync, synchronous_commit, full_page_writes) made no measurable difference and
 # are not set.
 MYSQL_SERVER_OPTIONS="--skip-log-bin --innodb-flush-log-at-trx-commit=2 --innodb-doublewrite=0"
+# The renderer of docs.typo3.org, by its "latest" tag on purpose and pulled before
+# every documentation run, see "pullRenderer".
 IMAGE_RSTRENDERING="ghcr.io/typo3-documentation/render-guides:latest"
 # The image TYPO3 core itself uses for its JavaScript suites. It carries node 24
 # and npm 11, which match the "engines" range of Build/package.json, and it ships
@@ -870,16 +919,20 @@ case ${TEST_SUITE} in
         ;;
     checkRstRenderingAll)
         SUITE_EXIT_CODE=0
-        echo "Scanning packages/fgtclb/ for directories with Documentation..."
-        for extensionFolder in packages/fgtclb//*/Documentation; do
-            extensionFolderName="${extensionFolder%/Documentation}"
-            extensionFolderName=$(basename "${extensionFolderName}")
-            executeRstRendering "${extensionFolderName}"
-            TMP_SUITE_EXIT_CODE=$?
-            if [ ${TMP_SUITE_EXIT_CODE} -ne 0 ]; then
-                SUITE_EXIT_CODE=${TMP_SUITE_EXIT_CODE}
-            fi
-        done
+        if ! pullRenderer "${IMAGE_RSTRENDERING}"; then
+            SUITE_EXIT_CODE=1
+        else
+            echo "Scanning packages/fgtclb/ for directories with Documentation..."
+            for extensionFolder in packages/fgtclb//*/Documentation; do
+                extensionFolderName="${extensionFolder%/Documentation}"
+                extensionFolderName=$(basename "${extensionFolderName}")
+                executeRstRendering "${extensionFolderName}"
+                TMP_SUITE_EXIT_CODE=$?
+                if [ ${TMP_SUITE_EXIT_CODE} -ne 0 ]; then
+                    SUITE_EXIT_CODE=${TMP_SUITE_EXIT_CODE}
+                fi
+            done
+        fi
         ;;
     checkRstRenderingSingle)
         extensionKey="${1}"
@@ -892,6 +945,8 @@ case ${TEST_SUITE} in
                 SUITE_EXIT_CODE=1
             elif [[ ! -d "packages/fgtclb/${extensionKey}/Documentation" ]]; then
                 echo "Error: Package folder \"${extensionKey}\" does not contain a \"Documentation\" folder"
+                SUITE_EXIT_CODE=1
+            elif ! pullRenderer "${IMAGE_RSTRENDERING}"; then
                 SUITE_EXIT_CODE=1
             else
                 executeRstRendering "${extensionKey}"

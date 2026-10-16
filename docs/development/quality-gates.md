@@ -331,6 +331,13 @@ The user-facing manuals live per package in
 `ghcr.io/typo3-documentation/render-guides` image; the rendering itself is in
 `executeRstRendering()`.
 
+The image is used by its `latest` tag, which is the release docs.typo3.org
+renders with, and both suites pull it before they render, because a container
+engine never refreshes a tag it already has. A failed pull is reported on
+stderr and in the summary, and the cached image is used. A new renderer release
+can turn this gate red without a change in the repository, and that is
+accepted, see [Container images](environment.md#container-images).
+
 **This is a real gate, not an artifact producer.** The renderer is invoked with
 `--fail-on-log --fail-on-error`, so a warning fails the job. The results are
 collected in `documentation-rendered/<extension>/Documentation-GENERATED-temp/`,
