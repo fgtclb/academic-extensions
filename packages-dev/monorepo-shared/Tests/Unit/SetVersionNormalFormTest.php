@@ -31,6 +31,9 @@ use PHPUnit\Framework\TestCase;
  * - The link table of every package README links the manual
  *   `Build/Scripts/readmeManualLink.php` writes for the branch and the version of the
  *   package. Its padding is left to `lintMarkdown`.
+ * - The links from the other files of every package into the manuals of the repository
+ *   name the manual version `Build/Scripts/manualLinkVersion.php` writes for the branch
+ *   and the version of the package.
  */
 final class SetVersionNormalFormTest extends TestCase
 {
@@ -173,6 +176,39 @@ final class SetVersionNormalFormTest extends TestCase
             $status,
         );
         $this->assertSame(0, $status, implode("\n", $output) . "\nbin/set-version would rewrite the README.");
+    }
+
+    /**
+     * @return \Generator<string, array{string}>
+     */
+    public static function packagesDataProvider(): \Generator
+    {
+        $directories = array_map('dirname', glob(self::repositoryPath() . '/packages/fgtclb/*/VERSION') ?: []);
+        sort($directories);
+        foreach ($directories as $directory) {
+            yield self::relativePath($directory) => [$directory];
+        }
+    }
+
+    #[DataProvider('packagesDataProvider')]
+    #[Test]
+    public function manualLinksNameTheVersionSetVersionWrites(string $directory): void
+    {
+        $output = [];
+        $status = 0;
+        exec(
+            implode(' ', array_map('escapeshellarg', [
+                PHP_BINARY,
+                self::repositoryPath() . '/Build/Scripts/manualLinkVersion.php',
+                '--check',
+                DocumentationGuidesTest::branch(),
+                trim((string)file_get_contents($directory . '/VERSION')),
+                $directory,
+            ])) . ' 2>&1',
+            $output,
+            $status,
+        );
+        $this->assertSame(0, $status, implode("\n", $output) . "\nbin/set-version would rewrite the manual links.");
     }
 
     /**

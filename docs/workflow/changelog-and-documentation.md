@@ -56,6 +56,39 @@ The extension key is not always the directory name: `academic-contact4pages`
 ships `academic_contacts4pages`. The manual's `Index.rst` states the key, the
 directory does not.
 
+### Absolute links between the manuals
+
+An absolute link from a package file into a manual of this repository, a manual
+page that links the page of another manual or a settings file that names the
+page documenting it, names the manual of the version line the file ships with:
+`https://docs.typo3.org/p/<composer name>/2.4/en-us/...` on this branch, the
+major and minor version of the packages, and `main` instead on `main`.
+`bin/set-version` writes that version with
+`Build/Scripts/manualLinkVersion.php`, so a minor bump and a branch cut move
+the links along, and a unit test fails for a link that names another version,
+see
+[Unit tests](../testing/unit-tests.md#the-links-into-the-manuals-of-the-repository).
+The `README.md` of a package is read without its link table, the lines that
+start with `|`, which `Build/Scripts/readmeManualLink.php` writes and pads and
+a test of its own checks, see
+[Unit tests](../testing/unit-tests.md#the-link-table-of-the-readmes). A link
+in the text below the table follows the version line like any other.
+Write a new link with the version of this branch. The branch was cut from
+`main` with seven links into the 3.0 manuals, which nothing reported until
+ACE-941. The manual of `2.4` is rendered by docs.typo3.org once `2.4.0` is
+tagged, and the links answer 404 until then.
+
+Two kinds of file are left out, and their links are not checked:
+
+- The `Documentation/Changelog/` folders and the `Documentation/Upgrade/`
+  pages. They are shared between the branches: `Changelog/2.4/` and
+  `From23To24.rst` are byte-identical on `main` and here, and a released
+  folder, 2.0 to 2.3, is never edited. No single version is right on both
+  branches, so a link there keeps the manual it was written with, on every
+  branch and after a cut. None of them links a manual of this repository on
+  this branch today.
+- The render output, `vendor/` and `node_modules/` trees and binary files.
+
 ### The upgrade chapter
 
 Every manual carries `Upgrade/` (ACE-910): an index page with the table of

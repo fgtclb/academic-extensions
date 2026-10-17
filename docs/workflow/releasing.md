@@ -61,11 +61,11 @@ bin/set-version <version> <type> [--source-branch=<name>] [--dry-run]
 ```
 
 It edits working-tree files and does **nothing else**: no git, no network
-(`bin/set-version:46-47`). That separation is what makes it safe to run and
+(`bin/set-version:48-49`). That separation is what makes it safe to run and
 inspect on its own.
 
 `<version>` is always a bare `MAJOR.MINOR.PATCH`; the `-dev` suffixes are
-derived, never passed. `<type>` decides how (`bin/set-version:186-210`):
+derived, never passed. `<type>` decides how (`bin/set-version:188-212`):
 
 | Type           | Package version | `ext_emconf` | Academic dependency constraint | Branch alias |
 |----------------|-----------------|--------------|--------------------------------|--------------|
@@ -73,18 +73,19 @@ derived, never passed. `<type>` decides how (`bin/set-version:186-210`):
 | `post-release` | `X.Y.Z-dev`     | `X.Y.Z`      | `~X.Y.Z@dev`                   | `X.Y.x-dev`  |
 | `dev`          | `X.Y.Z-dev`     | `X.Y.Z`      | `~X.Y.Z@dev`                   | `X.Y.x-dev`  |
 
-`post-release` and `dev` share one derivation (`bin/set-version:197-210`); `dev`
+`post-release` and `dev` share one derivation (`bin/set-version:199-212`); `dev`
 is the thin variant used for branching and forced minor or major bumps.
 `post-release` does **not** increment anything — the version passed is already
 the next one.
 
-What one run rewrites, in order (`bin/set-version:373-470`):
+What one run rewrites, in order (`bin/set-version:386-485`):
 
 1. `Build/Scripts/runTests.sh` → `COMPOSER_ROOT_VERSION`
 2. every split extension → academic composer dependencies,
    `extra.typo3/cms.version`, branch alias, `tailor set-version`, `VERSION`,
    `edit-on-github-branch` of `Documentation/guides.xml`, the "Read online"
-   link of `README.md`
+   link of `README.md`, the manual version of the links from the other package
+   files into the manuals
 3. functional-test fixture extensions → composer dependencies only
 4. every `ext_emconf.php` (splits **and** fixtures) → `version`, plus the
    `depends`/`suggests` constraints for each academic extension key
@@ -96,12 +97,12 @@ What one run rewrites, in order (`bin/set-version:373-470`):
 
 Nothing in that list is hardcoded. The package set is discovered by looking for
 directories under `packages/fgtclb/*/` that carry both a `composer.json` and an
-`ext_emconf.php` (`bin/set-version:228-239`); the extension key is read from
+`ext_emconf.php` (`bin/set-version:230-241`); the extension key is read from
 `extra.typo3/cms.extension-key`, never guessed from the directory name; fixture
 extensions are found under `Tests/Functional/Fixtures/Extensions`
-(`bin/set-version:244-249`); the `packages-dev` packages and the development
+(`bin/set-version:246-251`); the `packages-dev` packages and the development
 instances are discovered by path, `for dir in packages-dev/*/`
-(`bin/set-version:440`) and `for dir in core-*/` (`bin/set-version:455`). A
+(`bin/set-version:455`) and `for dir in core-*/` (`bin/set-version:470`). A
 thirteenth extension, a fourth `packages-dev` package or a `core-14` instance is
 picked up by existing, which is precisely what the previously hardcoded instance
 list failed to do — and is how `packages-dev/dev-site/` was versioned correctly
@@ -117,12 +118,12 @@ one drifts from it, see
 
 `--dry-run` prints every change without touching a file and is the way to
 rehearse a bump. `--source-branch=<name>` names the branch the version is
-applied on. **On this branch it defaults to `2`** (`bin/set-version:87`), which
+applied on. **On this branch it defaults to `2`** (`bin/set-version:89`), which
 is what a `2.x` release wants, so the flag is not needed here.
 
 The branch alias is keyed to the version name composer gives that branch:
 `2.x-dev` for `2`, `dev-main` for `main`, `2.2.x-dev` for `2.2`.
-`Build/Scripts/composerBranchVersion.sh` prints it (`bin/set-version:127-144`).
+`Build/Scripts/composerBranchVersion.sh` prints it (`bin/set-version:129-146`).
 Composer applies an alias only under that key and skips any other without a
 word, and `composer validate --strict` accepts it as well. This branch carried
 `dev-2` from its cut until ACE-784, so `2.4.x-dev` did not exist and no split
@@ -158,6 +159,23 @@ links the manual is not touched. The padding of the table follows the new
 link. A README without the table stops the run. A link changed by hand fails a
 unit test until it names the manual of the branch again, see
 [Unit tests](../testing/unit-tests.md#the-link-table-of-the-readmes).
+
+The absolute links from the other files of a package into a manual of this
+repository follow it too: a settings file that names the page documenting it,
+a manual page that links the page of another manual.
+`Build/Scripts/manualLinkVersion.php` writes the manual version of each from
+the same branch and version (ACE-941). The link table of the `README.md` is
+left to the script above, the links in its text are written here. The
+`Documentation/Changelog/` folders and `Documentation/Upgrade/`
+pages keep their links, because they are shared between the branches, see
+[Changelog and documentation](changelog-and-documentation.md#absolute-links-between-the-manuals).
+A file that already links the manual is not touched. A link into such a manual
+without a manual version and a locale stops the run, and so does a package
+directory that does not exist. A link changed by hand
+fails a unit test until it names the manual of the branch again, see
+[Unit tests](../testing/unit-tests.md#the-links-into-the-manuals-of-the-repository).
+This branch was cut with the links of `main` and linked the 3.0 manuals until
+then.
 
 ## `bin/release` — orchestrate the release
 
@@ -214,7 +232,7 @@ Pre-flight (`bin/release:178-200`):
 
 Tooling is resolved and verified up front, before anything changes:
 `bin/set-version` needs `composer`, `php`, `tailor`, `pkw`, `jq` and `sed` on
-`PATH` (`bin/set-version:158-164`); `bin/release` additionally needs `git` and an
+`PATH` (`bin/set-version:160-166`); `bin/release` additionally needs `git` and an
 authenticated `gh` (`bin/release:153-162`).
 
 ## `bin/cut-branch`: cut a version branch
@@ -232,7 +250,7 @@ the default of both scripts (ACE-249) and the edit branch of the manuals
 (ACE-773). The script takes over what is mechanical. It has the
 safety gates of `bin/release`, see [above](#two-independent-safety-gates).
 
-**Phase 1, the new branch** (`bin/cut-branch:303-324`)
+**Phase 1, the new branch** (`bin/cut-branch:304-325`)
 
 1. `git push origin <source commit>:refs/heads/<branch>`, skipped when the
    branch already exists on `origin` at that commit, so a branch created by
@@ -240,23 +258,24 @@ safety gates of `bin/release`, see [above](#two-independent-safety-gates).
 2. `git checkout -b cut-<branch> <source commit>`
 3. `bin/set-version <current version> dev --source-branch=<branch>`: the branch
    alias becomes `<branch>.x-dev`, the edit branch of the manuals `<branch>`,
-   and the READMEs link the manual of the version line of the new branch
+   and the READMEs and the other package files link the manuals of the version
+   line of the new branch
 4. the `--source-branch` default of `bin/set-version`, `bin/release` and
    `bin/cut-branch` becomes `<branch>`, two lines each
 5. commit `[TASK] Prepare branch <branch>`, push, PR against the new branch,
    checks, admin rebase-merge
 
-**Phase 2, the source branch** (`bin/cut-branch:329-344`)
+**Phase 2, the source branch** (`bin/cut-branch:330-345`)
 
 1. `git checkout -b set-version-<next-version> <source commit>`
-2. `bin/set-version <next-version> dev`, and the READMEs link the manual of
-   the minor version of `<next-version>`
+2. `bin/set-version <next-version> dev`, and the READMEs and the other package
+   files link the manuals of the minor version of `<next-version>`
 3. the version example in the help of `bin/set-version` and `bin/release`
    becomes `<next-version>`
 4. commit `[TASK] Set version <next-version>`, push, PR, checks, admin
    rebase-merge
 
-It refuses before anything is touched (`bin/cut-branch:196-230`, `:264-298`) a
+It refuses before anything is touched (`bin/cut-branch:197-231`, `:265-299`) a
 branch name that is not `MAJOR` or `MAJOR.MINOR`, versions that do not agree
 across the twelve `VERSION` files or are no dev version, a current version
 outside the new branch, a next version inside it or below the current one, a

@@ -68,7 +68,9 @@ something else: the three scripts behind `runTests.sh -j`,
 `Build/Scripts/composerBranchVersion.sh`, the version name composer gives a
 branch and with it the branch alias key (ACE-784), and
 `Build/Scripts/readmeManualLink.php`, which `bin/set-version` writes the manual
-link of the package READMEs with (ACE-939). They run the
+link of the package READMEs with (ACE-939), and
+`Build/Scripts/manualLinkVersion.php`, which it writes the manual version of the
+links from the other package files with (ACE-941). They run the
 scripts as subprocesses and are collected because the suites glob
 `packages-dev/*/Tests/` as well.
 
