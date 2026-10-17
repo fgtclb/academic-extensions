@@ -62,6 +62,39 @@ The extension key is not always the directory name: `academic-contact4pages`
 ships `academic_contacts4pages`. The manual's `Index.rst` states the key, the
 directory does not.
 
+### Links into the manual of academic_base
+
+A link from another manual into the manual of `academic_base` is an interlink,
+with the composer name of the package as its shortcode and a label of that
+manual as its target:
+
+```rst
+Each finding is described in the :ref:`upgrade check
+<fgtclb/academic-base:upgrade-check>` of :guilabel:`academic_base`.
+```
+
+The renderer resolves it from the inventory docs.typo3.org publishes with the
+manual of `main`, `objects.inv.json`, and logs a warning for a label it does
+not find there, which fails the render, see
+[The render is a gate](#the-render-is-a-gate-not-an-artifact-producer). An
+absolute link is checked by nothing. Until ACE-937 the manual of
+`academic_base` was not rendered at all, and the 88 absolute links into it
+answered 404 without a failing gate.
+
+The inventory is the published one, not the one of the change: a label that
+the same change adds to the manual of `academic_base` resolves only once
+docs.typo3.org has rendered `main` again, after the merge. Link a label that
+is already published, or add the link in a later change. Renaming or removing
+a label that another manual links renders green in its own change, because
+the published inventory still holds it, and turns the next pull request red
+once `main` is rendered again. Add the new label next to the old one, move the
+links once docs.typo3.org has rendered `main`, and remove the old label last.
+
+The shortcode resolves against the manual of `main` on every branch. A version
+branch cut from `main` keeps linking that manual, as the absolute links did,
+and its render depends on the labels published there. The links between the
+other manuals are still absolute.
+
 ### The upgrade chapter
 
 Every manual carries `Upgrade/` (ACE-910): an index page with the table of

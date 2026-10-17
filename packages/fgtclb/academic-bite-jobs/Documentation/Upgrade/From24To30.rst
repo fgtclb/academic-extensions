@@ -119,8 +119,8 @@ the site with the templates this extension ships:
 
     vendor/bin/typo3 academic:upgrade:check academic_bite_jobs --site=<site identifier>
 
-Each finding, and what to do about it, is described in the `upgrade check
-<https://docs.typo3.org/p/fgtclb/academic-base/main/en-us/UpgradeCheck/Index.html>`__
+Each finding, and what to do about it, is described in the :ref:`upgrade check
+<fgtclb/academic-base:upgrade-check>`
 of :guilabel:`academic_base`.
 
 ..  _upgrade-from-2-4-to-3-0-own-configuration:

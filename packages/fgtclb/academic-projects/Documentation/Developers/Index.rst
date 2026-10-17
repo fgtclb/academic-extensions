@@ -12,8 +12,8 @@ only alternative there used to be: subclassing :php:`ProjectController` and
 re-registering the plugin.
 
 Which classes of this extension are public API, and what that promises, is
-stated for all academic extensions on the `extension points page of
-academic_base <https://docs.typo3.org/p/fgtclb/academic-base/main/en-us/Developers/ExtensionPoints/Index.html>`__.
+stated for all academic extensions on the :ref:`extension points page of
+academic_base <fgtclb/academic-base:developers-extension-points>`.
 
 Nothing changes in an installation that has no listener: both plugins query and
 render exactly what they did before.

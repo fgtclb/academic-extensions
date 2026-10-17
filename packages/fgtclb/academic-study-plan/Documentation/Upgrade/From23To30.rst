@@ -177,8 +177,8 @@ the shipped file:
 
     vendor/bin/typo3 academic:upgrade:check academic_study_plan --site=<site identifier>
 
-Each finding, and what to do about it, is described in the `upgrade check
-<https://docs.typo3.org/p/fgtclb/academic-base/main/en-us/UpgradeCheck/Index.html>`__
+Each finding, and what to do about it, is described in the :ref:`upgrade check
+<fgtclb/academic-base:upgrade-check>`
 of :guilabel:`academic_base`.
 
 ..  _upgrade-from-2-3-to-3-0-page-tsconfig:
@@ -214,7 +214,7 @@ in the field :guilabel:`Type` followed by
 :guilabel:`(not enabled on this page)`, and saving keeps it. The warning of the
 2.4 changelog entry that saving such a record rewrites its type describes the
 state before a fix that :guilabel:`academic_base` 2.4 carries as well, see
-`its changelog entry <https://docs.typo3.org/p/fgtclb/academic-base/main/en-us/Changelog/2.4/Important-HiddenContentTypeStaysSelectable.html>`__.
+:ref:`its changelog entry <fgtclb/academic-base:important-ace-666-academic-base>`.
 A content element that a page TSconfig of your own already turned into another
 type is not repaired. Correct it by hand from its record history.
 
@@ -361,7 +361,7 @@ Speaking classes and the layout
     classes `row` and `col` stay. Move the selectors of the site stylesheet to
     the new classes. How the markup of the study plan is built up is described
     in :ref:`styling-markup`, the class system of all academic extensions in
-    the `Styling chapter of academic_base <https://docs.typo3.org/p/fgtclb/academic-base/main/en-us/Styling/Index.html>`__.
+    the :ref:`Styling chapter of academic_base <fgtclb/academic-base:styling>`.
 *   The content element renders through the :file:`Default` layout of
     :guilabel:`fluid_styled_content`. Its header sits above the
     :html:`.academic-study-plan` wrapper, inside the frame of the layout. A

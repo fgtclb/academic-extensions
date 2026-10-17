@@ -16,9 +16,9 @@ controller.
 The context of the event names the extension :php:`AcademicContacts4pages` and
 the plugin name :php:`List`, which a listener checks for the plugin it means.
 
-The event, with an example listener, is described in the `changelog of
+The event, with an example listener, is described in the :ref:`changelog of
 academic_base
-<https://docs.typo3.org/p/fgtclb/academic-base/main/en-us/Changelog/3.0/Feature-ModifyPluginViewEvent.html>`__.
+<fgtclb/academic-base:feature-modify-plugin-view-event>`.
 What the content element of this extension passes in is described in
 :ref:`developers-event-modify-plugin-view-event`.
 
