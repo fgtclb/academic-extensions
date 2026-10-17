@@ -10,7 +10,8 @@
 #     - push the commit of the source branch as the new branch
 #     - branch cut-<branch> off it
 #     - bin/set-version <current version> dev --source-branch=<branch>, which
-#       keys the branch alias and the edit branch of every manual to it
+#       keys the branch alias and the edit branch of every manual to it and
+#       links the manuals of its version line
 #     - the --source-branch default of bin/set-version, bin/release and
 #       bin/cut-branch becomes <branch>
 #     - commit "[TASK] Prepare branch <branch>", push, open PR against the new

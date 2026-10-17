@@ -175,9 +175,10 @@ final class ReadmeLinkTableTest extends TestCase
     /**
      * The version of the manual docs.typo3.org renders for a branch: the name of a
      * non-numeric branch, `main`, and the major and minor version of the package for a
-     * version branch.
+     * version branch. {@see PackageManualLinkTest} asks it for the links of the other
+     * package files.
      */
-    private static function manualVersion(string $branch, string $version): string
+    public static function manualVersion(string $branch, string $version): string
     {
         if (preg_match('/^\d+(?:\.\d+)?$/', $branch) !== 1) {
             return $branch;
