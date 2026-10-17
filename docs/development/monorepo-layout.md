@@ -209,6 +209,13 @@ Extension Repository consume — and they are never a source of truth. A commit
 pushed to a split repository would be overwritten by the next split. All
 changes happen here.
 
+Each split repository calls two webhooks on push: Packagist, and
+`https://docs-hook.typo3.org` (content type JSON, push event), which makes
+docs.typo3.org render the manual of `main` and of every version tag. A new
+split repository needs both, and docs.typo3.org renders its manual only after
+the documentation team approved the first rendering. `fgtclb/academic-base`
+had no documentation webhook until ACE-937, and its manual was not rendered.
+
 | Directory                                | Composer package                 | Extension key             | Split repository                                                                  |
 |------------------------------------------|----------------------------------|---------------------------|-----------------------------------------------------------------------------------|
 | `packages/fgtclb/academic-base`          | `fgtclb/academic-base`           | `academic_base`           | [fgtclb/academic-base](https://github.com/fgtclb/academic-base)                   |

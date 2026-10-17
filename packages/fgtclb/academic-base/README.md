@@ -1,10 +1,10 @@
 # TYPO3 Extension `Academic Base` (READ-ONLY)
 
-|                  | URL                                                   |
-|------------------|-------------------------------------------------------|
-| **Repository:**  | https://github.com/fgtclb/academic-base               |
-| **Read online:** | -                                                     |
-| **TER:**         | https://extensions.typo3.org/extension/academic_base/ |
+|                  | URL                                                      |
+|------------------|----------------------------------------------------------|
+| **Repository:**  | https://github.com/fgtclb/academic-base                  |
+| **Read online:** | https://docs.typo3.org/p/fgtclb/academic-base/2.4/en-us/ |
+| **TER:**         | https://extensions.typo3.org/extension/academic_base/    |
 
 ## Description
 
