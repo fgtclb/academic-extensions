@@ -5,8 +5,8 @@ database, no site, no request. Everything the subject needs is passed to it or
 stubbed. That makes the suite fast enough to run on every save, and it makes a
 failure point at one class instead of at a stack.
 
-There are 175 unit test classes: 150 across the twelve extensions, five in
-`packages-dev/dev-site`, fourteen in `packages-dev/monorepo-shared` and six in
+There are 177 unit test classes: 150 across the twelve extensions, five in
+`packages-dev/dev-site`, fifteen in `packages-dev/monorepo-shared` and seven in
 `packages-dev/testing-helper`. Twelve of them are the one-line version
 compatibility test every extension carries (see
 [below](#the-version-compatibility-test)). Measured with
@@ -78,8 +78,10 @@ green because it never looked at it.
 tests of the three scripts behind `runTests.sh -j`, which split the functional
 suite, check that the chunks ran every listed test, and record the durations
 (ACE-692), of `Build/Scripts/composerBranchVersion.sh`, which names the
-branch alias key (ACE-784), and of `Build/Scripts/readmeManualLink.php`, which
-writes the manual link of the package READMEs (ACE-939). Its traits have no
+branch alias key (ACE-784), of `Build/Scripts/readmeManualLink.php`, which
+writes the manual link of the package READMEs (ACE-939), and of
+`Build/Scripts/manualLinkVersion.php`, which writes the manual version of the
+links from the other package files (ACE-941). Its traits have no
 tests of their own — they are exercised only through the extensions that use
 them.
 [`packages-dev/monorepo-shared/`](../../packages-dev/monorepo-shared) carries
@@ -93,7 +95,9 @@ see [below](#the-extension-points), the check that no source file names an
 issue of a customer project, see [below](#customer-issue-keys), the check
 of the manual links, see [below](#the-links-of-the-manuals), the check of
 the link table of every package README, see
-[below](#the-link-table-of-the-readmes), the check of
+[below](#the-link-table-of-the-readmes), the check of the links from the other
+package files into the manuals, see
+[below](#the-links-into-the-manuals-of-the-repository), the check of
 the directives in table cells of the manuals, see
 [below](#directives-in-table-cells), the check of
 the branch alias key, see [below](#the-branch-alias-key), the check of the form
@@ -120,7 +124,7 @@ them follow the shape below.
 
 **Every test class is `final`, declares `strict_types`, and extends
 `TYPO3\TestingFramework\Core\Unit\UnitTestCase`.** There is no local abstract
-unit test case, and no unit test extends another test class. The twenty-five below
+unit test case, and no unit test extends another test class. The twenty-seven below
 `packages-dev/` are the exception to the base class: they need nothing of
 TYPO3 and extend PHPUnit's `TestCase` directly.
 
@@ -571,6 +575,41 @@ The tables were written by hand and copied from one README to the next. Until
 ACE-934 five READMEs linked a manual path that answered 404 and four had no
 manual link at all, and nothing reported it.
 
+## The links into the manuals of the repository
+
+[`PackageManualLinkTest`](../../packages-dev/monorepo-shared/Tests/Unit/PackageManualLinkTest.php)
+reads the files of every package below `packages/fgtclb/` and finds every
+absolute link `https://docs.typo3.org/p/<composer name>/<version>/en-us/...`
+whose composer name a `composer.json` there declares, `fgtclb/category-types`
+included. Each link has to name the manual version of the branch, the one the
+README link names: `main` on `main`, the major and minor version of the
+package's `VERSION` on a version branch, from the branch
+`DocumentationGuidesTest` reads. It asks `ReadmeLinkTableTest` for that
+mapping rather than repeating it. A link into such a manual without a version
+and a locale fails as well. Scheme, host and composer name are matched in any
+letter case. The data set names the package, the failure each file, line and
+link with the link it expects.
+
+The `README.md` is read without its link table, the lines that start with
+`|`, which is the test above, so a link in its text is checked here. Left out
+are every `Documentation/Changelog/` folder and every `Documentation/Upgrade/` page,
+which are shared between the branches so that no single version is right on
+both, the render output `Documentation-GENERATED-temp/`, every `vendor/` and
+`node_modules/` tree and binary files, see
+[Changelog and documentation](../workflow/changelog-and-documentation.md#absolute-links-between-the-manuals).
+A second test runs the scan over a snippet with links of every form, in
+capitals, in a row of a link table, with a package whose name starts with the
+name of another and with links into other manuals, and a third asserts that
+the scan reads a settings file and the README of `academic-jobs` and none of
+the files it leaves out, so a change of the pattern
+or of the file list cannot turn the check into one of nothing.
+
+`bin/set-version` writes the version with `Build/Scripts/manualLinkVersion.php`
+from the same branch and version, so a minor bump and a branch cut keep the
+test green, see [Releasing](../workflow/releasing.md). Branch `2` was cut from
+`main` with seven links into the manuals of `main`, which describe 3.0, and
+nothing reported them until ACE-941.
+
 ## Directives in table cells
 
 [`DocumentationTableCellDirectiveTest`](../../packages-dev/monorepo-shared/Tests/Unit/DocumentationTableCellDirectiveTest.php)
@@ -632,6 +671,7 @@ changes nothing:
 | no `"providesPackages": {}`                                             | `packages/fgtclb/*/composer.json`, `packages-dev/*/composer.json`   |
 | `require` and `require-dev` in composer's order                         | every manifest of the repository with `config.sort-packages`        |
 | the "Read online" link `readmeManualLink.php` writes                    | `packages/fgtclb/*/README.md`                                       |
+| the manual version `manualLinkVersion.php` writes                       | the files of `packages/fgtclb/*/` that script reads                 |
 
 packwright writes `ext_emconf.php` from its data, so a comment is lost and a
 constraint it sets moves to the end of its list. `composer config` re-encodes
@@ -641,8 +681,9 @@ rewrote 22 files on `main`, and every release carried them into its commits.
 The test cannot run the tools themselves, `pkw` and `tailor` are not part of
 the container, so the pre-release checklist asks for that run, see
 [Releasing](../workflow/releasing.md#pre-release-checklist). The README check
-runs `Build/Scripts/readmeManualLink.php --check` with the branch of the root
-branch alias and the package's `VERSION`, it needs nothing but PHP.
+runs `Build/Scripts/readmeManualLink.php --check`, and the link check
+`Build/Scripts/manualLinkVersion.php --check`, each with the branch of the root
+branch alias and the package's `VERSION`. They need nothing but PHP.
 
 ## Class alias maps ship
 
