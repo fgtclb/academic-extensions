@@ -155,8 +155,8 @@ the shipped file:
 
     vendor/bin/typo3 academic:upgrade:check academic_study_plan --site=<site identifier>
 
-Each finding, and what to do about it, is described in the `upgrade check
-<https://docs.typo3.org/p/fgtclb/academic-base/main/en-us/UpgradeCheck/Index.html>`__
+Each finding, and what to do about it, is described in the :ref:`upgrade check
+<fgtclb/academic-base:upgrade-check>`
 of :guilabel:`academic_base`.
 
 ..  _upgrade-from-2-4-to-3-0-site-sets:
@@ -214,7 +214,7 @@ modules and the dialog carry the classes the table of
 `row` and `col` stay. Move the selectors of the site stylesheet to the new
 classes. How the markup of the study plan is built up is described in
 :ref:`styling-markup`, the class system of all academic extensions in the
-`Styling chapter of academic_base <https://docs.typo3.org/p/fgtclb/academic-base/main/en-us/Styling/Index.html>`__.
+:ref:`Styling chapter of academic_base <fgtclb/academic-base:styling>`.
 
 ..  _upgrade-from-2-4-to-3-0-icons:
 

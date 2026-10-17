@@ -8,8 +8,8 @@ ModifyTcaSelectFieldItemsEvent
 :guilabel:`academic_base`. The academic extensions dispatch it from the item
 providers of their backend select fields, so a listener changes the items an
 editor is offered without replacing the item provider. The event is described
-on `its page in the manual of academic_base
-<https://docs.typo3.org/p/fgtclb/academic-base/main/en-us/Developers/Events/ModifyTcaSelectFieldItemsEvent.html>`__.
+on :ref:`its page in the manual of academic_base
+<fgtclb/academic-base:developers-event-modify-tca-select-field-items-event>`.
 This page describes the selects of :guilabel:`academic_contacts4pages` that
 dispatch it.
 

@@ -140,8 +140,8 @@ checked with :guilabel:`academic_persons`. The check of
 :guilabel:`academic_contacts4pages` compares it with the partials of this
 extension, which ships no :file:`Profile/` partials, and reports every file in
 it as :bash:`missing-upstream`. Each finding, and what to do about it, is
-described in the `upgrade check
-<https://docs.typo3.org/p/fgtclb/academic-base/main/en-us/UpgradeCheck/Index.html>`__
+described in the :ref:`upgrade check
+<fgtclb/academic-base:upgrade-check>`
 of :guilabel:`academic_base`.
 
 ..  _upgrade-from-2-4-to-3-0-own-configuration:

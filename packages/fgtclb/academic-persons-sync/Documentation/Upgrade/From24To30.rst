@@ -120,8 +120,8 @@ package update:
 
 This extension ships no templates, so there is no template override of it to
 compare. Run the check with the keys of the other academic extensions, as
-their upgrade chapters describe. See the `upgrade check
-<https://docs.typo3.org/p/fgtclb/academic-base/main/en-us/UpgradeCheck/Index.html>`__
+their upgrade chapters describe. See the :ref:`upgrade check
+<fgtclb/academic-base:upgrade-check>`
 of :guilabel:`academic_base`.
 
 ..  _upgrade-from-2-4-to-3-0-check:
