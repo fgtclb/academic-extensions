@@ -91,9 +91,51 @@ once `main` is rendered again. Add the new label next to the old one, move the
 links once docs.typo3.org has rendered `main`, and remove the old label last.
 
 The shortcode resolves against the manual of `main` on every branch. A version
-branch cut from `main` keeps linking that manual, as the absolute links did,
-and its render depends on the labels published there. The links between the
-other manuals are still absolute.
+branch cut from `main` keeps linking that manual through its interlinks, unlike
+the absolute links, which `bin/set-version` moves to the manual of the new
+version line, see [below](#absolute-links-between-the-manuals). Its render
+depends on the labels published there. The links between the other manuals
+are still absolute.
+
+### Absolute links between the manuals
+
+An absolute link from a package file into a manual of this repository, a manual
+page that links the page of another manual or a settings file that names the
+page documenting it, names the manual of the version line the file ships with:
+`https://docs.typo3.org/p/<composer name>/main/en-us/...` on `main`, and the
+major and minor version instead of `main` on a version branch, `2.4` on branch
+`2`. `bin/set-version` writes that version with
+`Build/Scripts/manualLinkVersion.php`, so a minor bump on a version branch and
+a branch cut move the links along, and a unit test fails for a link that names
+another version, see
+[Unit tests](../testing/unit-tests.md#the-links-into-the-manuals-of-the-repository).
+The `README.md` of a package is read without its link table, the lines that
+start with `|`, which `Build/Scripts/readmeManualLink.php` writes and pads and
+a test of its own checks, see
+[Unit tests](../testing/unit-tests.md#the-link-table-of-the-readmes). A link
+in the text below the table follows the version line like any other.
+Write a new link with the version of the branch it is written on. Branch `2`
+was cut from `main` with seven links into the 3.0 manuals, which nothing
+reported until ACE-941.
+
+The 88 interlinks `fgtclb/academic-base:` are not absolute links and are
+neither checked nor written. They resolve against the inventory of `main` on
+every branch, so a branch `3` cut from `main` keeps linking the `main` manual
+of `academic_base` through them. Resolving them against the inventory of the
+version line would be the way out, which is not possible before the manual of
+`2.4` is rendered.
+
+Two kinds of file are left out, and their links are not checked:
+
+- The `Documentation/Changelog/` folders and the `Documentation/Upgrade/`
+  pages. They are shared between the branches: `Changelog/2.4/` and
+  `From23To24.rst` are byte-identical on `main` and `2`, and a released folder,
+  2.0 to 2.3, is never edited. No single version is right on both branches, so
+  a link there keeps the manual it was written with, on every branch and after
+  a cut. Three entries of `Changelog/3.0/` and six upgrade pages to 3.0 link
+  the manuals of `main` today, and a branch `3` cut from `main` keeps those
+  links.
+- The render output, `vendor/` and `node_modules/` trees and binary files.
 
 ### The upgrade chapter
 
