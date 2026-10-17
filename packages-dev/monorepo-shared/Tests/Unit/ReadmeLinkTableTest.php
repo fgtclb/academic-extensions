@@ -39,10 +39,15 @@ final class ReadmeLinkTableTest extends TestCase
      * with the issue that makes it render. Their README says `-` for "Read online", and
      * only theirs. The issue removes its entry in the same change that links the manual,
      * which the test enforces: a listed package that links a manual fails.
+     *
+     * Empty since ACE-937 got the manual of `academic-base` rendered. A new package needs
+     * an entry until docs.typo3.org has rendered its manual for the first time, which takes
+     * the docs.typo3.org webhook in its split repository and an approval by the
+     * documentation team.
+     *
+     * @var array<string, string>
      */
-    private const MANUALS_NOT_RENDERED = [
-        'academic-base' => 'ACE-937',
-    ];
+    private const MANUALS_NOT_RENDERED = [];
 
     /**
      * @return \Generator<string, array{string}>
