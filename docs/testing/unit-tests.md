@@ -559,10 +559,13 @@ tested on `main` too.
 
 `-` stands in the "Read online" row only for a package of the list
 `MANUALS_NOT_RENDERED` in the test, which names the issue that makes its manual
-render. Today that is `academic-base` with ACE-937: its manual is not rendered
-on docs.typo3.org yet. A listed package that links a manual fails, so the
-change that links it also removes its entry, and an entry that names no
-package directory fails as well.
+render. A listed package that links a manual fails, so the change that links it
+also removes its entry, and an entry that names no package directory fails as
+well. The list is empty since ACE-937, which got the manual of `academic-base`
+rendered. A new package goes on it until docs.typo3.org has rendered its
+manual for the first time, which needs the docs.typo3.org webhook in its split
+repository and an approval by the documentation team, see
+[the split repositories](../development/monorepo-layout.md#the-extensions-and-their-split-repositories).
 
 The tables were written by hand and copied from one README to the next. Until
 ACE-934 five READMEs linked a manual path that answered 404 and four had no
