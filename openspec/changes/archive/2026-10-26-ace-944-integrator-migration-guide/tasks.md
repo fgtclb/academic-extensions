@@ -58,7 +58,7 @@
 
 ## 6. Branch 2
 
-- [ ] 6.1 After the backport analysis of `docs/workflow/backporting.md`, a
+- [x] 6.1 After the backport analysis of `docs/workflow/backporting.md`, a
   change of its own on branch `2`: the task 4.1 text, byte-identical to `main`
   (verify with `cmp` against `origin/main`), and the section of task 3.1
   without the 3.0 step.
@@ -74,5 +74,8 @@
 - [x] 7.4 `docs/` needs no change, the rules for upgrade chapters and
   interlinks exist. State that, and that no changelog entry is added because
   the change is documentation only, in the pull request.
-- [ ] 7.5 Archive the change as the last commit of the pull request of task
+- [x] 7.5 Archive the change as the last commit of the pull request of task
   3.2.
+
+The backport of task 6.1 is #1041 on `2`, a change of its own archived
+there as `2026-10-26-ace-944-integrator-migration-guide`.
