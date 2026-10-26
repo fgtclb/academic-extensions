@@ -12,14 +12,14 @@
     ],
     "require": {
         "typo3/cms-core": "~13.4.35 || ~14.3.7",
-        "fgtclb/academic-base": "~3.0.0@dev",
-        "fgtclb/academic-bite-jobs": "~3.0.0@dev",
-        "fgtclb/academic-contacts4pages": "~3.0.0@dev",
-        "fgtclb/academic-jobs": "~3.0.0@dev",
-        "fgtclb/academic-partners": "~3.0.0@dev",
-        "fgtclb/academic-persons": "~3.0.0@dev",
-        "fgtclb/academic-programs": "~3.0.0@dev",
-        "fgtclb/academic-projects": "~3.0.0@dev"
+        "fgtclb/academic-base": "3.0.0@dev",
+        "fgtclb/academic-bite-jobs": "3.0.0@dev",
+        "fgtclb/academic-contacts4pages": "3.0.0@dev",
+        "fgtclb/academic-jobs": "3.0.0@dev",
+        "fgtclb/academic-partners": "3.0.0@dev",
+        "fgtclb/academic-persons": "3.0.0@dev",
+        "fgtclb/academic-programs": "3.0.0@dev",
+        "fgtclb/academic-projects": "3.0.0@dev"
     },
     "extra": {
         "typo3/cms": {
