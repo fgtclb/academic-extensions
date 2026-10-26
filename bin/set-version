@@ -35,7 +35,7 @@
 #                                minor/major bumps).
 #
 # Options:
-#   --source-branch=<name>   git branch the version is applied on (default: 2)
+#   --source-branch=<name>   git branch the version is applied on (default: 2.4)
 #                            It keys the branch-alias with the version name
 #                            composer gives that branch (dev-main, 2.x-dev), is
 #                            the edit-on-github-branch of every manual and picks
@@ -86,7 +86,7 @@ run() {
 # ---------------------------------------------------------------------------
 PASSED_VERSION=""
 TYPE=""
-SOURCE_BRANCH="2"
+SOURCE_BRANCH="2.4"
 
 while [ $# -gt 0 ]; do
     case "$1" in
