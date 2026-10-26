@@ -17,11 +17,11 @@ since the path repositories were reworked — no version map anywhere either:
 
 | File                                                  | Value today | Written by           |
 |-------------------------------------------------------|-------------|----------------------|
-| `composer.json` → `extra.typo3/cms.version`           | `2.4.0-dev` | `composer config`    |
-| `VERSION`                                             | `2.4.0-dev` | plain write          |
+| `composer.json` → `extra.typo3/cms.version`           | `2.5.0-dev` | `composer config`    |
+| `VERSION`                                             | `2.5.0-dev` | plain write          |
 | `ext_emconf.php` → `version`                          | `2.4.0`     | `pkw extemconf:set`  |
 | `Documentation/guides.xml` → `release`                | `2.4.0`     | `tailor set-version` |
-| `Build/Scripts/runTests.sh` → `COMPOSER_ROOT_VERSION` | `2.4.0-dev` | `sed`, root only     |
+| `Build/Scripts/runTests.sh` → `COMPOSER_ROOT_VERSION` | `2.5.0-dev` | `sed`, root only     |
 
 The `-dev` suffix appears in the composer-facing files and not in the two TYPO3
 facing ones, because `ext_emconf.php` and `guides.xml` express a released
@@ -31,7 +31,7 @@ The three `packages-dev/*` packages are **not** an exception:
 `fgtclb/academics-monorepo-shared`,
 `fgtclb/academics-monorepo-testing-helper` and
 `fgtclb/academics-monorepo-dev-site` all carry `extra.typo3/cms.version` and a
-`VERSION` file, all at `2.4.0-dev`. None of them has an `ext_emconf.php`, none
+`VERSION` file, all at `2.5.0-dev`. None of them has an `ext_emconf.php`, none
 is released, and none is ever published — but they are path packages, so their
 version has to be right for the same reason. That `dev-site` is a
 `typo3-cms-extension` rather than a `library` changes nothing here: the type is
