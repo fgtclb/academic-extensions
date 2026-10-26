@@ -3,7 +3,7 @@
 $EM_CONF[$_EXTKEY] = [
     'title' => 'FGTCLB: Academic Persons Sync',
     'description' => 'Adds some configuration for external users providers like Active Directory.',
-    'version' => '3.0.0',
+    'version' => '3.0.1',
     'category' => 'plugin',
     'state' => 'beta',
     'author' => 'FGTCLB',
@@ -14,9 +14,9 @@ $EM_CONF[$_EXTKEY] = [
             'typo3' => '13.4.35-14.3.99',
             'core' => '13.4.35-14.3.99',
             'extbase' => '13.4.35-14.3.99',
-            'academic_base' => '3.0.0',
-            'academic_persons' => '3.0.0',
-            'academic_persons_edit' => '3.0.0',
+            'academic_base' => '3.0.1',
+            'academic_persons' => '3.0.1',
+            'academic_persons_edit' => '3.0.1',
         ],
     ],
 ];
