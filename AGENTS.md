@@ -205,13 +205,17 @@ through `git worktree add` too. The script does nothing in the main checkout.
 
 ## Version support
 
-- Branch `main` = version `3.0.0-dev`, supporting **TYPO3 v13 + v14**, PHP 8.2–8.5.
-- Branch `2` = `^2` (`2.4.x-dev`), v12+v13. Branch `1` = `^1`, v11+v12 (legacy).
+- Branch `main` = version `3.1.0-dev`, supporting **TYPO3 v13 + v14**, PHP 8.2–8.5.
+- Branch `3.0` = `3.0.x-dev`, the patch line of 3.0, v13+v14.
+- Branch `2` = `^2` (`2.5.x-dev`) and branch `2.4` = `2.4.x-dev`, the patch line of 2.4, both v12+v13. Branch `1` = `^1`, v11+v12 (legacy).
 - The per-extension support/test status matrix is in `README.md` — consult it before assuming an extension works on a given core/PHP combination; many `2.x` combinations are explicitly "not tested yet".
 
 ### Backport targets
 
-**The only maintained backport targets are `main` and `2`.**
+**The maintained branches are `main`, `3.0`, `2` and `2.4`.** A fix is made on
+`main` first and goes to every one of them that has the defect. `3.0` and `2.4`
+are patch branches and take bugfixes only, a feature lands on `main` and, when
+it is backported, on `2`.
 
 **Branch `2.2` is no longer maintained.** Never backport to it, and do not
 propose it as a target — not even when it demonstrably carries the same defect —
@@ -362,11 +366,11 @@ extension is created from. All fourteen carry the same block; change them
 together. Do not add `github-token` to their `shivammathur/setup-php` step —
 that input already defaults to `github.token`.
 
-`nightly.yml` runs the complete `ci.yml` every night for `main` **and** `2`
-(ACE-693). It lives on `main` only — a schedule fires on the default branch
-alone — and starts `ci.yml` on each branch through `workflow_dispatch`, then
-waits for that run and takes over its result, because a dispatched run that
-fails notifies nobody. A possible later reduction of the pull request DBMS
+`nightly.yml` runs the complete `ci.yml` every night for `main`, `3.0`, `2`
+and `2.4` (ACE-693, ACE-946). It lives on `main` only — a schedule fires on the
+default branch alone — and starts `ci.yml` on each branch through
+`workflow_dispatch`, then waits for that run and takes over its result,
+because a dispatched run that fails notifies nobody. A possible later reduction of the pull request DBMS
 matrix, with the exact cells, is documented in
 [Quality gates](docs/development/quality-gates.md#reducing-the-pull-request-matrix--documented-not-applied);
 applying it means naming the executed matrix there and here.
@@ -635,7 +639,7 @@ labels emit `E_USER_DEPRECATED` on every form render on v14.
 
 ## Releasing / versions
 
-Every package carries its own version (on this branch `3.0.0-dev`) in
+Every package carries its own version (on this branch `3.1.0-dev`) in
 `extra.typo3/cms.version` and its `VERSION` file — including all three
 `packages-dev/*` packages, which are versioned but never released and carry no
 `ext_emconf.php`. The composer plugin

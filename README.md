@@ -24,8 +24,10 @@ follows, and how a release is cut.
 
 | Branch | Version                  | TYPO3     | PHP                                          |
 |--------|--------------------------|-----------|----------------------------------------------|
-| main   | ^3, 3.0.x-dev (dev-main) | v13 + v14 | 8.2, 8.3, 8.4, 8.5                           |
-| 2      | ^2, 2.4.x-dev (2.x-dev)  | v12 + v13 | 8.1, 8.2, 8.3, 8.4, 8.5 (depending on TYPO3) |
+| main   | ^3, 3.1.x-dev (dev-main) | v13 + v14 | 8.2, 8.3, 8.4, 8.5                           |
+| 3.0    | 3.0.*, 3.0.x-dev         | v13 + v14 | 8.2, 8.3, 8.4, 8.5                           |
+| 2      | ^2, 2.5.x-dev (2.x-dev)  | v12 + v13 | 8.1, 8.2, 8.3, 8.4, 8.5 (depending on TYPO3) |
+| 2.4    | 2.4.*, 2.4.x-dev         | v12 + v13 | 8.1, 8.2, 8.3, 8.4, 8.5 (depending on TYPO3) |
 | 1      | ^1, 1.x-dev              | v11 + v12 | 8.1, 8.2, 8.3, 8.4 (depending on TYPO3)      |
 
 **Testing 3.x.x extension version in projects (composer mode)**
@@ -82,14 +84,14 @@ Legend:
   (X)   Planned for the upcoming X.y.z line, not yet available/tested
 ```
 
-**The `3.x` line (in development)**
+**The `3.x` line**
 
-The `<3>` marker documents the upcoming major `3.x` line, which targets TYPO3
+The `<3>` marker documents the major `3.x` line, which targets TYPO3
 **v13 + v14** (see the branch support matrix above). Both core versions are
 implemented and verified for every extension above by the `ci.yml` workflow,
 which carries the core version as a matrix dimension rather than as a workflow
-of its own. The `3.x` line itself is still in development
-(`3.0.0-dev`) and not released yet.
+of its own. 3.0.0 is released, branch `3.0` carries its patch releases and
+`main` develops 3.1 (`3.1.0-dev`).
 
 ## List of TYPO3 extension and the split repositories (READ ONLY)
 

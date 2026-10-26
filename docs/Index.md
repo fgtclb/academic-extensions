@@ -47,16 +47,16 @@ such manual per extension; this tree is the single, repository-wide counterpart.
 
 ## [Testing](testing/Index.md)
 
-| Page                                                                                                 | Contents                                                                                                     |
-|------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------|
-| [PHPUnit configuration](testing/phpunit-configuration.md)                                            | Where the configuration comes from, the deliberate deviations, the strictness policy.                        |
-| [Unit tests](testing/unit-tests.md)                                                                  | Running them, discovery across all extensions, core version aware tests.                                     |
-| [Functional tests](testing/functional-tests.md)                                                      | Databases, why SQLite alone is not enough, loading extensions.                                               |
-| [Fixture extensions](testing/fixture-extensions.md)                                                  | Test-only extensions and how they are wired.                                                                 |
-| [Testing helper](testing/testing-helper.md)                                                          | The functional test base class and the shared traits in `packages-dev/testing-helper/`, and their traps.     |
-| [Seed verification](testing/seed-verification.md)                                                    | The manifest of the development seed, and the checks that keep it, the YAML and the snapshots together.      |
-| [JavaScript tests](testing/javascript-tests.md)                                                      | The `node --test` harness for the frontend TypeScript: the runner, the resolve hook and the stubs.           |
-| [Frontend verification for `academic-persons-edit`](testing/academic-persons-edit-frontend-tests.md) | How the profile editing TypeScript is verified, by which suite, and what none of them executes.              |
+| Page                                                                                                 | Contents                                                                                                 |
+|------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------|
+| [PHPUnit configuration](testing/phpunit-configuration.md)                                            | Where the configuration comes from, the deliberate deviations, the strictness policy.                    |
+| [Unit tests](testing/unit-tests.md)                                                                  | Running them, discovery across all extensions, core version aware tests.                                 |
+| [Functional tests](testing/functional-tests.md)                                                      | Databases, why SQLite alone is not enough, loading extensions.                                           |
+| [Fixture extensions](testing/fixture-extensions.md)                                                  | Test-only extensions and how they are wired.                                                             |
+| [Testing helper](testing/testing-helper.md)                                                          | The functional test base class and the shared traits in `packages-dev/testing-helper/`, and their traps. |
+| [Seed verification](testing/seed-verification.md)                                                    | The manifest of the development seed, and the checks that keep it, the YAML and the snapshots together.  |
+| [JavaScript tests](testing/javascript-tests.md)                                                      | The `node --test` harness for the frontend TypeScript: the runner, the resolve hook and the stubs.       |
+| [Frontend verification for `academic-persons-edit`](testing/academic-persons-edit-frontend-tests.md) | How the profile editing TypeScript is verified, by which suite, and what none of them executes.          |
 
 ## [Workflow](workflow/Index.md)
 
