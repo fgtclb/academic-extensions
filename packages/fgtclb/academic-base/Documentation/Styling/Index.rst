@@ -577,12 +577,12 @@ How the plugins of an extension are built up, with their outermost element and
 the classes they add to the system above, is described in the chapter
 :guilabel:`Styling` of each manual:
 
-*   `academic_bite_jobs <https://docs.typo3.org/p/fgtclb/academic-bite-jobs/main/en-us/Styling/Index.html>`__
-*   `academic_contacts4pages <https://docs.typo3.org/p/fgtclb/academic-contacts4pages/main/en-us/Styling/Index.html>`__
-*   `academic_jobs <https://docs.typo3.org/p/fgtclb/academic-jobs/main/en-us/Styling/Index.html>`__
-*   `academic_partners <https://docs.typo3.org/p/fgtclb/academic-partners/main/en-us/Styling/Index.html>`__
-*   `academic_persons <https://docs.typo3.org/p/fgtclb/academic-persons/main/en-us/Styling/Index.html>`__
-*   `academic_persons_edit <https://docs.typo3.org/p/fgtclb/academic-persons-edit/main/en-us/Styling/Index.html>`__
-*   `academic_programs <https://docs.typo3.org/p/fgtclb/academic-programs/main/en-us/Styling/Index.html>`__
-*   `academic_projects <https://docs.typo3.org/p/fgtclb/academic-projects/main/en-us/Styling/Index.html>`__
-*   `academic_study_plan <https://docs.typo3.org/p/fgtclb/academic-study-plan/main/en-us/Styling/Index.html>`__
+*   `academic_bite_jobs <https://docs.typo3.org/p/fgtclb/academic-bite-jobs/3.0/en-us/Styling/Index.html>`__
+*   `academic_contacts4pages <https://docs.typo3.org/p/fgtclb/academic-contacts4pages/3.0/en-us/Styling/Index.html>`__
+*   `academic_jobs <https://docs.typo3.org/p/fgtclb/academic-jobs/3.0/en-us/Styling/Index.html>`__
+*   `academic_partners <https://docs.typo3.org/p/fgtclb/academic-partners/3.0/en-us/Styling/Index.html>`__
+*   `academic_persons <https://docs.typo3.org/p/fgtclb/academic-persons/3.0/en-us/Styling/Index.html>`__
+*   `academic_persons_edit <https://docs.typo3.org/p/fgtclb/academic-persons-edit/3.0/en-us/Styling/Index.html>`__
+*   `academic_programs <https://docs.typo3.org/p/fgtclb/academic-programs/3.0/en-us/Styling/Index.html>`__
+*   `academic_projects <https://docs.typo3.org/p/fgtclb/academic-projects/3.0/en-us/Styling/Index.html>`__
+*   `academic_study_plan <https://docs.typo3.org/p/fgtclb/academic-study-plan/3.0/en-us/Styling/Index.html>`__

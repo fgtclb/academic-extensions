@@ -48,7 +48,7 @@
 #                     the new branch and still inside a numeric source branch.
 #
 # Options:
-#   --source-branch=<name>   branch the new one is cut from (default: main)
+#   --source-branch=<name>   branch the new one is cut from (default: 3.0)
 #   --dry-run                print the whole plan, change nothing
 #   --execute                enable remote/irreversible operations
 #   -h, --help               show this help
@@ -163,7 +163,7 @@ set_version_example() {
 # ---------------------------------------------------------------------------
 NEW_BRANCH=""
 NEXT_VERSION=""
-SOURCE_BRANCH="main"
+SOURCE_BRANCH="3.0"
 
 while [ $# -gt 0 ]; do
     case "$1" in

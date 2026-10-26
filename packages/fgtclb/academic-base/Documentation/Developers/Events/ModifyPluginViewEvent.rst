@@ -40,32 +40,32 @@ that is saved, renders nothing and dispatches nothing.
         -   :php:`getControllerExtensionName()`
         -   Plugins, by the name :php:`getPluginName()` returns
     *   -   `academic_bite_jobs
-            <https://docs.typo3.org/p/fgtclb/academic-bite-jobs/main/en-us/Developers/Events/ModifyPluginViewEvent.html>`__
+            <https://docs.typo3.org/p/fgtclb/academic-bite-jobs/3.0/en-us/Developers/Events/ModifyPluginViewEvent.html>`__
         -   ``AcademicBiteJobs``
         -   ``List``
     *   -   `academic_contacts4pages
-            <https://docs.typo3.org/p/fgtclb/academic-contacts4pages/main/en-us/Developers/Events/ModifyPluginViewEvent.html>`__
+            <https://docs.typo3.org/p/fgtclb/academic-contacts4pages/3.0/en-us/Developers/Events/ModifyPluginViewEvent.html>`__
         -   ``AcademicContacts4pages``
         -   ``List``
     *   -   `academic_jobs
-            <https://docs.typo3.org/p/fgtclb/academic-jobs/main/en-us/Developers/Events/ModifyPluginViewEvent.html>`__
+            <https://docs.typo3.org/p/fgtclb/academic-jobs/3.0/en-us/Developers/Events/ModifyPluginViewEvent.html>`__
         -   ``AcademicJobs``
         -   ``List``, ``Detail``, ``NewJobForm``
     *   -   `academic_partners
-            <https://docs.typo3.org/p/fgtclb/academic-partners/main/en-us/Developers/Events/ModifyPluginViewEvent.html>`__
+            <https://docs.typo3.org/p/fgtclb/academic-partners/3.0/en-us/Developers/Events/ModifyPluginViewEvent.html>`__
         -   ``AcademicPartners``
         -   ``List``, ``Map``, ``PartnershipsList``, ``PartnershipsTeaser``
     *   -   `academic_persons
-            <https://docs.typo3.org/p/fgtclb/academic-persons/main/en-us/Developers/Events/ModifyPluginViewEvent.html>`__
+            <https://docs.typo3.org/p/fgtclb/academic-persons/3.0/en-us/Developers/Events/ModifyPluginViewEvent.html>`__
         -   ``AcademicPersons``
         -   ``List``, ``ListAndDetail``, ``Detail``, ``Card``,
             ``SelectedProfiles``, ``SelectedContracts``
     *   -   `academic_programs
-            <https://docs.typo3.org/p/fgtclb/academic-programs/main/en-us/Developers/Events/ModifyPluginViewEvent.html>`__
+            <https://docs.typo3.org/p/fgtclb/academic-programs/3.0/en-us/Developers/Events/ModifyPluginViewEvent.html>`__
         -   ``AcademicPrograms``
         -   ``ProgramList``, ``ProgramFinder``, ``ProgramDetails``
     *   -   `academic_projects
-            <https://docs.typo3.org/p/fgtclb/academic-projects/main/en-us/Developers/Events/ModifyPluginViewEvent.html>`__
+            <https://docs.typo3.org/p/fgtclb/academic-projects/3.0/en-us/Developers/Events/ModifyPluginViewEvent.html>`__
         -   ``AcademicProjects``
         -   ``ProjectList``, ``ProjectListSingle``
 

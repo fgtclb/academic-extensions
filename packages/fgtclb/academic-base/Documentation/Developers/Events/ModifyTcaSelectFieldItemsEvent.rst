@@ -40,7 +40,7 @@ parameters a listener hands back are what the field offers.
         -   Table and field
         -   Backend label, and where it is shown
     *   -   `academic_jobs
-            <https://docs.typo3.org/p/fgtclb/academic-jobs/main/en-us/Developers/Events/ModifyTcaSelectFieldItemsEvent.html>`__
+            <https://docs.typo3.org/p/fgtclb/academic-jobs/3.0/en-us/Developers/Events/ModifyTcaSelectFieldItemsEvent.html>`__
         -   ``tx_academicjobs_domain_model_job``, ``type`` and
             ``employment_type``
         -   :guilabel:`Job Type` and :guilabel:`Employment Type` of a job
@@ -48,7 +48,7 @@ parameters a listener hands back are what the field offers.
             :guilabel:`Job Type` of the job list, with the table and the field
             of the record
     *   -   `academic_persons
-            <https://docs.typo3.org/p/fgtclb/academic-persons/main/en-us/Developers/Events/ModifyTcaSelectFieldItemsEvent.html>`__
+            <https://docs.typo3.org/p/fgtclb/academic-persons/3.0/en-us/Developers/Events/ModifyTcaSelectFieldItemsEvent.html>`__
         -   ``tt_content``, ``settings.selectedContracts`` and
             ``settings.showFields``, and
             ``tx_academiccontacts4pages_domain_model_contact``, ``contract``
@@ -57,7 +57,7 @@ parameters a listener hands back are what the field offers.
             selected profiles and the selected contracts, and
             :guilabel:`Contract` of a page contact of academic_contacts4pages
     *   -   `academic_contacts4pages
-            <https://docs.typo3.org/p/fgtclb/academic-contacts4pages/main/en-us/Developers/Events/ModifyTcaSelectFieldItemsEvent.html>`__
+            <https://docs.typo3.org/p/fgtclb/academic-contacts4pages/3.0/en-us/Developers/Events/ModifyTcaSelectFieldItemsEvent.html>`__
         -   ``tx_academiccontacts4pages_domain_model_contact``,
             ``email_address``, ``phone_number`` and ``physical_address``
         -   :guilabel:`E-mail address`, :guilabel:`Phone number` and
@@ -264,6 +264,6 @@ Introduced in
 
 The event exists since version 2.1. The extensions that dispatch it describe
 in their own changelogs when they started to, for example `academic_jobs 2.1
-<https://docs.typo3.org/p/fgtclb/academic-jobs/main/en-us/Changelog/2.1/Feature-DispatchModifyTcaSelectFieldItemsEventInTypeItemsAndEmploymentTypeItems.html>`__
+<https://docs.typo3.org/p/fgtclb/academic-jobs/3.0/en-us/Changelog/2.1/Feature-DispatchModifyTcaSelectFieldItemsEventInTypeItemsAndEmploymentTypeItems.html>`__
 and `academic_persons 2.4
-<https://docs.typo3.org/p/fgtclb/academic-persons/main/en-us/Changelog/2.4/Feature-DispatchModifyTcaSelectFieldItemsEventInItemsProcFunc.html>`__.
+<https://docs.typo3.org/p/fgtclb/academic-persons/3.0/en-us/Changelog/2.4/Feature-DispatchModifyTcaSelectFieldItemsEventInItemsProcFunc.html>`__.
