@@ -3,7 +3,7 @@
 |                  | URL                                                              |
 |------------------|------------------------------------------------------------------|
 | **Repository:**  | https://github.com/fgtclb/academic-persons-sync                  |
-| **Read online:** | https://docs.typo3.org/p/fgtclb/academic-persons-sync/2.4/en-us/ |
+| **Read online:** | https://docs.typo3.org/p/fgtclb/academic-persons-sync/2.5/en-us/ |
 | **TER:**         | https://extensions.typo3.org/extension/academic_persons_sync/    |
 
 ## Description

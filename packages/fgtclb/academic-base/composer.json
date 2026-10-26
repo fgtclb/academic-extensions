@@ -31,7 +31,7 @@
     "extra": {
         "typo3/cms": {
             "extension-key": "academic_base",
-            "version": "2.4.1-dev"
+            "version": "2.5.0-dev"
         },
         "typo3/class-alias-loader": {
             "class-alias-maps": [
@@ -39,7 +39,7 @@
             ]
         },
         "branch-alias": {
-            "2.x-dev": "2.4.x-dev"
+            "2.x-dev": "2.5.x-dev"
         },
         "sbuerk/release": {
             "tailor": {

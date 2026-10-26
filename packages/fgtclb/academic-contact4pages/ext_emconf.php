@@ -3,7 +3,7 @@
 $EM_CONF[$_EXTKEY] = [
     'title' => 'FGTCLB: Academic Contacts for Pages',
     'description' => 'Role based relations between profiles and pages',
-    'version' => '2.4.1',
+    'version' => '2.5.0',
     'category' => 'fe',
     'state' => 'beta',
     'author' => 'FGTCLB',
@@ -13,8 +13,8 @@ $EM_CONF[$_EXTKEY] = [
         'depends' => [
             'typo3' => '12.4.22-13.4.99',
             'install' => '12.4.22-13.4.99',
-            'academic_base' => '2.4.1',
-            'academic_persons' => '2.4.1',
+            'academic_base' => '2.5.0',
+            'academic_persons' => '2.5.0',
         ],
     ],
 ];
