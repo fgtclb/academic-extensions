@@ -6,7 +6,7 @@ schema: spec-driven
 context: |
   fgtclb/academic-extensions: a TYPO3 CMS extension mono repository. Twelve
   extensions under packages/fgtclb/, developed and tested together, each split
-  out to its own read-only repository. This is branch `2` (2.4.x-dev): TYPO3
+  out to its own read-only repository. This is branch `2.4` (2.4.x-dev), the patch line of 2.4: TYPO3
   v12 and v13 on PHP 8.1 to 8.5, not every PHP version for every core version,
   and every gate runs once per core version. A change that applies to `main`
   as well goes there first and arrives here as a separate, analysed backport.

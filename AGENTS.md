@@ -204,13 +204,17 @@ through `git worktree add` too. The script does nothing in the main checkout.
 
 ## Version support
 
-- **This branch is `2`** = `^2` (`2.4.x-dev`), supporting **TYPO3 v12 + v13**. PHP 8.1–8.5, but not every PHP version applies to every core version — see the matrix in `README.md` and the core/PHP pairs the pipeline uses below.
-- Branch `main` = `^3` (`3.0.0-dev`), v13+v14. Branch `1` = `^1`, v11+v12 (legacy).
+- **This branch is `2.4`** = `2.4.x-dev` (`2.4.1-dev`), the patch line of 2.4, supporting **TYPO3 v12 + v13**. PHP 8.1–8.5, but not every PHP version applies to every core version — see the matrix in `README.md` and the core/PHP pairs the pipeline uses below.
+- Branch `2` = `^2` (`2.5.x-dev`), v12+v13.
+- Branch `main` = `^3` (`3.1.0-dev`) and branch `3.0` = `3.0.x-dev`, the patch line of 3.0, both v13+v14. Branch `1` = `^1`, v11+v12 (legacy).
 - The per-extension support/test status matrix is in `README.md` — consult it before assuming an extension works on a given core/PHP combination; many `2.x` combinations are explicitly "not tested yet".
 
 ### Backport targets
 
-**The only maintained backport targets are `main` and `2`.**
+**The maintained branches are `main`, `3.0`, `2` and `2.4`.** A fix is made on
+`main` first and goes to every one of them that has the defect. `3.0` and `2.4`
+are patch branches and take bugfixes only, a feature lands on `main` and, when
+it is backported, on `2`.
 
 **Branch `2.2` is no longer maintained.** Never backport to it, and do not
 propose it as a target — not even when it demonstrably carries the same defect —
@@ -668,7 +672,7 @@ on v14 and none of it is a gate for a change made against `2`.
 
 ## Releasing / versions
 
-Every package carries its own version (on this branch `2.4.0-dev`) in
+Every package carries its own version (on this branch `2.4.1-dev`) in
 `extra.typo3/cms.version` and its `VERSION` file — including all three
 `packages-dev/*` packages, which are versioned but never released and carry no
 `ext_emconf.php`. The composer plugin
