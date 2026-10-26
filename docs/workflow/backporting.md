@@ -10,12 +10,14 @@ This page is about deciding which of the two it is, cheaply and with evidence.
 
 ## The only maintained targets
 
-| Branch | Version line | TYPO3     | PHP floor | Role                                |
-|--------|--------------|-----------|-----------|-------------------------------------|
-| `main` | `3.0.0-dev`  | v13 + v14 | 8.2       | where changes originate             |
-| `2`    | `2.4.x-dev`  | v12 + v13 | 8.1       | **this branch** — the backport line |
-| `2.2`  | `2.2.x`      | —         | —         | **no** — unmaintained               |
-| `1`    | `1.x`        | —         | —         | **no** — legacy                     |
+| Branch | Version line | TYPO3     | PHP floor | Role                                                 |
+|--------|--------------|-----------|-----------|------------------------------------------------------|
+| `main` | `3.1.x-dev`  | v13 + v14 | 8.2       | where changes originate                              |
+| `3.0`  | `3.0.x-dev`  | v13 + v14 | 8.2       | bugfixes for the 3.0 patch releases                  |
+| `2`    | `2.5.x-dev`  | v12 + v13 | 8.1       | the 2.x line                                         |
+| `2.4`  | `2.4.x-dev`  | v12 + v13 | 8.1       | **this branch**, bugfixes for the 2.4 patch releases |
+| `2.2`  | `2.2.x`      | —         | —         | **no** — unmaintained                                |
+| `1`    | `1.x`        | —         | —         | **no** — legacy                                      |
 
 The core constraints come from `packages-dev/monorepo-shared/composer.json`,
 which is where every extension's TYPO3 requirement is centralised: this branch
@@ -132,11 +134,11 @@ unchanged".
 
 ## What actually differs, in practice
 
-| Area                       | `2` — this branch                | `main`                           |
+| Area                       | `2.4` — this branch              | `main`                           |
 |----------------------------|----------------------------------|----------------------------------|
 | TYPO3                      | v12 + v13                        | v13 + v14                        |
 | `runTests.sh -t` values    | `12` (default), `13`             | `13` (default), `14`             |
-| `COMPOSER_ROOT_VERSION`    | `2.4.0-dev`                      | `3.0.0-dev`                      |
+| `COMPOSER_ROOT_VERSION`    | `2.4.1-dev`                      | `3.1.0-dev`                      |
 | PHPStan configurations     | `Build/phpstan/Core12`, `Core13` | `Build/phpstan/Core13`, `Core14` |
 | XLF indentation            | tabs                             | two spaces                       |
 | Test-helper traits         | 4                                | 8                                |
