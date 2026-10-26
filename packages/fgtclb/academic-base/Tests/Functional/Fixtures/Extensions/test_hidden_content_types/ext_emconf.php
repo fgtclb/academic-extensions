@@ -3,7 +3,7 @@
 $EM_CONF[$_EXTKEY] = [
     'title' => 'TESTS: Academic Base hidden content types',
     'description' => 'Content types hidden by page TSconfig, one in the academic item group and one outside of it',
-    'version' => '3.0.0',
+    'version' => '3.0.1',
     'category' => 'plugin',
     'state' => 'beta',
     'author' => 'Stefan Bürk',
@@ -13,7 +13,7 @@ $EM_CONF[$_EXTKEY] = [
         'depends' => [
             'typo3' => '13.4.35-14.3.99',
             'core' => '13.4.35-14.3.99',
-            'academic_base' => '3.0.0',
+            'academic_base' => '3.0.1',
         ],
     ],
 ];

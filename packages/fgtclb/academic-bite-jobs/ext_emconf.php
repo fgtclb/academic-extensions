@@ -3,7 +3,7 @@
 $EM_CONF[$_EXTKEY] = [
     'title' => 'FGTCLB: Academic Bite Jobs',
     'description' => 'The Academic Bite Jobs extension shows jobs from the B-Ite Job Board.',
-    'version' => '3.0.0',
+    'version' => '3.0.1',
     'category' => 'misc',
     'state' => 'beta',
     'author' => 'FGTCLB',
@@ -14,7 +14,7 @@ $EM_CONF[$_EXTKEY] = [
             'typo3' => '13.4.35-14.3.99',
             'core' => '13.4.35-14.3.99',
             'install' => '13.4.35-14.3.99',
-            'academic_base' => '3.0.0',
+            'academic_base' => '3.0.1',
         ],
     ],
 ];
