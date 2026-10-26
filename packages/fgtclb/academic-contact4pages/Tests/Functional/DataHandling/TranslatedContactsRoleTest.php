@@ -102,16 +102,48 @@ final class TranslatedContactsRoleTest extends AbstractAcademicContacts4PagesTes
 
     /**
      * Rearranging the contacts of the default language role still works, and still
-     * leaves the translations with the role they have.
+     * leaves the translations with the role they have. The form lists the default
+     * language contacts only, so it submits those.
      */
     #[Test]
     public function rearrangingTheContactsOfTheDefaultLanguageRoleKeepsTheTranslatedContacts(): void
     {
-        $this->processDataMap([self::TABLE_ROLE => [1 => ['contacts' => '2,1,3,4']]]);
+        $this->processDataMap([self::TABLE_ROLE => [1 => ['contacts' => '2,1']]]);
 
         $this->assertSame([2, 1], array_column($this->fetchContacts(1, 0), 'uid'));
         $this->assertSame(self::TRANSLATED_CONTACTS, $this->fetchContacts(1));
         $this->assertSame([], $this->fetchContacts(2), 'A contact was moved to the role translation.');
+    }
+
+    /**
+     * TYPO3 14.3.10 gives every inline child the language of its parent when the
+     * parent gets a new child (core #103970). The translated contacts point at the
+     * default language role too, so while the list held every language, a
+     * contact added here turned both translations into default language
+     * contacts without a translation parent (ACE-943). TYPO3 13 aligns nothing,
+     * and the result is the same there.
+     */
+    #[Test]
+    public function addingAContactToTheDefaultLanguageRoleKeepsTheTranslatedContacts(): void
+    {
+        $this->processDataMap([
+            self::TABLE_CONTACT => ['NEW1' => ['pid' => 10, 'page' => 10]],
+            self::TABLE_ROLE => [1 => ['contacts' => '1,2,NEW1']],
+        ]);
+
+        $this->assertCount(3, $this->fetchContacts(1, 0));
+        $this->assertSame(self::TRANSLATED_CONTACTS, $this->fetchContacts(1));
+    }
+
+    /**
+     * The list of the default language role holds the default language contacts
+     * only: the `foreign_match_fields` that keeps the translations out of the
+     * language alignment of TYPO3 14.3.10.
+     */
+    #[Test]
+    public function theContactsListOfTheRoleHoldsTheDefaultLanguageContactsOnly(): void
+    {
+        $this->assertSame([1, 2], array_column($this->compileRoleForm(1)['contacts']['children'], 'vanillaUid'));
     }
 
     /**
@@ -128,7 +160,7 @@ final class TranslatedContactsRoleTest extends AbstractAcademicContacts4PagesTes
     }
 
     /**
-     * @param array<string, array<int, array<string, int|string>>> $dataMap
+     * @param array<string, array<int|string, array<string, int|string>>> $dataMap
      */
     private function processDataMap(array $dataMap): void
     {

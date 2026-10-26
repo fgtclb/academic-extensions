@@ -123,6 +123,14 @@ return [
                 'type' => 'inline',
                 'foreign_table' => 'tx_academiccontacts4pages_domain_model_contact',
                 'foreign_field' => 'role',
+                // Only default language contacts are children of this relation. A
+                // translated contact points at the default language record here, and
+                // TYPO3 14.3.10 gives every inline child the language of its parent:
+                // without the match, a new contact added here turned every translated
+                // contact of the record into a default language one (ACE-943).
+                'foreign_match_fields' => [
+                    'sys_language_uid' => 0,
+                ],
                 // A sort column of this relation's own: the page relation owns
                 // "sorting", the column the frontend renders contacts in.
                 'foreign_sortby' => 'role_sorting',
