@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "907266c8c33f6c3bcb5ad450e3dded07",
+    "content-hash": "1ce6520685db19ca0a8cf292f698cf3a",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -3342,16 +3342,16 @@
         },
         {
             "name": "sbuerk/data-factory",
-            "version": "2.0.0",
+            "version": "2.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sbuerk/data-factory.git",
-                "reference": "2b446548d5bc57ca035c93669849a192655c6a30"
+                "reference": "6b353c3f7b9a0819aa5d2834e6a1c53824a9ac71"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sbuerk/data-factory/zipball/2b446548d5bc57ca035c93669849a192655c6a30",
-                "reference": "2b446548d5bc57ca035c93669849a192655c6a30",
+                "url": "https://api.github.com/repos/sbuerk/data-factory/zipball/6b353c3f7b9a0819aa5d2834e6a1c53824a9ac71",
+                "reference": "6b353c3f7b9a0819aa5d2834e6a1c53824a9ac71",
                 "shasum": ""
             },
             "require": {
@@ -3377,7 +3377,7 @@
                     "Package": {
                         "providesPackages": []
                     },
-                    "version": "2.0.0",
+                    "version": "2.0.2",
                     "web-dir": ".Build/Web",
                     "extension-key": "data_factory"
                 },
@@ -3427,7 +3427,7 @@
                 "issues": "https://github.com/sbuerk/data-factory/issues",
                 "source": "https://github.com/sbuerk/data-factory"
             },
-            "time": "2026-08-21T21:21:02+00:00"
+            "time": "2026-10-26T11:54:59+00:00"
         },
         {
             "name": "sbuerk/extended-path-repository",
