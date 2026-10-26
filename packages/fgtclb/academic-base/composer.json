@@ -31,7 +31,7 @@
     "extra": {
         "typo3/cms": {
             "extension-key": "academic_base",
-            "version": "2.4.0"
+            "version": "2.4.1-dev"
         },
         "typo3/class-alias-loader": {
             "class-alias-maps": [
