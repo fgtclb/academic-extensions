@@ -430,9 +430,22 @@ What to order by, learned from the ACE-482/ACE-491 sweeps:
   [Translation synchronization](translation-synchronization.md#an-inline-list-that-is-exclude),
   and how the children a localized role drags along are removed again in
   [the section after it](translation-synchronization.md#localizing-a-parent-that-does-not-own-its-children) (ACE-874).
+  Since TYPO3 14.3.10 a secondary relation also has to keep the translations
+  out of its children: DataHandler gives every inline child the language of a
+  parent that is created, changes its language or gets a new child (core
+  #103970), so a contact added to the default language role turned every
+  translated contact of that role into a default language one. The contacts
+  role, the partner role and the contracts relation of the organisational
+  unit carry `'foreign_match_fields' => ['sys_language_uid' => 0]` for that
+  (ACE-943), which also takes the contracts valid in all languages out of the
+  list of the unit.
   The contract relation of the page contacts,
   `tx_academiccontacts4pages_contacts` on contracts, carries neither
-  `l10n_mode` nor `displayCond` and has not been checked on translations.
+  `l10n_mode` nor `displayCond`, and no `foreign_match_fields` either: the
+  localization of a contract creates the translations of its contacts through
+  it (ACE-484), which a match on the default language prevents. A contact
+  added to a contract on TYPO3 14.3.10 therefore still turns the translated
+  contacts of that contract into default language ones.
 - **A demanded ordering** (a plugin's sort option) gets `uid` appended as a
   tiebreaker — records equal in the demanded ordering must keep a stable
   relative order.
