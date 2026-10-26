@@ -33,7 +33,7 @@
     "homepage": "https://www.fgtclb.com/",
     "extra": {
         "typo3/cms": {
-            "version": "3.0.1-dev"
+            "version": "3.1.0-dev"
         }
     }
 }

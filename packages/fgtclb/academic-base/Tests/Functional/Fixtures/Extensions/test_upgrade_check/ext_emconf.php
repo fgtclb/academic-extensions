@@ -3,7 +3,7 @@
 $EM_CONF[$_EXTKEY] = [
     'title' => 'TESTS: Upgrade check upstream',
     'description' => 'The extension the upgrade check compares an override folder with',
-    'version' => '3.0.1',
+    'version' => '3.1.0',
     'category' => 'plugin',
     'state' => 'beta',
     'author' => 'FGTCLB GmbH',

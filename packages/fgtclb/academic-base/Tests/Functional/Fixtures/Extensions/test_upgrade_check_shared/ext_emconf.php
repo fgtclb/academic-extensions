@@ -3,7 +3,7 @@
 $EM_CONF[$_EXTKEY] = [
     'title' => 'TESTS: Upgrade check shared partials',
     'description' => 'A shared partial package the upgrade check fixture extension requires, two links from the checked one',
-    'version' => '3.0.1',
+    'version' => '3.1.0',
     'category' => 'plugin',
     'state' => 'beta',
     'author' => 'FGTCLB GmbH',
@@ -13,7 +13,7 @@ $EM_CONF[$_EXTKEY] = [
         'depends' => [
             'typo3' => '13.4.35-14.3.99',
             'core' => '13.4.35-14.3.99',
-            'academic_base' => '3.0.1',
+            'academic_base' => '3.1.0',
         ],
     ],
 ];

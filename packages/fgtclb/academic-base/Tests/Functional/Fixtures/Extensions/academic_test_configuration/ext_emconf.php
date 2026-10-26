@@ -3,7 +3,7 @@
 $EM_CONF[$_EXTKEY] = [
     'title' => 'TESTS: Academic configuration check',
     'description' => 'An academic extension the configuration check finds stale configuration for',
-    'version' => '3.0.1',
+    'version' => '3.1.0',
     'category' => 'plugin',
     'state' => 'beta',
     'author' => 'FGTCLB GmbH',
