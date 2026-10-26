@@ -1,7 +1,7 @@
 name: "Nightly"
 
-# Runs the complete "CI" workflow every night, for both maintained lines: "main"
-# and "2" (ACE-693).
+# Runs the complete "CI" workflow every night, for the maintained branches "main",
+# "3.0", "2" and "2.4" (ACE-693, ACE-946).
 #
 # Why at all: "ci.yml" runs for pull requests and by hand, so a merged state is
 # never checked again. And there is no "composer.lock" - every run resolves its
@@ -11,10 +11,10 @@ name: "Nightly"
 #
 # Why a workflow of its own that starts "ci.yml", instead of a "schedule" trigger
 # in "ci.yml": a schedule only ever fires on the default branch, with the
-# workflow file of the default branch. Branch "2" has a "ci.yml" of its own -
+# workflow file of the default branch. Every other branch has a "ci.yml" of its own -
 # other core versions, other PHP versions - which a schedule on "main" cannot
 # reach. "workflow_dispatch" can: it starts "ci.yml" as it is on the branch it is
-# given. Both branches' "ci.yml" carry that trigger already. A dispatch made with
+# given. Every branch's "ci.yml" carries that trigger already. A dispatch made with
 # "github.token" starts a run, unlike most events that token causes.
 #
 # Why it waits for the run it started: a run started by the dispatch belongs to
@@ -52,7 +52,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        branch: [ "main", "2" ]
+        branch: [ "main", "3.0", "2", "2.4" ]
     env:
       GH_TOKEN: "${{ github.token }}"
       GH_REPO: "${{ github.repository }}"
