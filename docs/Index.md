@@ -4,7 +4,7 @@ Technical documentation for developers working **on** these extensions: how the
 mono repository is structured, which rules apply to it, how to run the tooling
 and how changes get released.
 
-It describes **branch `2`**, the `2.4.x-dev` line supporting TYPO3 v12 and v13.
+It describes **branch `2`**, the `2.5.x-dev` line supporting TYPO3 v12 and v13.
 The v13 + v14 line has its own copy of this tree on `main`.
 
 Documentation for people **using** an extension lives in that extension's own
