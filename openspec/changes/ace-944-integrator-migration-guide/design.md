@@ -33,7 +33,7 @@ See `proposal.md` for the motivation. On `main`:
   shortcode `fgtclb/academic-base` (ACE-937). A label resolves only once the
   rendering of `main` on docs.typo3.org carries it.
 - The branch aliases are `dev-main` → `3.0.x-dev` and `2.x-dev` →
-  `2.4.x-dev`. No branch answers `2.0.x-dev`.
+  `2.4.x-dev`. No branch answers `2.0.x-dev`, `2.1.x-dev` or `2.3.x-dev`.
 
 ## Goals / Non-Goals
 
@@ -85,14 +85,22 @@ override.
 `academic-base/Documentation/Upgrade/Index.rst` gains a section
 "Installations outside these paths":
 
-- **TYPO3 v12**: update the academic extensions to 2.4 on v12 first, then
-  TYPO3 to v13 with 2.4, then 3.0. The core update stays a non-goal.
+- **TYPO3 v12**: 2.3 and 2.4 run on 12.4 from 12.4.22 on and on 13.4. The
+  path from 2.3 to 2.4 covers v12, and the paths to 3.0 already start with
+  the update of TYPO3 to 13.4.35 while 2.3 or 2.4 still runs, so the item
+  only adds the 12.4.22 floor. An earlier draft routed v12 through 2.4 first,
+  which contradicted those pages. The core update stays a non-goal.
 - **A release older than 2.3**: read the `Breaking-` and `Important-` entries
   of each minor version after the installed one, then follow the 2.3 path.
-- **An unreleased revision**: the `ext_emconf.php` version of the installed
-  package names the release it was cut after.
-- **A `2.0.x-dev` or `2.x-dev` constraint**: replace it with `^2.4`, then
-  `^3.0`.
+- **An unreleased revision** (`dev-2`, `2.x-dev`, `2.4.x-dev`): it carries
+  the version of the release it leads to, `2.4.0` in `ext_emconf.php` and
+  `2.4.0-dev` in `VERSION`, and part of its changes. `composer.lock` names the
+  installed commit. Follow the path from the last release before it, 2.3,
+  and skip the steps that do not apply, as every page says.
+- **A development constraint of an earlier version**: `main` was aliased
+  `2.0.x-dev`, `2.1.x-dev`, `2.3.x-dev` and `2.4.x-dev` in turn, none of the
+  first three resolves any more, and `2.2.x-dev` resolves to the unmaintained
+  branch `2.2`. Replace it, or `2.x-dev`, with `^2.4`, then `^3.0`.
 
 The other eleven upgrade chapters link it from their "Before you start" by an
 interlink to a label of the new section. The label is published before the
@@ -106,14 +114,25 @@ is the same for every extension.
 
 ### Include order: in the changelog entry, on both branches
 
-The "Affected Installations" section of the three entries gains the order rule:
-TypoScript that assigns `page.10.templateName.cObject` after the extension's
-TypoScript wins over the name. On TYPO3 v13 and v14 a site set is parsed
-before the `sys_template` records, so a Bootstrap Package included as a static
-template overrides the name the set of the extension sets. Including the
-Bootstrap Package through its site set (ACE-601), or the extension through a
-static template after it, fixes it. On TYPO3 v12 the order of the static
-templates in the record decides.
+The "Affected Installations" section of the three entries gains the order rule
+proven by task 1.2: TypoScript that assigns `page.10.templateName.cObject`
+after the extension's TypoScript wins over the name. On TYPO3 v13 and v14 the
+TypoScript of the site sets is parsed before that of the `sys_template`
+records, so the static template of Bootstrap Package 15 (v12 and v13, version
+16 has none) or a record of the site package that assigns the name overrides
+the name the set of the extension sets. Including the Bootstrap Package
+through its site set (ACE-601), as both development instances do with
+versions 15 and 16, or the extension's static template after the one of the
+Bootstrap Package in the same record, fixes it. On TYPO3 v12 the later static
+template of the record wins. The text names
+"Included TypoScript" of the TypoScript module as the place to check
+the order on a page of the type.
+
+The text makes no promise about the order of two sets. TYPO3 sorts all sets
+of an installation by their dependencies and their names, not by the order
+of the site's dependency list, and neither set depends on the other. Making
+the order irrelevant, with an optional dependency of the page sets on the
+sets of the Bootstrap Package, stays a non-goal of this change.
 
 Rejected: a new changelog entry. The entry exists and is unreleased, so
 correcting it keeps one place for the fact.

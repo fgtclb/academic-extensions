@@ -66,6 +66,5 @@ None.
 
 Derived from the project differences analysis of 2026-09-12 (candidate
 `cross-cutting-10`, with `persons-data-19` folded in), narrowed after ACE-910
-delivered the upgrade chapters. The change is renamed to
-`ace-<NNN>-integrator-migration-guide` once its issue is filed.
+delivered the upgrade chapters. Filed as ACE-944.
 Relates to ACE-367, ACE-450, ACE-601 and ACE-910.
