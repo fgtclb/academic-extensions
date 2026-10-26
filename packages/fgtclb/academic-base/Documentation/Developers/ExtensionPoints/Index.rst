@@ -68,11 +68,11 @@ What is public API
     be ordered after them. The listener classes are not public API.
 *   The format of :file:`Configuration/CategoryTypes.yaml`, see the
     `category types chapter of category_types
-    <https://docs.typo3.org/p/fgtclb/category-types/main/en-us/Developers/CategoryTypes/Index.html>`__.
+    <https://docs.typo3.org/p/fgtclb/category-types/3.0/en-us/Developers/CategoryTypes/Index.html>`__.
 *   The routing aspect type ``CategoryFilterMapper`` of
     :guilabel:`category_types` and its settings, see the `routing chapter of
     category_types
-    <https://docs.typo3.org/p/fgtclb/category-types/main/en-us/Developers/Routing/Index.html>`__.
+    <https://docs.typo3.org/p/fgtclb/category-types/3.0/en-us/Developers/Routing/Index.html>`__.
     The class behind it is not public API.
 *   The format of :file:`Configuration/FrontendIcons.php`, the frontend icon
     registry of :guilabel:`academic_base`: the format of
@@ -104,7 +104,7 @@ What is public API
 *   The view helper ``ct:categoryTypeTitle`` of :guilabel:`category_types`,
     by tag name and arguments, which names a category type in a template by
     its registered title, see `naming a type in a template
-    <https://docs.typo3.org/p/fgtclb/category-types/main/en-us/Developers/CategoryTypes/Index.html#developers-category-types-title>`__.
+    <https://docs.typo3.org/p/fgtclb/category-types/3.0/en-us/Developers/CategoryTypes/Index.html#developers-category-types-title>`__.
     The class behind it is not public API.
 
 ..  _developers-extension-points-not-api:
@@ -146,14 +146,14 @@ Events
 Every event is a :php:`final` class, dispatched through the PSR-14 event
 dispatcher of TYPO3. A listener registers for it with the
 :php:`#[AsEventListener]` attribute of TYPO3. The developer chapters of
-`academic_bite_jobs <https://docs.typo3.org/p/fgtclb/academic-bite-jobs/main/en-us/Developers/Index.html>`__,
-`academic_contacts4pages <https://docs.typo3.org/p/fgtclb/academic-contacts4pages/main/en-us/Developers/Index.html>`__,
-`academic_persons <https://docs.typo3.org/p/fgtclb/academic-persons/main/en-us/Developers/Index.html>`__,
-`academic_persons_edit <https://docs.typo3.org/p/fgtclb/academic-persons-edit/main/en-us/Developers/Index.html>`__,
-`academic_partners <https://docs.typo3.org/p/fgtclb/academic-partners/main/en-us/Developers/Index.html>`__,
-`academic_programs <https://docs.typo3.org/p/fgtclb/academic-programs/main/en-us/Developers/Index.html>`__
+`academic_bite_jobs <https://docs.typo3.org/p/fgtclb/academic-bite-jobs/3.0/en-us/Developers/Index.html>`__,
+`academic_contacts4pages <https://docs.typo3.org/p/fgtclb/academic-contacts4pages/3.0/en-us/Developers/Index.html>`__,
+`academic_persons <https://docs.typo3.org/p/fgtclb/academic-persons/3.0/en-us/Developers/Index.html>`__,
+`academic_persons_edit <https://docs.typo3.org/p/fgtclb/academic-persons-edit/3.0/en-us/Developers/Index.html>`__,
+`academic_partners <https://docs.typo3.org/p/fgtclb/academic-partners/3.0/en-us/Developers/Index.html>`__,
+`academic_programs <https://docs.typo3.org/p/fgtclb/academic-programs/3.0/en-us/Developers/Index.html>`__
 and
-`academic_projects <https://docs.typo3.org/p/fgtclb/academic-projects/main/en-us/Developers/Index.html>`__
+`academic_projects <https://docs.typo3.org/p/fgtclb/academic-projects/3.0/en-us/Developers/Index.html>`__
 describe their events in detail, with examples.
 
 ..  list-table::

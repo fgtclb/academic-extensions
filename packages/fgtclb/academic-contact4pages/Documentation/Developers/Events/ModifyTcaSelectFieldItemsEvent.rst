@@ -45,7 +45,7 @@ receives the final items.
 The :guilabel:`Contract` select of a contact is filled by the item provider of
 :guilabel:`academic_persons`, which dispatches the same event for the field
 `contract` of this table. `Its page in the manual of academic_persons
-<https://docs.typo3.org/p/fgtclb/academic-persons/main/en-us/Developers/Events/ModifyTcaSelectFieldItemsEvent.html>`__
+<https://docs.typo3.org/p/fgtclb/academic-persons/3.0/en-us/Developers/Events/ModifyTcaSelectFieldItemsEvent.html>`__
 describes the selects it fills.
 
 What this extension passes in

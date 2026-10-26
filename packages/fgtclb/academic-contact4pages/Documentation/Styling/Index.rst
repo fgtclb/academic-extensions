@@ -60,7 +60,7 @@ Every contact is rendered as the profile item of
     A grouped contact does not repeat its role in an `ace-role`.
 *   The profile item is built up as described in the chapter
     `Styling of academic_persons
-    <https://docs.typo3.org/p/fgtclb/academic-persons/main/en-us/Styling/Index.html>`__.
+    <https://docs.typo3.org/p/fgtclb/academic-persons/3.0/en-us/Styling/Index.html>`__.
     The grid column is the cell of the contact list and the
     :html:`<article class="ace-item">` is the profile. In the list that is not
     grouped, the role is a :html:`<p class="ace-role">` in that column, in
