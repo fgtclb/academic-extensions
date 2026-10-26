@@ -28,7 +28,7 @@
     "extra": {
         "typo3/cms": {
             "extension-key": "academic_base",
-            "version": "3.0.0-dev",
+            "version": "3.0.0",
             "Package": {
                 "providesPackages": []
             }
