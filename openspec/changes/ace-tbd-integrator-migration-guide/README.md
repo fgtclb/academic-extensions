@@ -1,3 +1,4 @@
 # ace-tbd-integrator-migration-guide
 
-Integrator migration guide 2.x to 3.0 across all extensions
+Profile editor overrides to settings, installations outside the upgrade
+paths and the include order of the page template name
