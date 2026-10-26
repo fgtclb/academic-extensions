@@ -1,223 +1,134 @@
 ## Context
 
-**Status after ACE-910.** Every manual now has an `Upgrade/` chapter with the
-pages 2.3 to 2.4, 2.4 to 3.0 and 2.3 to 3.0, one chapter per extension, which
-the maintainer chose over one entry point in `academic_base`. That supersedes
-the decision on the entry point below and the one against pages per starting
-version, and every change this design lists as pending has landed since. What
-this change still adds goes beyond those pages: the profile editor chapter from
-template overrides to configuration, the chapters of programs, study plan and
-category types, and the upgrade guides per project. Revise this design against
-the upgrade chapters before it is applied.
+See `proposal.md` for the motivation. On `main`:
 
-See `proposal.md` for the motivation. On main:
-
-- `academic-persons/Documentation/Upgrade/Index.rst` orders six steps for
-  persons and the profile editor. `academic_base`'s manual has no upgrade
-  section.
-- The `Documentation/guides.xml` of the manuals declare only core
-  inventories, so a `:ref:` cannot cross from one manual into another.
-- The facts the chapters rest on were verified in the sources:
-  - `academic_base` removed `Environment\*` and `FileUploadConverter`
-    (`Changelog/3.0/Breaking-Removed*.rst`).
-  - `TsConfig/` became `TSconfig/` in nine extensions
-    (`Important-PageTsConfigDirectoryRenamed.rst`).
-  - Every content element is hidden by `Configuration/page.tsconfig` and
-    re-enabled by its component set.
-  - `ExtensionManagementUtility::addPiFlexFormValue()` is deprecated on v14
-    (#107047), and `TcaManipulator::addContentElementPluginFlexForm()` covers
-    both versions.
-  - `academic:persons:settings:migrate` exists.
-  - `Important-PageTemplateNameIsSetExplicitly.rst` (programs, partners,
-    projects) already states that an override named `Academicprogram.html` is
-    no longer used. What it lacks is why such an override still resolves
-    where the static template of the Bootstrap Package is parsed after the
-    sets, and that moving that package to its site set (ACE-601) changes it.
-  - The profile editor renders the synchronisation toggle only when
-    `special.skipSync` is configured (`Partials/Profile/Header.html:26`). Its
-    endpoint accepts `skipSync` only as an editable special field
-    (`ProfileUpdateValidationService::getEditableProperties()`) and otherwise
-    answers 422 `invalid_profile_data`; this is a code reading, confirmed by a
-    request while writing.
-  - `academic_programs` names the category types `program_type` and
-    `begin_program` (`Configuration/CategoryTypes.yaml`); the unit labels are
-    `credits` (study plan) and `program.creditPoints` (programs).
+- Every manual has `Documentation/Upgrade/` with `Index.rst`, `From23To24`,
+  `From24To30` and `From23To30` (ACE-910). Each `Index.rst` has a "Before you
+  start" list below its table of paths. Branch `2` has `Index.rst` and
+  `From23To24` only, and all twelve `From23To24.rst` are byte-identical
+  between the branches.
+- The upgrade pages of `academic_persons_edit` list the removed Fluid files
+  under "The replaced view" and end with "re-apply what the project still
+  wants on top of the new files".
+- The editor reads its fields from `Configuration/AcademicPersons/Settings.yaml`
+  of `academic_persons`. Verified there:
+  - a document section offers only the buttons listed under its `actions`
+    (`hide`, `view`, `down`, `up`, `delete`, `edit`), and `readonly: true`
+    disables creation and every mutating action while keeping `view`;
+  - a field takes `readonly`, `frontendreadonly` (ACE-756) or `disabled`, and
+    a field or a section that is removed from the file is neither rendered nor
+    written;
+  - `special.skipSync` is the synchronisation toggle. `~` removes it, and
+    `readonly` or `disabled` locks it. The endpoint answers 422
+    `invalid_profile_data` when the special field is missing, read-only or
+    disabled (`ProfileController::isSpecialFieldWritable()`). This is a code
+    reading, not a request.
+- `managedFields` (ACE-758, ACE-760), `BeforeProfileEditingWriteEvent`
+  (ACE-762) and custom profile fields (ACE-764) have landed, so the gaps the
+  first draft of this change named have a replacement now.
+- The three `Important-PageTemplateNameIsSetExplicitly.rst` are in
+  `Changelog/2.4/`, which is byte-identical between `main` and `2`. 2.4.0 is
+  not tagged, so the folder may still change, on both branches alike.
+- Links into the manual of `academic_base` are `:ref:` interlinks with the
+  shortcode `fgtclb/academic-base` (ACE-937). A label resolves only once the
+  rendering of `main` on docs.typo3.org carries it.
+- The branch aliases are `dev-main` → `3.0.x-dev` and `2.x-dev` →
+  `2.4.x-dev`. No branch answers `2.0.x-dev`.
 
 ## Goals / Non-Goals
 
 **Goals:**
 
-- One entry point, ordered, with every step linking its owning changelog.
-- Extension detail stays in the extension's manual.
+- Every row of the persons-edit table is checked against `Settings.yaml` and
+  the manual of `academic_persons`, never taken from this design alone.
+- The include order explanation is proven in an instance before it is written.
 
 **Non-Goals:**
 
-- Describing the TYPO3 core update itself.
+- New pages per starting version, such as 2.2 to 3.0. The added part points to
+  the changelogs and to the existing pages.
 
 ## Decisions
 
-### Entry point in `academic_base`, chapters in the owning manuals
+### Persons-edit: one table of intents, on both 3.0 pages
 
-`academic-base/Documentation/Upgrade/Index.rst` carries the ordered steps:
+A section "From an override to a setting" below "The replaced view" of
+`From24To30.rst` and `From23To30.rst`. 2.4 still ships the 2.x form flow, so
+`From23To24.rst` needs nothing. The rows, each to be verified:
 
-1. core and PHP floor;
-2. plugin migration wizards, still on v13;
-3. database compare;
-4. removed `academic_base` APIs;
-5. site sets or static templates, one mechanism per site;
-6. `TSconfig/` imports;
-7. hidden content elements;
-8. FlexForm registration of project plugins;
-9. settings migration of persons;
-10. page templates and include order;
-11. removed content-load sets and `styles.content.getContent`;
-12. TYPO3's `#[AsEventListener]`;
-13. template override check.
+- no add, delete or sort buttons: the `actions` of the section;
+- a section that shows but does not change: `readonly: true` of the section;
+- a field that shows but does not change: `readonly`, or `frontendreadonly`
+  when the backend keeps it editable;
+- a hidden field or section: removed from the settings file of the site
+  package;
+- the synchronisation toggle hidden or locked: `special.skipSync: ~`, or
+  `readonly` or `disabled`. Whether it shows by default stays with ACE-367;
+- fields owned by an import: `managedFields`;
+- relabelled fields: the `profileEditing.*` label keys;
+- replaced icons: `Configuration/FrontendIcons.php` of the site package;
+- the "View" link to the public profile: `plugin.tx_academicpersons.detailPid`;
+- extra fields: custom profile fields;
+- a write that needs a check or a change of the data:
+  `BeforeProfileEditingWriteEvent`.
 
-It then links the extension chapters: `academic-persons-edit/Documentation/Upgrade/Index.rst`
-(new), the existing persons page, `academic-programs/Documentation/Upgrade/Index.rst`,
-`academic-study-plan/Documentation/Upgrade/Index.rst` and a section in
-`typo3-category-types/Documentation/`.
+What has no setting (layout, markup, the order of whole sections where the
+settings cannot express it) is named as staying a template override, with a
+link to the label `templates-override` of the manual.
 
-Rejected: one monolithic page in `academic_base`. Its detail would drift from
-the changelogs it summarizes, and a reader of the programs manual on
-docs.typo3.org would not find it. Rejected: a Markdown file in the mono
-repository, which integrators do not read. Rejected: notes per project.
+Rejected: a checklist per 2.x override path. The paths are all removed, the
+existing list already says so, and what matters is the intent behind each
+override.
 
-### Links between manuals are absolute
+### Before you start: one place, linked from the others
 
-Cross-manual links use the rendered docs.typo3.org URL of the package,
-together with the `:composer:` role the persons page already uses. Rejected:
-inventories for the sibling manuals in `guides.xml`, which would make
-`checkRstRenderingAll` depend on published renderings of 3.0 that do not
-exist before the release.
+`academic-base/Documentation/Upgrade/Index.rst` gains a section
+"Installations outside these paths":
 
-### Profile editor chapter: intent to setting
+- **TYPO3 v12**: update the academic extensions to 2.4 on v12 first, then
+  TYPO3 to v13 with 2.4, then 3.0. The core update stays a non-goal.
+- **A release older than 2.3**: read the `Breaking-` and `Important-` entries
+  of each minor version after the installed one, then follow the 2.3 path.
+- **An unreleased revision**: the `ext_emconf.php` version of the installed
+  package names the release it was cut after.
+- **A `2.0.x-dev` or `2.x-dev` constraint**: replace it with `^2.4`, then
+  `^3.0`.
 
-A table maps each 2.x override intent to its 3.0 setting:
+The other eleven upgrade chapters link it from their "Before you start" by an
+interlink to a label of the new section. The label is published before the
+links use it, see Risks.
 
-- no add, delete or sort: `actions`;
-- a locked section: `readonly`;
-- hiding the synchronisation toggle: remove `special.skipSync`;
-- hiding a field: remove it from the profile map;
-- labels: the `profileEditing.*` keys;
-- icons: `FrontendIcons.php` of a site package that depends on the extension
-  (`ace-812-persons-frontend-icons`).
+On branch `2` the section has no 3.0 step, and the v12 item reads "2.4
+supports v12 and v13".
 
-It names the gaps without a replacement (`ace-760-managed-fields-editor`,
-`ace-762-editor-before-write-event`, `ace-764-editor-custom-profile-fields`)
-and lists the 2.x override paths with their fate.
+Rejected: the section in every manual. Twelve copies drift, and the content
+is the same for every extension.
 
-### Pending changes are labelled
+### Include order: in the changelog entry, on both branches
 
-A chapter that depends on a change not released when the guide is written
-(`ace-91-program-finder-element`, `ace-777-program-application-link`,
-`ace-722-study-plan-decimal-credit-points`,
-`ace-704-study-plan-partials-js-contract`, `ace-703-study-plan-asset-switch`,
-`ace-666-keep-hidden-ctype-selectable`, `ace-745-legacy-typoscript-paths`,
-`ace-733-program-facts-field-list`,
-`ace-721-program-page-content-without-getcontent`,
-`ace-785-page-templates-sections-subtitle`,
-`ace-712-upgrade-check-template-overrides`,
-`ace-713-upgrade-check-configuration`,
-`ace-812-persons-frontend-icons`,
-`ace-813-jobs-study-plan-frontend-icons`,
-`ace-814-programs-partners-projects-frontend-icons`) carries a note naming it
-as not yet available.
+The "Affected Installations" section of the three entries gains the order rule:
+TypoScript that assigns `page.10.templateName.cObject` after the extension's
+TypoScript wins over the name. On TYPO3 v13 and v14 a site set is parsed
+before the `sys_template` records, so a Bootstrap Package included as a static
+template overrides the name the set of the extension sets. Including the
+Bootstrap Package through its site set (ACE-601), or the extension through a
+static template after it, fixes it. On TYPO3 v12 the order of the static
+templates in the record decides.
 
-### Decided: the static template step names the 2.x paths as deprecated
-
-The 2.x TypoScript paths stay until 4.0 (`ace-745-legacy-typoscript-paths`),
-so step 5 documents them as deprecated and points to the "All components"
-static template, or to the site set, as the replacement. Keeping the paths
-turns the step from "your site renders nothing" into a deprecation to clean
-up.
-
-### Decided: decimal credit points ship with 2.4 and 3.0
-
-The credit points change of `ace-722-study-plan-decimal-credit-points` ships
-on `main` and, by the maintainer's decision of 2026-09-23, as a backport on
-branch `2` (2.4), with a database compare in both releases. The 3.0 study
-plan chapter covers it for an update from 2.3 or older; an installation on
-2.4 already has the decimal column. The branch `2` backport of the guide
-names the database compare of 2.4.
-
-### Decided: the content-load sets are documented as removed, not deprecated
-
-The three content-load sets (`fgtclb/academic-partners-content-load`,
-`fgtclb/academic-programs-content-load`,
-`fgtclb/academic-projects-content-load`) and the programs partial
-`Partials/Program/Categories.html` are removed in 3.0 as a breaking change,
-not deprecated for 4.0. Step 11 of the guide therefore documents a removal and
-its migration:
-
-- the sets redefined the global `styles.content.getContent` for every page of
-  a site, and the aggregate set of each extension depended on them;
-- a site configuration, or a set of the site package, that still names one
-  answers every page with HTTP 500 ("depends on unavailable sets"), so the
-  entry is removed first; `academic:upgrade:check` reports it as
-  `unavailable-set`;
-- the upstream page templates of programs, partners and projects render their
-  content without that path in 3.0, so a site using them needs nothing;
-- a site template or project page template that still renders
-  `styles.content.getContent` defines it itself, and the guide shows the
-  definition the sets carried;
-- a project override of `Partials/Program/Categories.html` moves to the facts
-  partial of `ace-733-program-facts-field-list`.
-
-The removals are owned by three changes, and the step links their `Breaking-`
-entries, which own the detail:
-
-- `ace-721-program-page-content-without-getcontent` removes the
-  academic_programs set;
-- `ace-733-program-facts-field-list` removes `Partials/Program/Categories.html`;
-- `ace-785-page-templates-sections-subtitle` removes the academic_partners and
-  academic_projects sets and switches their page templates off
-  `styles.content.getContent`.
- The first draft asked whether to deprecate the sets for removal in
-4.0; removing them in the unreleased 3.0 spares projects a second migration.
-
-### Decided: the guide starts where the site is
-
-The steps assume a site on 2.4 and TYPO3 v13. Two of the analysed projects are
-further back: one on 2.2.1 with TYPO3 v12, one on unreleased `dev-main`
-revisions of the split packages between 2.0.1 and 2.1.0, also on v12 and
-installed with the constraint `2.0.x-dev`, which no branch answers any more
-(branch `2` is `2.4.x-dev`, `main` is `3.0.x-dev`). The entry point therefore
-opens with a part "Before you start":
-
-- **TYPO3 v12**: update the academic extensions to 2.4 on v12 first (branch
-  `2` supports v12 and v13), then the core to v13 with 2.4, then 3.0. The core
-  update itself stays a non-goal, the part only orders the three moves.
-- **A release older than 2.4**: read the changelogs of each minor version after
-  the installed one, `Breaking-` and `Important-` entries first. 2.1 carries the
-  removed partials of persons and programs, the changed backend layout
-  identifier of programs and the moved programs translations.
-- **An unreleased revision**: find the last release before it (the
-  `ext_emconf.php` version of the installed package names it) and read from
-  the minor version after that. Some entries are then already installed, which
-  the template override check of step 13 sorts out.
-- **A `2.0.x-dev` or `2.x-dev` constraint**: replace it with a released
-  constraint (`^2.4`, then `^3.0`), because the branch aliases moved.
-
-Rejected: chapters per starting version. They would repeat the changelogs the
-guide links, and the order of the three moves is the only thing a changelog
-does not say.
-
-### Category type rename by SQL
-
-`UPDATE sys_category SET type = 'program_type' WHERE type = 'course_type'`,
-and the same for `begin_course`. The statement covers translations and
-workspace versions, because they carry the same `type`. Rejected: an
-`Install\Updates` wizard, see Non-goals.
+Rejected: a new changelog entry. The entry exists and is unreleased, so
+correcting it keeps one place for the fact.
 
 ## Risks / Trade-offs
 
-- [The guide goes stale] → `docs/workflow/changelog-and-documentation.md`
-  makes a step in the guide part of every future breaking change.
-- [Absolute links break when a manual moves] → They point at package URLs,
-  which docs.typo3.org keeps stable.
+- [A link to a new label fails `checkRstRenderingAll` until `main` is
+  rendered with it] → The section and its label land in their own commit and
+  pull request first, the links of the other manuals in a second one after the
+  rendering, as `docs/workflow/changelog-and-documentation.md` describes.
+- [The include order claim is wrong for one core version] → Task 1.2 proves it
+  on v13 and v14 on `main`, and on v12 on `2`, before it is written.
+- [The `Changelog/2.4/` copies drift between the branches] → Both pull
+  requests carry the same text, compared with `cmp` before pushing.
 
-## Open Questions
+## Migration Plan
 
-None.
+None. Documentation only.
