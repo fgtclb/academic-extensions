@@ -6,7 +6,8 @@ schema: spec-driven
 context: |
   fgtclb/academic-extensions: a TYPO3 CMS extension mono repository. Twelve
   extensions under packages/fgtclb/, developed and tested together, each split
-  out to its own read-only repository. This branch supports TYPO3 v13 and v14
+  out to its own read-only repository. This is branch `3.0`, the patch line of
+  3.0, and it supports TYPO3 v13 and v14
   on PHP 8.2 to 8.5, and every gate runs once per core version.
   Read AGENTS.md and docs/ before writing an artifact: they hold the quality
   gates, the dual core rule, the database query rules, the class design and

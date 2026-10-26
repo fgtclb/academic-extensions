@@ -1,6 +1,6 @@
 # Backporting
 
-Most fixes made on `main` belong on the older maintained branch as well. Getting
+Most fixes made on `main` belong on the older maintained branches as well. Getting
 them there is a small research task, not a `git cherry-pick`: the two branches
 support different TYPO3 major versions, so the same defect can need a different
 patch — or, just as often, the identical one.
@@ -9,12 +9,14 @@ This page is about deciding which of the two it is, cheaply and with evidence.
 
 ## The only maintained targets
 
-| Branch | Version line | TYPO3     | PHP floor | Backport target?                       |
-|--------|--------------|-----------|-----------|----------------------------------------|
-| `main` | `3.0.0-dev`  | v13 + v14 | 8.2       | yes — where changes originate          |
-| `2`    | `2.4.x-dev`  | v12 + v13 | 8.1       | yes — the one maintained backport line |
-| `2.2`  | `2.2.x`      | —         | —         | **no** — unmaintained                  |
-| `1`    | `1.x`        | —         | —         | **no** — legacy                        |
+| Branch | Version line | TYPO3     | PHP floor | Backport target?                                           |
+|--------|--------------|-----------|-----------|------------------------------------------------------------|
+| `main` | `3.1.x-dev`  | v13 + v14 | 8.2       | yes — where changes originate                              |
+| `3.0`  | `3.0.x-dev`  | v13 + v14 | 8.2       | yes — **this branch**, bugfixes for the 3.0 patch releases |
+| `2`    | `2.5.x-dev`  | v12 + v13 | 8.1       | yes — the 2.x line                                         |
+| `2.4`  | `2.4.x-dev`  | v12 + v13 | 8.1       | yes — bugfixes for the 2.4 patch releases                  |
+| `2.2`  | `2.2.x`      | —         | —         | **no** — unmaintained                                      |
+| `1`    | `1.x`        | —         | —         | **no** — legacy                                            |
 
 The core constraints come from `packages-dev/monorepo-shared/composer.json`,
 which is where every extension's TYPO3 requirement is centralised: `main`
@@ -118,7 +120,7 @@ unchanged".
 |--------------------------|----------------------------------|----------------------------------|
 | TYPO3                    | v13 + v14                        | v12 + v13                        |
 | `runTests.sh -t` default | `13`                             | `12`                             |
-| `COMPOSER_ROOT_VERSION`  | `3.0.0-dev`                      | `2.4.0-dev`                      |
+| `COMPOSER_ROOT_VERSION`  | `3.0.1-dev`                      | `2.5.0-dev`                      |
 | PHPStan configurations   | `Build/phpstan/Core13`, `Core14` | `Build/phpstan/Core12`, `Core13` |
 | XLF indentation          | two spaces                       | tabs                             |
 | Test-helper traits       | 8                                | 4                                |
