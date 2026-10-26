@@ -139,7 +139,10 @@ files:
 # "tt_content.assets", "tx_academicjobs_domain_model_job.image" and
 # "tx_academicstudyplan_domain_model_module.audio_file" do not inherit, so the
 # German variant of each of them carries its own entry - the ones at the
-# original's uid plus 500.
+# original's uid plus 500. Those entries declare "sys_language_uid: 1": TYPO3
+# 14.3.10 gives a file reference the language of the record it hangs on, TYPO3
+# 13 leaves it at 0, and only a declared language writes the same row on both
+# (ACE-943).
 #
 # The "/legacy/" tree carries the same images as the "/" tree (ACE-460, S3-2),
 # which is what lets "LegacyDeliveryTest" compare the two trees as markup rather
@@ -316,6 +319,7 @@ references:
     values:
       title: 'Bilder aus dem Seed'
       alternative: 'Ein generierter Platzhalter'
+      sys_language_uid: 1
   - file: content-02
     table: tt_content
     uid: 538
@@ -323,6 +327,7 @@ references:
     values:
       title: 'Eindrücke vom Campus'
       alternative: 'Ein generierter Platzhalter'
+      sys_language_uid: 1
   - file: content-03
     table: tt_content
     uid: 551
@@ -330,6 +335,7 @@ references:
     values:
       title: 'Die Plattform'
       alternative: 'Ein generierter Platzhalter'
+      sys_language_uid: 1
   - file: content-04
     table: tt_content
     uid: 560
@@ -337,6 +343,7 @@ references:
     values:
       title: 'Der Verein'
       alternative: 'Ein generierter Platzhalter'
+      sys_language_uid: 1
   - file: logo-01
     table: tx_academicjobs_domain_model_job
     uid: 1
@@ -365,6 +372,7 @@ references:
     values:
       title: 'web-vision GmbH'
       alternative: 'Firmenlogo'
+      sys_language_uid: 1
   - file: logo-02
     table: tx_academicjobs_domain_model_job
     uid: 502
@@ -372,6 +380,7 @@ references:
     values:
       title: 'TYPO3 Universität'
       alternative: 'Logo der Hochschule'
+      sys_language_uid: 1
   - file: logo-03
     table: tx_academicjobs_domain_model_job
     uid: 503
@@ -379,6 +388,7 @@ references:
     values:
       title: 'TYPO3 Universität'
       alternative: 'Logo der Hochschule'
+      sys_language_uid: 1
   - file: module-audio
     table: tx_academicstudyplan_domain_model_module
     uid: 1
@@ -393,6 +403,7 @@ references:
     values:
       title: 'Programmierung I'
       alternative: 'Gesprochene Modulbeschreibung'
+      sys_language_uid: 1
 
   # The "/legacy/" mirror. Same files, same metadata, at the mirrored uids -
   # pages and "tt_content" at the original plus 1000, the four duplicated record
@@ -513,6 +524,7 @@ references:
     values:
       title: 'Bilder aus dem Seed'
       alternative: 'Ein generierter Platzhalter'
+      sys_language_uid: 1
   - file: content-02
     table: tt_content
     uid: 1538
@@ -520,6 +532,7 @@ references:
     values:
       title: 'Eindrücke vom Campus'
       alternative: 'Ein generierter Platzhalter'
+      sys_language_uid: 1
   - file: content-03
     table: tt_content
     uid: 1551
@@ -527,6 +540,7 @@ references:
     values:
       title: 'Die Plattform'
       alternative: 'Ein generierter Platzhalter'
+      sys_language_uid: 1
   - file: content-04
     table: tt_content
     uid: 1560
@@ -534,6 +548,7 @@ references:
     values:
       title: 'Der Verein'
       alternative: 'Ein generierter Platzhalter'
+      sys_language_uid: 1
   - file: module-audio
     table: tx_academicstudyplan_domain_model_module
     uid: 201
@@ -548,3 +563,4 @@ references:
     values:
       title: 'Programmierung I'
       alternative: 'Gesprochene Modulbeschreibung'
+      sys_language_uid: 1

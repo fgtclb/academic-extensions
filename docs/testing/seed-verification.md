@@ -302,6 +302,26 @@ least one of four columns on all 258 `pages` rows of the seed
 red on every v14 job, with no change in the repository (ACE-906). It moved
 columns of `tt_content` as well, which the manifest does not measure.
 
+14.3.10 moved it again, in two ways (ACE-943). It gives every inline child
+the language of its parent when the parent is created in the run, changes its
+language or gets a new child (core #103970). The 13 file references of
+translated records - content elements, jobs and study plan modules - went
+from language 0 to language 1, which is right, and TYPO3 13 still writes 0.
+The seed declares `sys_language_uid: 1` on those references in `config.yml`,
+so both versions write the same rows. And the translations of contacts,
+partnerships and contracts lost their translation parent, the contacts and
+partnerships their language too: each of them names the role, the contract
+or the organisational unit of its default language record, the import wrote
+those parents in the same run, and the core aligned every child they list.
+`sbuerk/data-factory` 2.0.2 writes the translations of a seed in a run of
+`DataHandler` after the default language, which keeps them, and three of the
+four relations keep translations out of their lists since ACE-943, see
+[Database queries](../architecture/database-queries.md). Written after their
+originals, translations get the `l10n_mode` `exclude` fields of their original
+copied, as a translation made in the backend does: translated pages and
+contracts hold `''` or `0` there now where the import left `NULL`, on both core
+versions.
+
 When a core release changes what the import writes, three things move
 together, in one change: the instance's `composer.lock` moves to that release,
 the snapshot is rebuilt from nothing with it, and the manifest is regenerated.
