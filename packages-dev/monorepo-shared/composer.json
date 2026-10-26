@@ -10,18 +10,18 @@
         }
     ],
     "require": {
-        "fgtclb/academic-base": "~2.4.1@dev",
-        "fgtclb/academic-bite-jobs": "~2.4.1@dev",
-        "fgtclb/academic-contacts4pages": "~2.4.1@dev",
-        "fgtclb/academic-jobs": "~2.4.1@dev",
-        "fgtclb/academic-partners": "~2.4.1@dev",
-        "fgtclb/academic-persons": "~2.4.1@dev",
-        "fgtclb/academic-persons-edit": "~2.4.1@dev",
-        "fgtclb/academic-persons-sync": "~2.4.1@dev",
-        "fgtclb/academic-programs": "~2.4.1@dev",
-        "fgtclb/academic-projects": "~2.4.1@dev",
-        "fgtclb/academic-study-plan": "~2.4.1@dev",
-        "fgtclb/category-types": "~2.4.1@dev",
+        "fgtclb/academic-base": "~2.5.0@dev",
+        "fgtclb/academic-bite-jobs": "~2.5.0@dev",
+        "fgtclb/academic-contacts4pages": "~2.5.0@dev",
+        "fgtclb/academic-jobs": "~2.5.0@dev",
+        "fgtclb/academic-partners": "~2.5.0@dev",
+        "fgtclb/academic-persons": "~2.5.0@dev",
+        "fgtclb/academic-persons-edit": "~2.5.0@dev",
+        "fgtclb/academic-persons-sync": "~2.5.0@dev",
+        "fgtclb/academic-programs": "~2.5.0@dev",
+        "fgtclb/academic-projects": "~2.5.0@dev",
+        "fgtclb/academic-study-plan": "~2.5.0@dev",
+        "fgtclb/category-types": "~2.5.0@dev",
         "fgtclb/environment-state-manager": "^1.0",
         "sbuerk/extended-path-repository": "^1.1.0",
         "typo3/cms-backend": "^12.4.22 || ^13.4",
@@ -74,7 +74,7 @@
     },
     "extra": {
         "typo3/cms": {
-            "version": "2.4.1-dev"
+            "version": "2.5.0-dev"
         }
     }
 }
