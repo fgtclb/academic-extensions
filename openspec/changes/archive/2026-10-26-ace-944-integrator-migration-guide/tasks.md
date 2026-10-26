@@ -16,4 +16,4 @@
 - [x] 2.4 `lintMarkdown -n` and `checkRstRenderingAll` green (render output
   removed before the lint).
 - [x] 2.5 Commit as `[DOCS] ACE-944: <subject>` in TYPO3 Core format.
-- [ ] 2.6 Archive the change as the last commit of the pull request.
+- [x] 2.6 Archive the change as the last commit of the pull request.
