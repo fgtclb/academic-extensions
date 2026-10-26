@@ -17,9 +17,9 @@
     "homepage": "https://www.fgtclb.com/",
     "require": {
         "php": "^8.2 || ^8.3 || ^8.4",
-        "fgtclb/academic-base": "~3.0.1@dev",
-        "fgtclb/academic-persons": "~3.0.1@dev",
-        "fgtclb/academic-persons-edit": "~3.0.1@dev",
+        "fgtclb/academic-base": "~3.1.0@dev",
+        "fgtclb/academic-persons": "~3.1.0@dev",
+        "fgtclb/academic-persons-edit": "~3.1.0@dev",
         "typo3/cms-core": "~13.4.35 || ~14.3.7",
         "typo3/cms-extbase": "~13.4.35 || ~14.3.7"
     },
@@ -47,13 +47,13 @@
             "web-dir": ".Build/public",
             "app-dir": ".Build",
             "extension-key": "academic_persons_sync",
-            "version": "3.0.1-dev",
+            "version": "3.1.0-dev",
             "Package": {
                 "providesPackages": []
             }
         },
         "branch-alias": {
-            "dev-main": "3.0.x-dev"
+            "dev-main": "3.1.x-dev"
         }
     }
 }
