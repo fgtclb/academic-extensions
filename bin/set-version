@@ -8,13 +8,15 @@
 # ext_emconf.php, VERSION, tailor, branch-alias, the edit branch of its
 # manual, the manual link of its README and the manual version of the links
 # from its other files into the manuals), the functional-test fixture
-# extensions, the three packages-dev packages, the ddev instances and the root
-# composer.json (monorepo-shared requirement + branch-alias).
+# extensions, the three packages-dev packages and the root composer.json
+# (monorepo-shared requirement + branch-alias). The ddev instances are left
+# alone: they require the packages-dev packages as "@dev", so a version bump
+# never contradicts their tracked composer.lock.
 #
 # The set of academic packages, their extension keys and their inter-package
 # dependencies are discovered dynamically from the repository — nothing about the
-# package list is hardcoded here. The same holds for the packages-dev packages
-# and the ddev instances, which are discovered by path.
+# package list is hardcoded here. The same holds for the packages-dev packages,
+# which are discovered by path.
 #
 # There are no path-repository version maps to maintain any more: the composer
 # plugin "sbuerk/extended-path-repository" derives a path package's version from
@@ -180,7 +182,6 @@ PKW_CMD=("${PHP}" "${PKW}")
 #   EMCONF_CONSTRAINT     -> ext_emconf.php depends/suggests (pkw constraints:set)
 #   TAILOR_VERSION        -> tailor set-version
 #   ACADEMIC_CONSTRAINT   -> composer require constraint for academic package deps
-#                            and for academics-monorepo-shared in the ddev instances
 #   ROOT_SHARED_CONSTRAINT-> composer require academics-monorepo-shared in root
 #   SET_BRANCH_ALIAS      -> extra.branch-alias, keyed and checked above
 # ---------------------------------------------------------------------------
@@ -295,13 +296,6 @@ apply_academic_composer_deps() {
     if [ "${#hard[@]}" -eq 0 ] && [ "${#soft[@]}" -eq 0 ]; then
         step "${dir}" "no academic composer dependencies"
     fi
-}
-
-# Helper: set a composer require constraint for a single package name in a dir.
-apply_single_composer_require() {
-    local dir="$1" name="$2" constraint="$3"
-    step "${dir}" "composer require ${name}:${constraint}"
-    run "${COMPOSER}" require -d "${dir}" --no-update "${name}:${constraint}"
 }
 
 # Helper: set the branch-alias for a package (or the root when dir is '.'). The
@@ -461,22 +455,7 @@ for dir in packages-dev/*/; do
 done
 
 # ---------------------------------------------------------------------------
-# 6. ddev instances: academics-monorepo-shared require.
-#
-#    Discovered by path so a new core version is picked up by adding its folder,
-#    which is what the previously hardcoded list failed to do.
-# ---------------------------------------------------------------------------
-info "ddev instances"
-for dir in core-*/; do
-    dir="${dir%/}"
-    [ -f "${dir}/composer.json" ] || continue
-    info "${dir}"
-    apply_single_composer_require "${dir}" \
-        "fgtclb/academics-monorepo-shared" "${ACADEMIC_CONSTRAINT}"
-done
-
-# ---------------------------------------------------------------------------
-# 7. root composer.json: monorepo-shared require + branch alias.
+# 6. root composer.json: monorepo-shared require + branch alias.
 # ---------------------------------------------------------------------------
 info "root composer.json"
 step "." "composer require fgtclb/academics-monorepo-shared:${ROOT_SHARED_CONSTRAINT}"

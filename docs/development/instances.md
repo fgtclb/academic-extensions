@@ -24,6 +24,17 @@ container at all (`omit_containers: [db]`), and `config/system/additional.php`
 copies the committed template from `sqlite-databases/` into `var/sqlite/` when
 the database is missing. Check out, start, log in.
 
+Every start runs two hooks of `.ddev/config.yaml`. `composer install` brings
+`vendor/` to the tracked `composer.lock`, which requires the packages of this
+repository as `@dev`, so a version bump never stops it, see
+[Releasing](../workflow/releasing.md). Then `typo3 cache:flush` empties the
+caches, because they outlive the code they were built from: after a release, a
+pull or a branch switch, a stale dependency injection container ends a plugin
+with an `ArgumentCountError`, and a stale page cache links files that are gone.
+The flush runs only when `var/sqlite/` holds the database. While an instance is
+rebuilt from nothing the seeding is suppressed, and a TYPO3 command would leave
+an empty database file behind.
+
 **Switching branches in one checkout collides.** The instance directories have
 the same path on every branch but the DDEV project names differ per version line
 (`core13-academics-v3` on `main`, `core13-academics-v2` on `2`), and DDEV refuses
