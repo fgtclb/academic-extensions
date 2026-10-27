@@ -5,8 +5,8 @@ database, no site, no request. Everything the subject needs is passed to it or
 stubbed. That makes the suite fast enough to run on every save, and it makes a
 failure point at one class instead of at a stack.
 
-There are 115 unit test classes: 95 across the twelve extensions, four in
-`packages-dev/dev-site`, nine in `packages-dev/monorepo-shared` and seven in
+There are 116 unit test classes: 95 across the twelve extensions, four in
+`packages-dev/dev-site`, ten in `packages-dev/monorepo-shared` and seven in
 `packages-dev/testing-helper`. Twelve of them are the one-line version
 compatibility test every extension carries (see
 [below](#the-version-compatibility-test)). Measured with
@@ -102,9 +102,11 @@ check of the link table of every package README, see
 package files into the manuals, see
 [below](#the-links-into-the-manuals-of-the-repository), the check of the form
 `bin/set-version` writes, see
-[below](#the-form-binset-version-writes), and the check that every inline event
-handler of a template is allowed by the Content Security Policy of its
-extension, see [below](#inline-event-handlers).
+[below](#the-form-binset-version-writes), the check that the development
+instances require the packages of the repository as `@dev`, see
+[below](#the-requirements-of-the-development-instances), and the check that
+every inline event handler of a template is allowed by the Content Security
+Policy of its extension, see [below](#inline-event-handlers).
 
 **Test classes are autoloaded, not included.** Each extension registers its own
 `Tests/` namespace as `autoload-dev`, for example
@@ -488,6 +490,21 @@ container, so the pre-release checklist asks for that run, see
 runs `Build/Scripts/readmeManualLink.php --check`, and the link check
 `Build/Scripts/manualLinkVersion.php --check`, each with the branch of the root
 branch alias and the package's `VERSION`. They need nothing but PHP.
+
+## The requirements of the development instances
+
+[`DevelopmentInstanceRequirementTest`](../../packages-dev/monorepo-shared/Tests/Unit/DevelopmentInstanceRequirementTest.php)
+asserts that every `core-*/composer.json` requires each package of the
+repository it names, from `packages/fgtclb/` or `packages-dev/`, as `@dev`, and
+that every instance names at least one, so the check covers each of them.
+
+The instances track their `composer.lock`, and `ddev start` runs
+`composer install` on it. Composer refuses that when a locked package no longer
+satisfies a requirement of the root, and nothing refreshes the locks on a
+version bump: that needs composer, the network and the path repository plugin
+of the instance, while `bin/set-version` only edits files. With a pinned
+requirement the first start after the 2.4.0 release failed, see
+[Releasing](../workflow/releasing.md).
 
 ## Inline event handlers
 
