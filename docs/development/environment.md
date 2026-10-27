@@ -912,14 +912,21 @@ Two things can stop `ddev start` before the rebuild even begins:
   ```
 
 * **The lock file is stale.** `ddev start` runs `composer install` as a
-  post-start hook, and that refuses to run when `composer.json` has changed
-  since `composer.lock` was written — which is exactly the case right after a
-  dependency was added, removed or bumped. Refresh the lock first, naming the
-  package so nothing else moves:
+  post-start hook. A changed `composer.json` only earns a warning, but the
+  install refuses to run when a requirement is missing from `composer.lock` or
+  a locked package no longer satisfies it, which is the case right after a
+  dependency was added or bumped. Refresh the lock first, naming the package so
+  nothing else moves:
 
   ```shell
   ddev composer update <vendor>/<package>
   ```
+
+  The versions of the path packages come from the plugin
+  `sbuerk/extended-path-repository`, which composer loads from `vendor/` only.
+  With an empty `vendor/` they are written as `dev-main`, or the update fails
+  on the constraints between them, so run `ddev composer install` first while
+  the old lock still installs.
 
 Then install TYPO3 into the empty instance. **`extension:setup` cannot do this**
 — it authenticates a backend user before it does anything else, so against a
