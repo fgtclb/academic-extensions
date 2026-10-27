@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "1ce6520685db19ca0a8cf292f698cf3a",
+    "content-hash": "8f088021be8e4910704122725818bff3",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -939,11 +939,11 @@
         },
         {
             "name": "fgtclb/academic-base",
-            "version": "3.0.0-dev",
+            "version": "3.0.1-dev",
             "dist": {
                 "type": "path",
                 "url": "../packages/fgtclb/academic-base",
-                "reference": "a0a00e051ecb9e6de7940e49b4ac41b3a48eda5b"
+                "reference": "5703b4ee826b2fb4e4902509e320167b0df3c4dd"
             },
             "require": {
                 "fgtclb/environment-state-manager": "^2.0.1",
@@ -957,13 +957,13 @@
             "extra": {
                 "typo3/cms": {
                     "extension-key": "academic_base",
-                    "version": "3.0.0-dev",
+                    "version": "3.0.1-dev",
                     "Package": {
                         "providesPackages": []
                     }
                 },
                 "branch-alias": {
-                    "dev-main": "3.0.x-dev"
+                    "3.0.x-dev": "3.0.x-dev"
                 },
                 "sbuerk/release": {
                     "tailor": {
@@ -994,14 +994,14 @@
         },
         {
             "name": "fgtclb/academic-bite-jobs",
-            "version": "3.0.0-dev",
+            "version": "3.0.1-dev",
             "dist": {
                 "type": "path",
                 "url": "../packages/fgtclb/academic-bite-jobs",
-                "reference": "8a4b1f8e43bd2845ea621f49fadab7465b0c1239"
+                "reference": "b23a0e8e28be07ee086a387cefaf91a01e78ce6d"
             },
             "require": {
-                "fgtclb/academic-base": "~3.0.0@dev",
+                "fgtclb/academic-base": "~3.0.1@dev",
                 "php": "^8.2 || ^8.3 || ^8.4",
                 "typo3/cms-core": "~13.4.35 || ~14.3.7",
                 "typo3/cms-install": "~13.4.35 || ~14.3.7"
@@ -1015,13 +1015,13 @@
                     "web-dir": ".Build/Web",
                     "app-dir": ".Build",
                     "extension-key": "academic_bite_jobs",
-                    "version": "3.0.0-dev",
+                    "version": "3.0.1-dev",
                     "Package": {
                         "providesPackages": []
                     }
                 },
                 "branch-alias": {
-                    "dev-main": "3.0.x-dev"
+                    "3.0.x-dev": "3.0.x-dev"
                 }
             },
             "autoload": {
@@ -1056,15 +1056,15 @@
         },
         {
             "name": "fgtclb/academic-contacts4pages",
-            "version": "3.0.0-dev",
+            "version": "3.0.1-dev",
             "dist": {
                 "type": "path",
                 "url": "../packages/fgtclb/academic-contact4pages",
-                "reference": "ae06db2a63a048daec9c76628becde74c6deb8e9"
+                "reference": "7f6fa028049f2141e5583a6492d1a344fe49b84a"
             },
             "require": {
-                "fgtclb/academic-base": "~3.0.0@dev",
-                "fgtclb/academic-persons": "~3.0.0@dev",
+                "fgtclb/academic-base": "~3.0.1@dev",
+                "fgtclb/academic-persons": "~3.0.1@dev",
                 "php": "^8.2 || ^8.3 || ^8.4",
                 "typo3/cms-core": "~13.4.35 || ~14.3.7",
                 "typo3/cms-install": "~13.4.35 || ~14.3.7"
@@ -1076,13 +1076,13 @@
             "extra": {
                 "typo3/cms": {
                     "extension-key": "academic_contacts4pages",
-                    "version": "3.0.0-dev",
+                    "version": "3.0.1-dev",
                     "Package": {
                         "providesPackages": []
                     }
                 },
                 "branch-alias": {
-                    "dev-main": "3.0.x-dev"
+                    "3.0.x-dev": "3.0.x-dev"
                 }
             },
             "autoload": {
@@ -1117,14 +1117,14 @@
         },
         {
             "name": "fgtclb/academic-jobs",
-            "version": "3.0.0-dev",
+            "version": "3.0.1-dev",
             "dist": {
                 "type": "path",
                 "url": "../packages/fgtclb/academic-jobs",
-                "reference": "aaa5d6f4c6a7568e23e071af554603adedc47026"
+                "reference": "f18ced27d79480c95e71800df0dbc072dc206088"
             },
             "require": {
-                "fgtclb/academic-base": "~3.0.0@dev",
+                "fgtclb/academic-base": "~3.0.1@dev",
                 "php": "^8.2 || ^8.3 || ^8.4",
                 "typo3/cms-core": "~13.4.35 || ~14.3.7",
                 "typo3/cms-fluid-styled-content": "~13.4.35 || ~14.3.7",
@@ -1146,7 +1146,7 @@
                     "web-dir": ".Build/Web",
                     "app-dir": ".Build",
                     "extension-key": "academic_jobs",
-                    "version": "3.0.0-dev",
+                    "version": "3.0.1-dev",
                     "Package": {
                         "providesPackages": []
                     }
@@ -1157,7 +1157,7 @@
                     ]
                 },
                 "branch-alias": {
-                    "dev-main": "3.0.x-dev"
+                    "3.0.x-dev": "3.0.x-dev"
                 }
             },
             "autoload": {
@@ -1195,15 +1195,15 @@
         },
         {
             "name": "fgtclb/academic-partners",
-            "version": "3.0.0-dev",
+            "version": "3.0.1-dev",
             "dist": {
                 "type": "path",
                 "url": "../packages/fgtclb/academic-partners",
-                "reference": "83141b1e2217b072f7ee8ec63c301a14d7f5b0ed"
+                "reference": "5ffa081526da32f5c957eea340e04c8cb3f8a07d"
             },
             "require": {
-                "fgtclb/academic-base": "~3.0.0@dev",
-                "fgtclb/category-types": "~3.0.0@dev",
+                "fgtclb/academic-base": "~3.0.1@dev",
+                "fgtclb/category-types": "~3.0.1@dev",
                 "php": "^8.2 || ^8.3 || ^8.4",
                 "typo3/cms-backend": "~13.4.35 || ~14.3.7",
                 "typo3/cms-core": "~13.4.35 || ~14.3.7",
@@ -1232,13 +1232,13 @@
                     "ignore-as-root": false,
                     "web-dir": ".Build/public",
                     "app-dir": ".Build",
-                    "version": "3.0.0-dev",
+                    "version": "3.0.1-dev",
                     "Package": {
                         "providesPackages": []
                     }
                 },
                 "branch-alias": {
-                    "dev-main": "3.0.x-dev"
+                    "3.0.x-dev": "3.0.x-dev"
                 }
             },
             "autoload": {
@@ -1273,14 +1273,14 @@
         },
         {
             "name": "fgtclb/academic-persons",
-            "version": "3.0.0-dev",
+            "version": "3.0.1-dev",
             "dist": {
                 "type": "path",
                 "url": "../packages/fgtclb/academic-persons",
-                "reference": "117fb4443eb5f69504624e7ac9683625e7fd0980"
+                "reference": "62879a558d62f0caeaf7ff88c334c93eec64dd5d"
             },
             "require": {
-                "fgtclb/academic-base": "~3.0.0@dev",
+                "fgtclb/academic-base": "~3.0.1@dev",
                 "fgtclb/environment-state-manager": "^2.0.1",
                 "php": "^8.2 || ^8.3 || ^8.4",
                 "typo3/cms-core": "~13.4.35 || ~14.3.7",
@@ -1303,13 +1303,13 @@
                     "web-dir": ".Build/Web",
                     "app-dir": ".Build",
                     "extension-key": "academic_persons",
-                    "version": "3.0.0-dev",
+                    "version": "3.0.1-dev",
                     "Package": {
                         "providesPackages": []
                     }
                 },
                 "branch-alias": {
-                    "dev-main": "3.0.x-dev"
+                    "3.0.x-dev": "3.0.x-dev"
                 }
             },
             "autoload": {
@@ -1347,15 +1347,15 @@
         },
         {
             "name": "fgtclb/academic-persons-edit",
-            "version": "3.0.0-dev",
+            "version": "3.0.1-dev",
             "dist": {
                 "type": "path",
                 "url": "../packages/fgtclb/academic-persons-edit",
-                "reference": "0a5ac119641849fdb3b8f8bd1c5b03a0733f90f0"
+                "reference": "8490744a91e3e9738134a22d59813440ce76e171"
             },
             "require": {
-                "fgtclb/academic-base": "~3.0.0@dev",
-                "fgtclb/academic-persons": "~3.0.0@dev",
+                "fgtclb/academic-base": "~3.0.1@dev",
+                "fgtclb/academic-persons": "~3.0.1@dev",
                 "php": "^8.2 || ^8.3 || ^8.4",
                 "typo3/cms-core": "~13.4.35 || ~14.3.7",
                 "typo3/cms-install": "~13.4.35 || ~14.3.7",
@@ -1371,13 +1371,13 @@
                     "web-dir": ".Build/Web",
                     "app-dir": ".Build",
                     "extension-key": "academic_persons_edit",
-                    "version": "3.0.0-dev",
+                    "version": "3.0.1-dev",
                     "Package": {
                         "providesPackages": []
                     }
                 },
                 "branch-alias": {
-                    "dev-main": "3.0.x-dev"
+                    "3.0.x-dev": "3.0.x-dev"
                 }
             },
             "autoload": {
@@ -1412,16 +1412,16 @@
         },
         {
             "name": "fgtclb/academic-persons-sync",
-            "version": "3.0.0-dev",
+            "version": "3.0.1-dev",
             "dist": {
                 "type": "path",
                 "url": "../packages/fgtclb/academic-persons-sync",
-                "reference": "7edd2bd8408ea3a724107aefec6dd98477b12012"
+                "reference": "43c42c1b06daae3c4acfb565db135a10c8e4c6ab"
             },
             "require": {
-                "fgtclb/academic-base": "~3.0.0@dev",
-                "fgtclb/academic-persons": "~3.0.0@dev",
-                "fgtclb/academic-persons-edit": "~3.0.0@dev",
+                "fgtclb/academic-base": "~3.0.1@dev",
+                "fgtclb/academic-persons": "~3.0.1@dev",
+                "fgtclb/academic-persons-edit": "~3.0.1@dev",
                 "php": "^8.2 || ^8.3 || ^8.4",
                 "typo3/cms-core": "~13.4.35 || ~14.3.7",
                 "typo3/cms-extbase": "~13.4.35 || ~14.3.7"
@@ -1435,13 +1435,13 @@
                     "web-dir": ".Build/public",
                     "app-dir": ".Build",
                     "extension-key": "academic_persons_sync",
-                    "version": "3.0.0-dev",
+                    "version": "3.0.1-dev",
                     "Package": {
                         "providesPackages": []
                     }
                 },
                 "branch-alias": {
-                    "dev-main": "3.0.x-dev"
+                    "3.0.x-dev": "3.0.x-dev"
                 }
             },
             "autoload": {
@@ -1476,15 +1476,15 @@
         },
         {
             "name": "fgtclb/academic-programs",
-            "version": "3.0.0-dev",
+            "version": "3.0.1-dev",
             "dist": {
                 "type": "path",
                 "url": "../packages/fgtclb/academic-programs",
-                "reference": "072a37b191dd1a9d87b351126b7f03b469602316"
+                "reference": "f366b2a374fc1daff07b39a222b581d3e75d7bbd"
             },
             "require": {
-                "fgtclb/academic-base": "~3.0.0@dev",
-                "fgtclb/category-types": "~3.0.0@dev",
+                "fgtclb/academic-base": "~3.0.1@dev",
+                "fgtclb/category-types": "~3.0.1@dev",
                 "php": "^8.2 || ^8.3 || ^8.4",
                 "typo3/cms-backend": "~13.4.35 || ~14.3.7",
                 "typo3/cms-core": "~13.4.35 || ~14.3.7",
@@ -1510,13 +1510,13 @@
                     "ignore-as-root": false,
                     "web-dir": ".Build/public",
                     "app-dir": ".Build",
-                    "version": "3.0.0-dev",
+                    "version": "3.0.1-dev",
                     "Package": {
                         "providesPackages": []
                     }
                 },
                 "branch-alias": {
-                    "dev-main": "3.0.x-dev"
+                    "3.0.x-dev": "3.0.x-dev"
                 }
             },
             "autoload": {
@@ -1551,15 +1551,15 @@
         },
         {
             "name": "fgtclb/academic-projects",
-            "version": "3.0.0-dev",
+            "version": "3.0.1-dev",
             "dist": {
                 "type": "path",
                 "url": "../packages/fgtclb/academic-projects",
-                "reference": "7ea5dc2bdc6de5682b425bca7b4740f972f08c84"
+                "reference": "4624afd23a6fe3c53b8b4880b6cb297ae659766c"
             },
             "require": {
-                "fgtclb/academic-base": "~3.0.0@dev",
-                "fgtclb/category-types": "~3.0.0@dev",
+                "fgtclb/academic-base": "~3.0.1@dev",
+                "fgtclb/category-types": "~3.0.1@dev",
                 "php": "^8.2 || ^8.3 || ^8.4",
                 "typo3/cms-backend": "~13.4.35 || ~14.3.7",
                 "typo3/cms-core": "~13.4.35 || ~14.3.7",
@@ -1579,13 +1579,13 @@
                     "web-dir": ".Build/Web",
                     "app-dir": ".Build",
                     "extension-key": "academic_projects",
-                    "version": "3.0.0-dev",
+                    "version": "3.0.1-dev",
                     "Package": {
                         "providesPackages": []
                     }
                 },
                 "branch-alias": {
-                    "dev-main": "3.0.x-dev"
+                    "3.0.x-dev": "3.0.x-dev"
                 }
             },
             "autoload": {
@@ -1620,14 +1620,14 @@
         },
         {
             "name": "fgtclb/academic-study-plan",
-            "version": "3.0.0-dev",
+            "version": "3.0.1-dev",
             "dist": {
                 "type": "path",
                 "url": "../packages/fgtclb/academic-study-plan",
-                "reference": "efd43d020dc0e1c7477e8f2aeb5615258125c217"
+                "reference": "22a8354f5d589274279bae6c0415f45cd4d95f63"
             },
             "require": {
-                "fgtclb/academic-base": "~3.0.0@dev",
+                "fgtclb/academic-base": "~3.0.1@dev",
                 "php": "^8.2 || ^8.3 || ^8.4",
                 "typo3/cms-backend": "~13.4.35 || ~14.3.7",
                 "typo3/cms-core": "~13.4.35 || ~14.3.7",
@@ -1644,13 +1644,13 @@
                     "web-dir": ".Build/Web",
                     "app-dir": ".Build",
                     "extension-key": "academic_study_plan",
-                    "version": "3.0.0-dev",
+                    "version": "3.0.1-dev",
                     "Package": {
                         "providesPackages": []
                     }
                 },
                 "branch-alias": {
-                    "dev-main": "3.0.x-dev"
+                    "3.0.x-dev": "3.0.x-dev"
                 }
             },
             "autoload": {
@@ -1685,14 +1685,14 @@
         },
         {
             "name": "fgtclb/academics-monorepo-dev-site",
-            "version": "3.0.0-dev",
+            "version": "3.0.1-dev",
             "dist": {
                 "type": "path",
                 "url": "../packages-dev/dev-site",
-                "reference": "9bace458f7cbba9bbd467ac2adfa25ffa5f66a71"
+                "reference": "1301b320d7b8d19c2695f61008a93318e8f5ebb6"
             },
             "require": {
-                "fgtclb/academic-base": "~3.0.0@dev",
+                "fgtclb/academic-base": "~3.0.1@dev",
                 "php": "^8.2 || ^8.3 || ^8.4",
                 "typo3/cms-core": "~13.4.35 || ~14.3.7",
                 "typo3/cms-fluid": "~13.4.35 || ~14.3.7",
@@ -1702,7 +1702,7 @@
             "extra": {
                 "typo3/cms": {
                     "extension-key": "academics_dev_site",
-                    "version": "3.0.0-dev"
+                    "version": "3.0.1-dev"
                 }
             },
             "autoload": {
@@ -1741,25 +1741,25 @@
         },
         {
             "name": "fgtclb/academics-monorepo-shared",
-            "version": "3.0.0-dev",
+            "version": "3.0.1-dev",
             "dist": {
                 "type": "path",
                 "url": "../packages-dev/monorepo-shared",
-                "reference": "f01ca2e0a6612896317752f64ead4fb18818f095"
+                "reference": "77fc6e4e9849dc9fc8d4b8343ec409a19e8a4c0e"
             },
             "require": {
-                "fgtclb/academic-base": "~3.0.0@dev",
-                "fgtclb/academic-bite-jobs": "~3.0.0@dev",
-                "fgtclb/academic-contacts4pages": "~3.0.0@dev",
-                "fgtclb/academic-jobs": "~3.0.0@dev",
-                "fgtclb/academic-partners": "~3.0.0@dev",
-                "fgtclb/academic-persons": "~3.0.0@dev",
-                "fgtclb/academic-persons-edit": "~3.0.0@dev",
-                "fgtclb/academic-persons-sync": "~3.0.0@dev",
-                "fgtclb/academic-programs": "~3.0.0@dev",
-                "fgtclb/academic-projects": "~3.0.0@dev",
-                "fgtclb/academic-study-plan": "~3.0.0@dev",
-                "fgtclb/category-types": "~3.0.0@dev",
+                "fgtclb/academic-base": "~3.0.1@dev",
+                "fgtclb/academic-bite-jobs": "~3.0.1@dev",
+                "fgtclb/academic-contacts4pages": "~3.0.1@dev",
+                "fgtclb/academic-jobs": "~3.0.1@dev",
+                "fgtclb/academic-partners": "~3.0.1@dev",
+                "fgtclb/academic-persons": "~3.0.1@dev",
+                "fgtclb/academic-persons-edit": "~3.0.1@dev",
+                "fgtclb/academic-persons-sync": "~3.0.1@dev",
+                "fgtclb/academic-programs": "~3.0.1@dev",
+                "fgtclb/academic-projects": "~3.0.1@dev",
+                "fgtclb/academic-study-plan": "~3.0.1@dev",
+                "fgtclb/category-types": "~3.0.1@dev",
                 "fgtclb/environment-state-manager": "^2.0.1",
                 "sbuerk/extended-path-repository": "^1.1.0",
                 "typo3/cms-backend": "~13.4.35 || ~14.3.7",
@@ -1790,7 +1790,7 @@
             "type": "library",
             "extra": {
                 "typo3/cms": {
-                    "version": "3.0.0-dev"
+                    "version": "3.0.1-dev"
                 }
             },
             "autoload-dev": {
@@ -1820,14 +1820,14 @@
         },
         {
             "name": "fgtclb/category-types",
-            "version": "3.0.0-dev",
+            "version": "3.0.1-dev",
             "dist": {
                 "type": "path",
                 "url": "../packages/fgtclb/typo3-category-types",
-                "reference": "383dd977d9e83eec7df737ccc412c3a922e6afb2"
+                "reference": "5c4d7a9245522ad58e614abdf4937bee08782d71"
             },
             "require": {
-                "fgtclb/academic-base": "~3.0.0@dev",
+                "fgtclb/academic-base": "~3.0.1@dev",
                 "php": "^8.2 || ^8.3 || ^8.4",
                 "typo3/cms-core": "~13.4.35 || ~14.3.7"
             },
@@ -1842,14 +1842,14 @@
                     "ignore-as-root": false,
                     "web-dir": ".Build/Web",
                     "app-dir": ".Build",
-                    "version": "3.0.0-dev",
+                    "version": "3.0.1-dev",
                     "Package": {
                         "serviceProvider": "FGTCLB\\CategoryTypes\\ServiceProvider",
                         "providesPackages": []
                     }
                 },
                 "branch-alias": {
-                    "dev-main": "3.0.x-dev"
+                    "3.0.x-dev": "3.0.x-dev"
                 }
             },
             "autoload": {
