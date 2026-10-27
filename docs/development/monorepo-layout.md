@@ -99,8 +99,9 @@ rather than code, and how that content is applied is described in
 `bin/set-version <version> <type>` applies a version across the whole
 repository: every extension's `composer.json`, `ext_emconf.php`, `VERSION` file
 and tailor metadata, the functional-test fixture extensions, the three
-`packages-dev` packages, the development instances, the root `composer.json`
-and the `COMPOSER_ROOT_VERSION` assignment in `runTests.sh`. It discovers the
+`packages-dev` packages, the root `composer.json` and the
+`COMPOSER_ROOT_VERSION` assignment in `runTests.sh`. It leaves the development
+instances alone, they require the `packages-dev` packages as `@dev`. It discovers the
 package list from the repository rather than carrying one, so a new extension
 needs no change there. It only edits files; it runs no git and no
 network operation.

@@ -61,11 +61,11 @@ bin/set-version <version> <type> [--source-branch=<name>] [--dry-run]
 ```
 
 It edits working-tree files and does **nothing else**: no git, no network
-(`bin/set-version:48-49`). That separation is what makes it safe to run and
+(`bin/set-version:50-51`). That separation is what makes it safe to run and
 inspect on its own.
 
 `<version>` is always a bare `MAJOR.MINOR.PATCH`; the `-dev` suffixes are
-derived, never passed. `<type>` decides how (`bin/set-version:188-212`):
+derived, never passed. `<type>` decides how (`bin/set-version:189-213`):
 
 | Type           | Package version | `ext_emconf` | Academic dependency constraint | Branch alias |
 |----------------|-----------------|--------------|--------------------------------|--------------|
@@ -73,12 +73,12 @@ derived, never passed. `<type>` decides how (`bin/set-version:188-212`):
 | `post-release` | `X.Y.Z-dev`     | `X.Y.Z`      | `~X.Y.Z@dev`                   | `X.Y.x-dev`  |
 | `dev`          | `X.Y.Z-dev`     | `X.Y.Z`      | `~X.Y.Z@dev`                   | `X.Y.x-dev`  |
 
-`post-release` and `dev` share one derivation (`bin/set-version:199-212`); `dev`
+`post-release` and `dev` share one derivation (`bin/set-version:200-213`); `dev`
 is the thin variant used for branching and forced minor or major bumps.
 `post-release` does **not** increment anything — the version passed is already
 the next one.
 
-What one run rewrites, in order (`bin/set-version:386-485`):
+What one run rewrites, in order (`bin/set-version:380-464`):
 
 1. `Build/Scripts/runTests.sh` → `COMPOSER_ROOT_VERSION`
 2. every split extension → academic composer dependencies,
@@ -90,23 +90,28 @@ What one run rewrites, in order (`bin/set-version:386-485`):
 4. every `ext_emconf.php` (splits **and** fixtures) → `version`, plus the
    `depends`/`suggests` constraints for each academic extension key
 5. `packages-dev/*` → academic dependencies, `extra.typo3/cms.version`, `VERSION`
-6. `core-*/` development instances → the `academics-monorepo-shared` requirement
-   (`core-12/` and `core-13/` here)
-7. root `composer.json` → the `academics-monorepo-shared` requirement and the
+6. root `composer.json` → the `academics-monorepo-shared` requirement and the
    branch alias
+
+The `core-12/` and `core-13/` development instances are not on the list. They
+require the `packages-dev` packages as `@dev`, so no version a run writes can
+contradict their tracked `composer.lock`, and `composer install` on
+`ddev start` keeps working after a release. A pinned requirement there made the
+first start after the 2.4.0 release fail, because nothing refreshes those locks
+on a version bump. Their locked path package versions therefore trail the
+packages until a lock is updated for another reason, which changes nothing: the
+path packages are symlinked, so an instance always runs the code of its
+checkout.
 
 Nothing in that list is hardcoded. The package set is discovered by looking for
 directories under `packages/fgtclb/*/` that carry both a `composer.json` and an
-`ext_emconf.php` (`bin/set-version:230-241`); the extension key is read from
+`ext_emconf.php` (`bin/set-version:231-242`); the extension key is read from
 `extra.typo3/cms.extension-key`, never guessed from the directory name; fixture
 extensions are found under `Tests/Functional/Fixtures/Extensions`
-(`bin/set-version:246-251`); the `packages-dev` packages and the development
-instances are discovered by path, `for dir in packages-dev/*/`
-(`bin/set-version:455`) and `for dir in core-*/` (`bin/set-version:470`). A
-thirteenth extension, a fourth `packages-dev` package or a `core-14` instance is
-picked up by existing, which is precisely what the previously hardcoded instance
-list failed to do — and is how `packages-dev/dev-site/` was versioned correctly
-the moment it was added.
+(`bin/set-version:247-252`); the `packages-dev` packages are discovered by
+path, `for dir in packages-dev/*/` (`bin/set-version:449`). A thirteenth
+extension or a fourth `packages-dev` package is picked up by existing, which is
+how `packages-dev/dev-site/` was versioned correctly the moment it was added.
 
 A run with the version the branch already carries changes nothing. The tools
 it calls regenerate what they touch: packwright writes `ext_emconf.php` from
@@ -118,12 +123,12 @@ one drifts from it, see
 
 `--dry-run` prints every change without touching a file and is the way to
 rehearse a bump. `--source-branch=<name>` names the branch the version is
-applied on. **On this branch it defaults to `2`** (`bin/set-version:89`), which
+applied on. **On this branch it defaults to `2`** (`bin/set-version:91`), which
 is what a `2.x` release wants, so the flag is not needed here.
 
 The branch alias is keyed to the version name composer gives that branch:
 `2.x-dev` for `2`, `dev-main` for `main`, `2.2.x-dev` for `2.2`.
-`Build/Scripts/composerBranchVersion.sh` prints it (`bin/set-version:129-146`).
+`Build/Scripts/composerBranchVersion.sh` prints it (`bin/set-version:131-148`).
 Composer applies an alias only under that key and skips any other without a
 word, and `composer validate --strict` accepts it as well. This branch carried
 `dev-2` from its cut until ACE-784, so `2.4.x-dev` did not exist and no split
@@ -232,8 +237,8 @@ Pre-flight (`bin/release:178-200`):
 
 Tooling is resolved and verified up front, before anything changes:
 `bin/set-version` needs `composer`, `php`, `tailor`, `pkw`, `jq` and `sed` on
-`PATH` (`bin/set-version:160-166`); `bin/release` additionally needs `git` and an
-authenticated `gh` (`bin/release:153-162`).
+`PATH` (`bin/set-version:162-168`); `bin/release` additionally needs `git` and an
+authenticated `gh` (`bin/release:154-162`).
 
 ## `bin/cut-branch`: cut a version branch
 

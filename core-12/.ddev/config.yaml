@@ -24,3 +24,10 @@ hooks:
         # packages that may come from private VCS remotes.
         - exec-host: ddev auth ssh
         - composer: install
+        # The caches outlive the code they were built from: after a release, a
+        # branch switch or a pull, the dependency injection container and the
+        # page cache still describe the previous state, which shows as a fatal
+        # error or a page linking files that are gone. Only with a database:
+        # while an instance is rebuilt from nothing the seeding is suppressed,
+        # and a TYPO3 command would then leave an empty database file behind.
+        - exec: '[ ! -f var/sqlite/core-12.sqlite ] || vendor/bin/typo3 cache:flush'
